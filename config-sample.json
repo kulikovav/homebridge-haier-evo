@@ -1,0 +1,34 @@
+{
+  "bridge": {
+    "name": "Homebridge",
+    "username": "CC:22:3D:E3:CE:30",
+    "port": 51826,
+    "pin": "031-45-154"
+  },
+  "accessories": [],
+  "platforms": [
+    {
+      "platform": "homebridge-haier-evo",
+      "name": "Haier Evo",
+      "email": "your-email@example.com",
+      "password": "your-password",
+      "region": "ru",
+      "refreshInterval": 300,
+      "debug": false,
+
+      "_comment_api": "API optimization options (all are optional)",
+      "deviceCacheTTL": 300,
+      "requestRandomization": true,
+      "minRequestDelay": 100,
+      "maxRequestDelay": 1000,
+
+      "_comment": "Device filtering options (all are optional)",
+      "includeDevices": ["device-id-1", "device-id-2"],
+      "excludeDevices": ["device-id-3"],
+      "includeDeviceTypes": ["air_conditioner"],
+      "excludeDeviceTypes": ["refrigerator"],
+      "includeNamePattern": "Living Room|Kitchen",
+      "excludeNamePattern": "Basement"
+    }
+  ]
+}
