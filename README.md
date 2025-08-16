@@ -1,7 +1,7 @@
 # Homebridge Haier Evo Plugin
 
 [![npm version](https://badge.fury.io/js/homebridge-haier-evo.svg)](https://www.npmjs.com/package/homebridge-haier-evo)
-[![GitHub Actions](https://github.com/haier-evo/homebridge-haier-evo/workflows/Node.js%20Package/badge.svg)](https://github.com/haier-evo/homebridge-haier-evo/actions)
+[![GitHub Actions](https://github.com/kulikovav/homebridge-haier-evo/workflows/Node.js%20Package/badge.svg)](https://github.com/kulikovav/homebridge-haier-evo/actions)
 
 A Homebridge plugin that integrates Haier Evo devices (air conditioners, refrigerators, etc.) with Apple HomeKit.
 
