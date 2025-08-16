@@ -44,4 +44,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.9] - 2025-08-16
 - Update CHANGELOG and README for versioning and repository ownership changes
 
+## [1.0.46] - 2025-08-16
+
+## [1.0.46] - 2025-08-16
+
+## [1.0.46] - 2025-08-16
+
+## [1.0.46] - 2025-08-16
+
 ## [Unreleased]
