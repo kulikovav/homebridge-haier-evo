@@ -132,7 +132,11 @@ jobs:
           git commit -m "Bump version to ${{ env.VERSION }}"
 
       - name: Create tag
-        run: git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
+        run: |
+          # Check if tag already exists
+          if ! git tag -l "v${{ env.VERSION }}"; then
+            git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
+          fi
 
       - name: Push changes and tags
         run: |
