@@ -61,13 +61,10 @@ jobs:
         id: bump_version
         run: |
           # Bump version according to input
-          VERSION=$(npm version ${{ github.event.inputs.version }} --no-git-tag-version)
+          VERSION=$(npm version ${{ github.event.inputs.version }} --no-git-tag-version | sed 's/^"//;s/"$//' | sed 's/^v//')
 
-          # Remove quotes from version
-          CLEAN_VERSION=$(echo $VERSION | sed 's/^"//;s/"$//')
-
-          echo "VERSION=$CLEAN_VERSION" >> $GITHUB_ENV
-          echo "version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Update changelog
         run: |

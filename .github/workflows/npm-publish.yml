@@ -93,11 +93,8 @@ jobs:
       - name: Bump version (from workflow dispatch)
         if: github.event_name == 'workflow_dispatch'
         run: |
-          # Bump version according to input
-          VERSION=$(npm version ${{ github.event.inputs.version }} --no-git-tag-version)
-
-          # Remove quotes from version
-          CLEAN_VERSION=$(echo $VERSION | sed 's/^"//;s/"$//')
+          # Bump version according to input and remove v prefix if present
+          VERSION=$(npm version ${{ github.event.inputs.version }} --no-git-tag-version | sed 's/^"//;s/"$//' | sed 's/^v//')
 
           echo "VERSION=$CLEAN_VERSION" >> $GITHUB_ENV
 
