@@ -106,11 +106,15 @@ jobs:
             # Create a temporary file
             TEMP_FILE=$(mktemp)
 
+            CURRENT_VERSION=$(git describe --abbrev=0 --tags)
+
             # Process the changelog
             while IFS= read -r line; do
               if [[ "$line" == "## [Unreleased]" ]]; then
                 # Add the new version header
                 echo "## [${{ env.VERSION }}] - $CURRENT_DATE" >> "$TEMP_FILE"
+                # Generate release notes from commit messages since previous version
+                git log --pretty=format:"- %s" $CURRENT_VERSION..HEAD | egrep -v "(Merge pull request|Merge branch|Bump version)" >> "$TEMP_FILE"
                 echo "" >> "$TEMP_FILE"
                 echo "## [Unreleased]" >> "$TEMP_FILE"
               else

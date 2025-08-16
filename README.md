@@ -404,21 +404,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you need help or have questions:
 
 1. Check the [troubleshooting section](#troubleshooting)
-2. Search existing [issues](https://github.com/your-username/homebridge-haier-evo/issues)
+2. Search existing [issues](https://github.com/kulikovav/homebridge-haier-evo/issues)
 3. Create a new issue with detailed information about your problem
-
-## Changelog
-
-### 1.1.0
-
-- Added device filtering options to control which devices are discovered
-- Improved logging for device status updates
-- Fixed temperature validation issues
-
-### 1.0.0
-
-- Initial release
-- Support for air conditioners and refrigerators
-- Full HomeKit integration
-- Real-time device updates
-- Automatic device discovery
