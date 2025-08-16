@@ -136,10 +136,7 @@ jobs:
 
       - name: Create tag
         run: |
-          # Check if tag already exists
-          if ! git tag -l "v${{ env.VERSION }}"; then
-            git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
-          fi
+          git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
 
       - name: Push changes and tags
         run: |
