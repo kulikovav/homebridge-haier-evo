@@ -15,6 +15,11 @@ on:
           - minor
           - major
 
+# Add permissions needed for creating releases and pushing code
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -50,6 +55,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -140,8 +146,12 @@ jobs:
 
       - name: Push changes and tags
         run: |
+          # Use GITHUB_TOKEN for authentication
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
           git push origin HEAD:${GITHUB_REF#refs/heads/}
           git push origin "v${{ env.VERSION }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm
         run: npm publish

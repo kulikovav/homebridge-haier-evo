@@ -152,6 +152,22 @@ The npm package must include:
 - Proper metadata in `package.json`
 - The package should NOT include source TypeScript files or test files
 
+### GitHub Actions Configuration
+
+For the automated publishing to work correctly:
+
+1. **Required Secrets**:
+   - `NPM_TOKEN`: An npm access token with publish permissions
+
+2. **Required Permissions**:
+   - The workflow needs `contents: write` permission to push commits and tags
+   - The workflow needs `packages: write` permission to publish packages
+
+3. **Troubleshooting**:
+   - If you see "Permission denied" errors, check the repository settings:
+     - Go to Settings > Actions > General
+     - Under "Workflow permissions", ensure "Read and write permissions" is selected
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the project's MIT License.

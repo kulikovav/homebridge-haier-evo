@@ -324,6 +324,24 @@ This project is set up for automatic npm publishing through GitHub Actions:
 1. When a GitHub Release is created, the package is automatically published to npm
 2. When the "Node.js Package" workflow is manually triggered, the package is published to npm
 
+#### Required GitHub Secrets
+
+For the automated publishing to work, you need to set up the following GitHub secrets:
+
+1. `NPM_TOKEN` - An npm access token with publish permissions
+   - Go to your npm account settings
+   - Create a new access token with "Automation" type
+   - Add it as a repository secret in GitHub
+
+#### Setting up GitHub Secrets
+
+1. Go to your GitHub repository
+2. Click on "Settings" > "Secrets and variables" > "Actions"
+3. Click "New repository secret"
+4. Add the NPM_TOKEN with your npm access token value
+
+#### Manual Publishing
+
 To publish manually:
 
 1. Make sure you have an npm account and are logged in:
