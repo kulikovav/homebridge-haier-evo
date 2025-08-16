@@ -108,7 +108,7 @@ You can control which devices are discovered and added to HomeKit using the foll
 
 ```json
 {
-  "platform": "HaierEvo",
+  "platform": "homebridge-haier-evo",
   "name": "Haier Evo",
   "email": "your-email@example.com",
   "password": "your-password",
@@ -219,7 +219,7 @@ homebridge -D
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/haier-evo/homebridge-haier-evo.git
+   git clone https://github.com/kulikovav/homebridge-haier-evo.git
    cd homebridge-haier-evo
    ```
 

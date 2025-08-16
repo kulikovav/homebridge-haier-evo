@@ -76,10 +76,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/haier-evo/homebridge-haier-evo.git"
+    "url": "https://github.com/kulikovav/homebridge-haier-evo.git"
   },
   "bugs": {
-    "url": "https://github.com/haier-evo/homebridge-haier-evo/issues"
+    "url": "https://github.com/kulikovav/homebridge-haier-evo/issues"
   },
-  "homepage": "https://github.com/haier-evo/homebridge-haier-evo#readme"
+  "homepage": "https://github.com/kulikovav/homebridge-haier-evo#readme"
 }
