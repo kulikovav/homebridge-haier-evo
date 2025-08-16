@@ -1,6 +1,6 @@
 # Testing Guide for Homebridge Haier Evo Plugin
 
-This document provides comprehensive guidance on running tests for the Homebridge Haier Evo plugin, including unit tests, integration tests, and end-to-end tests.
+This document provides comprehensive guidance on running tests for the Homebridge Haier Evo plugin, including unit tests and standalone tests.
 
 ## 🧪 Test Structure
 
@@ -14,10 +14,6 @@ tests/
 ├── unit/                      # Unit tests for individual components
 │   ├── constants.test.ts      # Constants module tests
 │   └── device-factory.test.ts # Device factory tests
-├── integration/               # Integration tests
-│   ├── haier-api.integration.test.ts    # API integration tests
-│   ├── platform.integration.test.ts     # Platform integration tests
-│   └── end-to-end.integration.test.ts   # End-to-end flow tests
 └── README.md                  # This testing guide
 ```
 
@@ -50,7 +46,7 @@ npm run test:coverage
 | `npm test` | Run all tests once |
 | `npm run test:watch` | Run tests in watch mode (re-runs on file changes) |
 | `npm run test:coverage` | Run tests with coverage report |
-| `npm run test:integration` | Run only integration tests |
+
 | `npm run test:unit` | Run only unit tests |
 
 ## 🧩 Test Types
@@ -67,28 +63,18 @@ npm run test:coverage
 - Type checking
 - Utility functions
 
-### Integration Tests (`tests/integration/`)
-- **Purpose**: Test interactions between multiple components
+### Standalone Tests (Root directory)
+- **Purpose**: Test real-world scenarios and API interactions
 - **Scope**: Component integration and API communication
-- **Dependencies**: Partially mocked (real logic, mocked external APIs)
-- **Speed**: Medium execution
+- **Dependencies**: Can use real API or mocked responses
+- **Speed**: Medium to slow execution
 
 **Examples:**
-- Haier API authentication and device discovery
-- Platform initialization and device management
-- Event handling between components
-
-### End-to-End Tests (`tests/integration/end-to-end.integration.test.ts`)
-- **Purpose**: Test complete user workflows
-- **Scope**: Full plugin lifecycle from initialization to device control
-- **Dependencies**: Heavily mocked external services
-- **Speed**: Slower execution
-
-**Examples:**
-- Complete device lifecycle
-- Error recovery scenarios
-- Performance and scalability
-- Real-time updates
+- `test-devices.js` - Device factory and functionality testing
+- `test-rate-limiting.js` - API rate limiting behavior
+- `test-real-api.js` - Real API integration testing
+- `test-ac-control.js` - Air conditioner control testing
+- `run-tests.js` - Comprehensive test runner
 
 ## 🔧 Test Configuration
 
@@ -375,8 +361,7 @@ npm run build          # Verify TypeScript compilation
 
 ### Performance Targets
 - **Unit Tests**: <100ms per test
-- **Integration Tests**: <500ms per test
-- **End-to-End Tests**: <2s per test
+- **Standalone Tests**: <2s per test
 - **Full Test Suite**: <30s total
 
 ### Quality Metrics

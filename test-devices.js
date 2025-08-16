@@ -13,19 +13,39 @@ const { HaierAPI } = require('./dist/haier-api');
 // Mock device data for testing
 const MOCK_DEVICES = {
   airConditioner: {
+    id: 'ac-123',
     name: 'Test AC',
     type: 'air_conditioner',
     mac: '00:11:22:33:44:55',
     model: 'Test AC Model',
-    firmware: '1.0.0'
+    status: 1,
+    attributes: []
   },
   refrigerator: {
+    id: 'fridge-123',
     name: 'Test Fridge',
     type: 'refrigerator',
     mac: 'AA:BB:CC:DD:EE:FF',
     model: 'Test Fridge Model',
-    firmware: '1.0.0'
+    status: 1,
+    attributes: []
   }
+};
+
+// Create a mock API for testing
+const createMockApi = () => {
+  return {
+    on: () => {},
+    emit: () => {},
+    sendCommand: async () => Promise.resolve({}),
+    getDeviceStatus: async () => Promise.resolve({}),
+    ensureValidToken: async () => Promise.resolve(),
+    isWebSocketConnected: () => false,
+    connectWebSocket: async () => Promise.resolve(),
+    disconnectWebSocket: () => {},
+    removeAllListeners: () => {},
+    setDeviceProperty: async () => Promise.resolve({})
+  };
 };
 
 // Test results tracking
@@ -158,7 +178,8 @@ async function testAirConditionerDevice(runner) {
 
   // Test device creation
   await runner.runTest('AC Device Creation', async () => {
-    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, null);
+    const mockApi = createMockApi();
+    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, mockApi);
     runner.assertTrue(device, 'AC device should be created');
     runner.assertEqual(device.constructor.name, 'HaierACDevice', 'Should create HaierACDevice instance');
     console.log('   ✅ AC device created successfully');
@@ -166,7 +187,8 @@ async function testAirConditionerDevice(runner) {
 
     // Test temperature setting
   await runner.runTest('AC Temperature Setting', async () => {
-    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, null);
+    const mockApi = createMockApi();
+    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, mockApi);
     const testTemp = 22;
     // Mock the API call since we don't have a real API
     device.sendCommand = async () => Promise.resolve();
@@ -177,7 +199,8 @@ async function testAirConditionerDevice(runner) {
 
   // Test mode setting
   await runner.runTest('AC Mode Setting', async () => {
-    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, null);
+    const mockApi = createMockApi();
+    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, mockApi);
     const testMode = 'cool';
     // Mock the API call since we don't have a real API
     device.sendCommand = async () => Promise.resolve();
@@ -188,7 +211,8 @@ async function testAirConditionerDevice(runner) {
 
   // Test fan speed setting
   await runner.runTest('AC Fan Speed Setting', async () => {
-    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, null);
+    const mockApi = createMockApi();
+    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, mockApi);
     const testFanSpeed = 'medium';
     // Mock the API call since we don't have a real API
     device.sendCommand = async () => Promise.resolve();
@@ -199,7 +223,8 @@ async function testAirConditionerDevice(runner) {
 
   // Test power control
   await runner.runTest('AC Power Control', async () => {
-    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, null);
+    const mockApi = createMockApi();
+    const device = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, mockApi);
     // Mock the API call since we don't have a real API
     device.sendCommand = async () => Promise.resolve();
     await device.switch_on('cool');
@@ -281,8 +306,9 @@ async function testDeviceFactory(runner) {
 
   // Test factory with valid device types
   await runner.runTest('Factory Valid Device Types', async () => {
-    const acDevice = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, null);
-    const fridgeDevice = DeviceFactory.createDevice(MOCK_DEVICES.refrigerator, null);
+    const mockApi = createMockApi();
+    const acDevice = DeviceFactory.createDevice(MOCK_DEVICES.airConditioner, mockApi);
+    const fridgeDevice = DeviceFactory.createDevice(MOCK_DEVICES.refrigerator, mockApi);
 
     runner.assertTrue(acDevice, 'AC device should be created');
     runner.assertTrue(fridgeDevice, 'Fridge device should be created');
@@ -293,10 +319,11 @@ async function testDeviceFactory(runner) {
 
   // Test factory with invalid device type
   await runner.runTest('Factory Invalid Device Type', async () => {
+    const mockApi = createMockApi();
     const invalidDevice = { ...MOCK_DEVICES.airConditioner, type: 'invalid_type' };
 
     // The factory should handle invalid device types gracefully by falling back to AC device
-    const device = DeviceFactory.createDevice(invalidDevice, null);
+    const device = DeviceFactory.createDevice(invalidDevice, mockApi);
     runner.assertTrue(device, 'Device should be created even for invalid type');
     runner.assertEqual(device.constructor.name, 'HaierACDevice', 'Should fall back to AC device for invalid types');
     console.log('   ✅ Invalid device types handled gracefully (fallback to AC device)');

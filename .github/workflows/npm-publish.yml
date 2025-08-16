@@ -1,0 +1,162 @@
+name: Node.js Package
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version bump type (patch, minor, major)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run standalone device tests
+        run: node test-devices.js
+
+      - name: Run standalone rate limiting tests
+        run: node test-rate-limiting.js
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Bump version (from release)
+        if: github.event_name == 'release'
+        run: |
+          # Extract version from release tag (remove 'v' prefix if present)
+          RELEASE_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//')
+
+          # Check if version is valid
+          if [[ ! $RELEASE_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format: $RELEASE_VERSION"
+            exit 1
+          fi
+
+          # Set version directly
+          npm version $RELEASE_VERSION --no-git-tag-version
+
+          echo "VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
+
+      - name: Bump version (from workflow dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          # Bump version according to input
+          VERSION=$(npm version ${{ github.event.inputs.version }} --no-git-tag-version)
+
+          # Remove quotes from version
+          CLEAN_VERSION=$(echo $VERSION | sed 's/^"//;s/"$//')
+
+          echo "VERSION=$CLEAN_VERSION" >> $GITHUB_ENV
+
+      - name: Update changelog
+        run: |
+          if [ -f "CHANGELOG.md" ]; then
+            CURRENT_DATE=$(date +%Y-%m-%d)
+
+            # Create a temporary file
+            TEMP_FILE=$(mktemp)
+
+            # Process the changelog
+            while IFS= read -r line; do
+              if [[ "$line" == "## [Unreleased]" ]]; then
+                # Add the new version header
+                echo "## [${{ env.VERSION }}] - $CURRENT_DATE" >> "$TEMP_FILE"
+                echo "" >> "$TEMP_FILE"
+                echo "## [Unreleased]" >> "$TEMP_FILE"
+              else
+                echo "$line" >> "$TEMP_FILE"
+              fi
+            done < "CHANGELOG.md"
+
+            # Replace the original file
+            mv "$TEMP_FILE" "CHANGELOG.md"
+          else
+            echo "CHANGELOG.md not found, skipping update"
+          fi
+
+      - name: Commit version bump
+        run: |
+          git add package.json package-lock.json
+
+          if [ -f "CHANGELOG.md" ]; then
+            git add CHANGELOG.md
+          fi
+
+          git commit -m "Bump version to ${{ env.VERSION }}"
+
+      - name: Create tag
+        run: git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
+
+      - name: Push changes and tags
+        run: |
+          git push origin HEAD:${GITHUB_REF#refs/heads/}
+          git push origin "v${{ env.VERSION }}"
+
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+      - name: Output publishing result
+        run: |
+          echo "🎉 Published to npm: https://www.npmjs.com/package/homebridge-haier-evo"
+          echo "Version: ${{ env.VERSION }}"
+
+      - name: Create GitHub Release
+        if: github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

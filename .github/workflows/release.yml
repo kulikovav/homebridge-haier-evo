@@ -1,0 +1,115 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run standalone device tests
+        run: node test-devices.js
+
+      - name: Run standalone rate limiting tests
+        run: node test-rate-limiting.js
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Bump version
+        id: bump_version
+        run: |
+          # Bump version according to input
+          VERSION=$(npm version ${{ github.event.inputs.version }} --no-git-tag-version)
+
+          # Remove quotes from version
+          CLEAN_VERSION=$(echo $VERSION | sed 's/^"//;s/"$//')
+
+          echo "VERSION=$CLEAN_VERSION" >> $GITHUB_ENV
+          echo "version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update changelog
+        run: |
+          if [ -f "CHANGELOG.md" ]; then
+            CURRENT_DATE=$(date +%Y-%m-%d)
+
+            # Create a temporary file
+            TEMP_FILE=$(mktemp)
+
+            # Process the changelog
+            while IFS= read -r line; do
+              if [[ "$line" == "## [Unreleased]" ]]; then
+                # Add the new version header
+                echo "## [${{ env.VERSION }}] - $CURRENT_DATE" >> "$TEMP_FILE"
+                echo "" >> "$TEMP_FILE"
+                echo "## [Unreleased]" >> "$TEMP_FILE"
+              else
+                echo "$line" >> "$TEMP_FILE"
+              fi
+            done < "CHANGELOG.md"
+
+            # Replace the original file
+            mv "$TEMP_FILE" "CHANGELOG.md"
+          else
+            echo "CHANGELOG.md not found, skipping update"
+          fi
+
+      - name: Commit version bump
+        run: |
+          git add package.json package-lock.json
+
+          if [ -f "CHANGELOG.md" ]; then
+            git add CHANGELOG.md
+          fi
+
+          git commit -m "Bump version to ${{ env.VERSION }}"
+
+      - name: Push changes
+        run: git push origin HEAD:${GITHUB_REF#refs/heads/}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.bump_version.outputs.version }}
+          name: Release v${{ steps.bump_version.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

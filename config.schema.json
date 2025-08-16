@@ -1,0 +1,168 @@
+{
+  "pluginAlias": "homebridge-haier-evo",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "Haier Evo"
+      },
+      "email": {
+        "title": "Email",
+        "type": "string",
+        "required": true,
+        "description": "Your Haier Evo account email"
+      },
+      "password": {
+        "title": "Password",
+        "type": "string",
+        "required": true,
+        "description": "Your Haier Evo account password"
+      },
+      "region": {
+        "title": "Region",
+        "type": "string",
+        "required": true,
+        "default": "ru",
+        "oneOf": [
+          { "title": "Russia", "enum": ["ru"] },
+          { "title": "Kazakhstan", "enum": ["kz"] },
+          { "title": "Belarus", "enum": ["by"] }
+        ],
+        "description": "Your region for the Haier Evo app"
+      },
+      "refreshInterval": {
+        "title": "Refresh Interval",
+        "type": "integer",
+        "minimum": 30,
+        "maximum": 3600,
+        "default": 300,
+        "description": "Device refresh interval in seconds (default: 300)"
+      },
+      "debug": {
+        "title": "Debug Mode",
+        "type": "boolean",
+        "default": false,
+        "description": "Enable debug logging"
+      },
+      "deviceCacheTTL": {
+        "title": "Device Cache TTL",
+        "type": "integer",
+        "minimum": 30,
+        "maximum": 3600,
+        "default": 300,
+        "description": "Time in seconds to cache device list (default: 300)"
+      },
+      "requestRandomization": {
+        "title": "Request Randomization",
+        "type": "boolean",
+        "default": true,
+        "description": "Add randomization to requests to appear more natural"
+      },
+      "minRequestDelay": {
+        "title": "Minimum Request Delay",
+        "type": "integer",
+        "minimum": 50,
+        "maximum": 5000,
+        "default": 100,
+        "description": "Minimum delay between requests in milliseconds (default: 100)"
+      },
+      "maxRequestDelay": {
+        "title": "Maximum Request Delay",
+        "type": "integer",
+        "minimum": 100,
+        "maximum": 10000,
+        "default": 1000,
+        "description": "Maximum delay between requests in milliseconds (default: 1000)"
+      },
+      "includeDevices": {
+        "title": "Include Devices",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of device IDs to include. If specified, only these devices will be added."
+      },
+      "excludeDevices": {
+        "title": "Exclude Devices",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of device IDs to exclude"
+      },
+      "includeDeviceTypes": {
+        "title": "Include Device Types",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["air_conditioner", "refrigerator"]
+        },
+        "description": "List of device types to include (e.g., \"air_conditioner\", \"refrigerator\")"
+      },
+      "excludeDeviceTypes": {
+        "title": "Exclude Device Types",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["air_conditioner", "refrigerator"]
+        },
+        "description": "List of device types to exclude"
+      },
+      "includeNamePattern": {
+        "title": "Include Name Pattern",
+        "type": "string",
+        "description": "Regex pattern for device names to include (e.g., \"Living Room|Kitchen\")"
+      },
+      "excludeNamePattern": {
+        "title": "Exclude Name Pattern",
+        "type": "string",
+        "description": "Regex pattern for device names to exclude"
+      }
+    }
+  },
+  "layout": [
+    {
+      "type": "fieldset",
+      "title": "Account Settings",
+      "items": [
+        "name",
+        "email",
+        "password",
+        "region",
+        "refreshInterval",
+        "debug"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "API Optimization",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "deviceCacheTTL",
+        "requestRandomization",
+        "minRequestDelay",
+        "maxRequestDelay"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Device Filtering",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "includeDevices",
+        "excludeDevices",
+        "includeDeviceTypes",
+        "excludeDeviceTypes",
+        "includeNamePattern",
+        "excludeNamePattern"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+# Source files
+src/
+tests/
+*.ts
+!*.d.ts
+
+# Development files
+.github/
+.git/
+.gitignore
+.npmignore
+.eslintrc.js
+eslint.config.mts
+jest.config.js
+tsconfig.json
+*.tgz
+
+# Test files
+test-*.js
+run-tests.js
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+*.data
+
+# Documentation files
+TESTING.md
+TESTING_STANDALONE.md
+INTEGRATION_TESTING.md
+
+# Environment and credentials
+.env
+env.example
+setup-test-credentials.sh
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo

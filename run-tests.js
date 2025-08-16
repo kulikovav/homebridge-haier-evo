@@ -12,20 +12,15 @@ const path = require('path');
 
 // Test configuration
 const TEST_CONFIG = {
-  api: {
-    script: './test-real-api.js',
-    name: 'API Integration Tests',
-    description: 'Real Haier Evo API integration testing'
-  },
   devices: {
     script: './test-devices.js',
     name: 'Device Tests',
     description: 'Device functionality and factory testing'
   },
-  accontrol: {
-    script: './test-ac-control.js',
-    name: 'AC Control Tests',
-    description: 'Air conditioner control functionality testing'
+  ratelimiting: {
+    script: './test-rate-limiting.js',
+    name: 'Rate Limiting Tests',
+    description: 'Rate limiting functionality testing'
   }
 };
 
@@ -53,18 +48,15 @@ function showHelp() {
   console.log('\nUsage:');
   console.log('  node run-tests.js [options]');
   console.log('\nOptions:');
-  console.log('  --api              Run only API integration tests');
   console.log('  --devices          Run only device tests');
-  console.log('  --ac-control       Run only AC control tests');
+  console.log('  --rate-limiting    Run only rate limiting tests');
   console.log('  --all              Run all tests (default)');
   console.log('  --help             Show this help message');
   console.log('\nExamples:');
-  console.log('  node run-tests.js --api');
   console.log('  node run-tests.js --devices');
-  console.log('  node run-tests.js --ac-control');
+  console.log('  node run-tests.js --rate-limiting');
   console.log('  node run-tests.js --all');
   console.log('\nEnvironment Variables:');
-  console.log('  RUN_REAL_API_TESTS=1  Enable real API testing');
   console.log('  DEBUG=1               Enable debug output');
 }
 
@@ -72,23 +64,18 @@ function showHelp() {
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
-    api: false,
     devices: false,
-    accontrol: false,
     all: false,
     help: false
   };
 
   for (const arg of args) {
     switch (arg) {
-      case '--api':
-        options.api = true;
-        break;
       case '--devices':
         options.devices = true;
         break;
-      case '--ac-control':
-        options.accontrol = true;
+      case '--rate-limiting':
+        options.ratelimiting = true;
         break;
       case '--all':
         options.all = true;
@@ -105,7 +92,7 @@ function parseArgs() {
   }
 
   // Default to all if no specific option is selected
-  if (!options.api && !options.devices && !options.accontrol && !options.all) {
+  if (!options.devices && !options.ratelimiting && !options.all) {
     options.all = true;
   }
 
@@ -155,25 +142,11 @@ async function runTests(options) {
   console.log(`Start time: ${new Date().toISOString()}`);
   console.log('='.repeat(60));
 
-  // Check environment variables
-  if (!process.env.RUN_REAL_API_TESTS) {
-    console.log(colorize('yellow', '\n⚠️  Real API tests are disabled.'));
-    console.log(colorize('yellow', '   Set RUN_REAL_API_TESTS=1 to enable real API testing.'));
-    console.log(colorize('yellow', '   Example: RUN_REAL_API_TESTS=1 node run-tests.js'));
-  }
+  // Real API tests are disabled by default
+  process.env.RUN_REAL_API_TESTS = '0';
+  console.log(colorize('yellow', '\n⚠️  Real API tests are permanently disabled in this environment.'));
 
   try {
-    // Run API tests if requested
-    if (options.api || options.all) {
-      results.total++;
-      const apiResult = await runTestScript(TEST_CONFIG.api.script, TEST_CONFIG.api.name);
-      if (apiResult.success) {
-        results.passed++;
-      } else {
-        results.failed++;
-      }
-    }
-
     // Run device tests if requested
     if (options.devices || options.all) {
       results.total++;
@@ -185,12 +158,11 @@ async function runTests(options) {
       }
     }
 
-    // Run AC control tests if requested
-    if (options.accontrol || options.all) {
+    // Run rate limiting tests if requested
+    if (options.ratelimiting || options.all) {
       results.total++;
-      // For AC control tests, we'll use the 'power-on' command as a default test
-      const acControlResult = await runTestScript(TEST_CONFIG.accontrol.script + ' power-on', TEST_CONFIG.accontrol.name);
-      if (acControlResult.success) {
+      const rateLimitingResult = await runTestScript(TEST_CONFIG.ratelimiting.script, TEST_CONFIG.ratelimiting.name);
+      if (rateLimitingResult.success) {
         results.passed++;
       } else {
         results.failed++;

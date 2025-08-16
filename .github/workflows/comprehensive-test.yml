@@ -1,0 +1,41 @@
+name: Comprehensive Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Test type to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - devices
+          - rate-limiting
+      debug:
+        description: 'Enable debug mode'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  comprehensive-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run comprehensive tests
+        run: node run-tests.js --${{ github.event.inputs.test_type }}
+        env:
+          RUN_REAL_API_TESTS: 0
+          DEBUG: ${{ github.event.inputs.debug == 'true' && '1' || '0' }}

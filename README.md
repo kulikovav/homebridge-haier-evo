@@ -1,5 +1,8 @@
 # Homebridge Haier Evo Plugin
 
+[![npm version](https://badge.fury.io/js/homebridge-haier-evo.svg)](https://www.npmjs.com/package/homebridge-haier-evo)
+[![GitHub Actions](https://github.com/haier-evo/homebridge-haier-evo/workflows/Node.js%20Package/badge.svg)](https://github.com/haier-evo/homebridge-haier-evo/actions)
+
 A Homebridge plugin that integrates Haier Evo devices (air conditioners, refrigerators, etc.) with Apple HomeKit.
 
 This plugin is adapted from the [Home Assistant Haier Evo integration](https://github.com/and7ey/haier_evo) to work with Homebridge.
@@ -28,15 +31,22 @@ This plugin supports devices that work with the Haier Evo app in the following r
 
 ## Installation
 
-1. Install Homebridge if you haven't already:
+1. Install Homebridge if you haven't already.
 
-2. Install this plugin:
+2. Install this plugin using one of these methods:
 
    ```bash
+   # Using Homebridge UI
+   # Search for "homebridge-haier-evo" in the plugins tab
+
+   # Using hb-service
    hb-service add homebridge-haier-evo
+
+   # Using npm
+   npm install -g homebridge-haier-evo
    ```
 
-3. Add the platform to your Homebridge configuration file (`config.json`):
+3. Add the platform to your Homebridge configuration file (`config.json`) or use the Homebridge UI to configure it:
 
    ```json
    {
@@ -209,7 +219,7 @@ homebridge -D
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/homebridge-haier-evo.git
+   git clone https://github.com/haier-evo/homebridge-haier-evo.git
    cd homebridge-haier-evo
    ```
 
@@ -230,6 +240,109 @@ homebridge -D
    ```bash
    npm link
    ```
+
+### Testing
+
+This project includes several testing approaches:
+
+#### Unit Tests
+
+```bash
+# Run unit tests
+npm run test:unit
+```
+
+#### Standalone Tests
+
+```bash
+# Run device tests
+node test-devices.js
+
+# Run rate limiting tests
+node test-rate-limiting.js
+```
+
+#### Comprehensive Test Runner
+
+```bash
+# Run all tests
+node run-tests.js --all
+
+# Run specific test types
+node run-tests.js --devices
+node run-tests.js --rate-limiting
+```
+
+> Note: Tests that require real API access have been disabled in this environment.
+
+### GitHub Actions Workflows
+
+This project uses GitHub Actions for automated testing, version management, and publishing to npm.
+
+#### Test Workflows
+
+1. **Standard Tests**: Runs on every push and pull request
+   - Unit tests, device tests, and rate limiting tests
+   - No real API access required
+
+2. **Comprehensive Tests**: Manually triggered workflow
+   - Can run device tests or rate limiting tests
+   - No real API access required
+
+#### Release Process
+
+1. **Create a Release**:
+   - Go to the Actions tab in the GitHub repository
+   - Select the "Create Release" workflow
+   - Click "Run workflow"
+   - Choose the version bump type (patch, minor, major)
+   - Click "Run workflow"
+
+2. **Publishing to npm**:
+   - After a release is created, the "Node.js Package" workflow automatically runs
+   - It builds, tests, and publishes the package to npm
+   - It also updates the CHANGELOG.md file
+
+#### Manual Release Process
+
+You can also use the included script for manual releases:
+
+```bash
+# Interactive release process
+npm run release
+
+# Quick release with specific version bump
+npm run release:patch
+npm run release:minor
+npm run release:major
+```
+
+### Publishing to npm
+
+This project is set up for automatic npm publishing through GitHub Actions:
+
+1. When a GitHub Release is created, the package is automatically published to npm
+2. When the "Node.js Package" workflow is manually triggered, the package is published to npm
+
+To publish manually:
+
+1. Make sure you have an npm account and are logged in:
+   ```bash
+   npm login
+   ```
+
+2. Run the release script:
+   ```bash
+   npm run release
+   ```
+
+3. The script will:
+   - Run tests
+   - Bump the version
+   - Update the changelog
+   - Publish to npm
+   - Create a git tag
+   - Push changes to GitHub
 
 ### Project Structure
 
