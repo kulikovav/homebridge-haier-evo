@@ -41,4 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial device status update during plugin startup
 - Trailing spaces in received data
 
+## [1.1.9] - 2025-08-16
+- Update CHANGELOG and README for versioning and repository ownership changes
+
 ## [Unreleased]
