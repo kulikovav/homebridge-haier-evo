@@ -1,20 +1,12 @@
 import {
-  DOMAIN,
   API_PATH,
   API_LOGIN,
   HVAC_MODES,
   FAN_MODES,
-  SWING_MODES,
-  HORIZONTAL_SWING_MODES
+  SWING_MODES
 } from '../../src/constants';
 
 describe('Constants', () => {
-  describe('DOMAIN', () => {
-    it('should have correct domain value', () => {
-      expect(DOMAIN).toBe('haier_evo');
-    });
-  });
-
   describe('API endpoints', () => {
     it('should have correct API base path', () => {
       expect(API_PATH).toBe('https://evo.haieronline.ru');
@@ -81,16 +73,4 @@ describe('Constants', () => {
     });
   });
 
-  describe('Horizontal Swing Modes', () => {
-    it('should have correct horizontal swing mode mappings', () => {
-      expect(HORIZONTAL_SWING_MODES['1']).toBe('position_1');
-      expect(HORIZONTAL_SWING_MODES['8']).toBe('auto');
-    });
-
-    it('should have all required horizontal swing modes', () => {
-      const modes = Object.values(HORIZONTAL_SWING_MODES);
-      expect(modes).toContain('position_1');
-      expect(modes).toContain('auto');
-    });
-  });
 });

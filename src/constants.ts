@@ -1,4 +1,3 @@
-export const DOMAIN = 'haier_evo';
 export const COMMON_LIMIT_CALLS = 5;
 export const COMMON_LIMIT_PERIOD = 60;
 export const LOGIN_LIMIT_CALLS = 1;
@@ -21,8 +20,6 @@ export const API_TOKEN_REFRESH = 'v2/{region}/users/auth/refresh';
 export const API_DEVICES = 'v2/{region}/pages/sduiRawPaginated/smartHome/spaces/house?part=1&partitionWeight=6';
 // This endpoint returns detailed device configuration and current status
 export const API_DEVICE_CONFIG = 'https://iot-platform.evo.haieronline.ru/mobile-backend-service/api/v1/config/{mac}?type=DETAILED';
-// Alternative endpoint for device status (sometimes works better for AC devices)
-export const API_DEVICE_STATUS_ALT = 'v2/{region}/devices/{mac}/status';
 // This endpoint provides real-time device status updates via WebSocket
 export const API_WEBSOCKET_STATUS = 'wss://iot-platform.evo.haieronline.ru/gateway-ws-service/ws/';
 
@@ -62,17 +59,3 @@ export const SWING_MODES = {
 } as const;
 
 export type SwingMode = typeof SWING_MODES[keyof typeof SWING_MODES];
-
-// Horizontal Swing Modes mapping
-export const HORIZONTAL_SWING_MODES = {
-  '1': 'position_1',
-  '2': 'position_2',
-  '3': 'position_3',
-  '4': 'position_4',
-  '5': 'position_5',
-  '6': 'position_6',
-  '7': 'position_7',
-  '8': 'auto'
-} as const;
-
-export type HorizontalSwingMode = typeof HORIZONTAL_SWING_MODES[keyof typeof HORIZONTAL_SWING_MODES];

@@ -29,7 +29,7 @@ export class HaierAPI extends EventEmitter {
   private tokenExpire: Date | null = null;
   private refreshExpire: Date | null = null;
 
-  // Device cache to reduce API calls
+    // Device cache to reduce API calls (now includes complete device information)
   private deviceCache: DeviceInfo[] | null = null;
   private deviceCacheTimestamp: number = 0;
   private deviceCacheTTL: number = 300000; // 5 minutes by default
@@ -46,6 +46,7 @@ export class HaierAPI extends EventEmitter {
   private maxRefreshFailures: number = 3;
   private refreshInProgress: boolean = false;
   private refreshPromise: Promise<void> | null = null;
+  private tokenRefreshTimer: NodeJS.Timeout | null = null;
 
   // Rate limiting and retry configuration
   private rateLimitConfig = {
@@ -69,12 +70,40 @@ export class HaierAPI extends EventEmitter {
   private lastRequestTime = 0;
   private minRequestInterval = 100; // Minimum 100ms between requests
 
+  // Command batching system
+  private commandBatches: Map<string, {
+    commands: Array<{propertyId: string, value: string | number | boolean}>;
+    promises: Array<{resolve: () => void, reject: (error: any) => void}>;
+    timeout: NodeJS.Timeout;
+  }> = new Map();
+  private batchTimeout: number = 100; // 100ms timeout for batching
+
   constructor(private config: HaierEvoConfig) {
     super();
 
     // Set device cache TTL from config if provided
     if (this.config.deviceCacheTTL !== undefined) {
       this.deviceCacheTTL = this.config.deviceCacheTTL * 1000; // Convert to milliseconds
+    }
+
+    // Set batch timeout from config if provided
+    if (this.config.batchTimeout !== undefined) {
+      this.setBatchTimeout(this.config.batchTimeout);
+    }
+
+    // Set default token refresh mode if not provided
+    if (this.config.tokenRefreshMode === undefined) {
+      this.config.tokenRefreshMode = 'auto';
+    }
+
+    // Set default token refresh threshold if not provided
+    if (this.config.tokenRefreshThreshold === undefined) {
+      this.config.tokenRefreshThreshold = 300; // 5 minutes by default
+    }
+
+    // Set default token refresh interval if not provided
+    if (this.config.tokenRefreshInterval === undefined) {
+      this.config.tokenRefreshInterval = 3600; // 1 hour by default
     }
 
     // Get or generate device ID
@@ -306,6 +335,9 @@ export class HaierAPI extends EventEmitter {
       }
 
       this.emit('authenticated');
+
+      // Set up token refresh based on configuration
+      this.setupTokenRefresh();
     } catch (error) {
       if (this.config.debug) {
         console.log('Authentication error:', error);
@@ -319,6 +351,67 @@ export class HaierAPI extends EventEmitter {
       }
       this.emit('error', `Authentication failed: ${error}`);
       throw error;
+    }
+  }
+
+  /**
+   * Sets up token refresh based on configuration
+   */
+  private setupTokenRefresh(): void {
+    // Clear any existing timer
+    this.clearTokenRefreshTimer();
+
+    // Skip if token refresh is disabled
+    if (this.config.tokenRefreshMode === 'disabled') {
+      if (this.config.debug) {
+        console.log('Token refresh is disabled in configuration');
+      }
+      return;
+    }
+
+    const timestamp = new Date().toLocaleString();
+
+    if (this.config.tokenRefreshMode === 'manual') {
+      // Set up timer based on fixed interval
+      const interval = (this.config.tokenRefreshInterval || 3600) * 1000; // Convert to ms
+
+      console.log(`[${timestamp}] [Haier Evo] Setting up manual token refresh every ${interval / 1000} seconds`);
+
+      this.tokenRefreshTimer = setInterval(() => {
+        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Performing scheduled manual token refresh`);
+        this.refreshAccessToken().catch(error => {
+          console.error(`[${new Date().toLocaleString()}] [Haier Evo] Scheduled token refresh failed:`, error);
+        });
+      }, interval);
+
+    } else if (this.config.tokenRefreshMode === 'auto') {
+      // Set up timer based on token expiration
+      if (this.tokenExpire) {
+        const now = new Date();
+        const timeUntilExpire = this.tokenExpire.getTime() - now.getTime();
+        const threshold = (this.config.tokenRefreshThreshold || 300) * 1000; // Convert to ms
+        const timeUntilRefresh = Math.max(timeUntilExpire - threshold, 0);
+
+        console.log(`[${timestamp}] [Haier Evo] Token expires in ${timeUntilExpire / 1000} seconds, will refresh in ${timeUntilRefresh / 1000} seconds`);
+
+        this.tokenRefreshTimer = setTimeout(() => {
+          console.log(`[${new Date().toLocaleString()}] [Haier Evo] Performing auto token refresh before expiration`);
+          this.refreshAccessToken().catch(error => {
+            console.error(`[${new Date().toLocaleString()}] [Haier Evo] Auto token refresh failed:`, error);
+          });
+        }, timeUntilRefresh);
+      }
+    }
+  }
+
+  /**
+   * Clears any existing token refresh timer
+   */
+  private clearTokenRefreshTimer(): void {
+    if (this.tokenRefreshTimer) {
+      clearTimeout(this.tokenRefreshTimer);
+      clearInterval(this.tokenRefreshTimer);
+      this.tokenRefreshTimer = null;
     }
   }
 
@@ -345,6 +438,9 @@ export class HaierAPI extends EventEmitter {
 
     try {
       await this.refreshPromise;
+
+      // Set up next token refresh after successful refresh
+      this.setupTokenRefresh();
     } finally {
       this.refreshInProgress = false;
       this.refreshPromise = null;
@@ -419,30 +515,43 @@ export class HaierAPI extends EventEmitter {
         }
       }
 
-      // Check if this is an authentication error (401)
+      // Check if this is an authentication error (401) - refresh token is invalid/expired
       if (error.response?.status === 401) {
+        console.log(`[${new Date().toLocaleString()}] [Haier Evo] 🔑 Refresh token invalid/expired (401), performing full reauthentication`);
         this.emit('tokenRefreshFailed', 'Refresh token expired or invalid');
 
-        // If we haven't exceeded max failures, wait and try again with exponential backoff
+        // Clear invalid tokens
+        this.accessToken = null;
+        this.refreshToken = null;
+        this.tokenExpire = null;
+        this.refreshExpire = null;
+
+        // Reset failure count and immediately try full authentication
+        this.refreshFailureCount = 0;
+        return this.authenticate();
+      }
+
+      // Check if this is a rate limiting error (429)
+      if (error.response?.status === 429) {
+        console.log(`[${new Date().toLocaleString()}] [Haier Evo] ⏳ Token refresh rate limited (429), will retry with exponential backoff`);
+        this.emit('tokenRefreshFailed', 'Token refresh rate limited');
+
+        // For rate limiting, we should retry with exponential backoff
         if (this.refreshFailureCount < this.maxRefreshFailures) {
           const backoffDelay = Math.min(1000 * Math.pow(2, this.refreshFailureCount), 30000);
-
-          if (this.config.debug) {
-            console.log(`Waiting ${backoffDelay}ms before retrying token refresh`);
-          }
+          console.log(`[${new Date().toLocaleString()}] [Haier Evo] ⏳ Waiting ${backoffDelay}ms before retrying token refresh`);
 
           await this.delay(backoffDelay);
           return this._refreshAccessToken();
         } else {
-          // Max failures reached, try full authentication
-          if (this.config.debug) {
-            console.log('Maximum refresh failures reached, performing full authentication');
-          }
+          console.log(`[${new Date().toLocaleString()}] [Haier Evo] ❌ Maximum refresh failures reached after rate limiting, performing full authentication`);
           this.refreshFailureCount = 0;
           return this.authenticate();
         }
       }
 
+      // For other errors, emit and throw
+      console.error(`[${new Date().toLocaleString()}] [Haier Evo] ❌ Token refresh failed with unexpected error:`, error);
       this.emit('error', `Token refresh failed: ${error}`);
       throw error;
     }
@@ -553,11 +662,15 @@ export class HaierAPI extends EventEmitter {
             console.log(`[${timestamp}] [Haier Evo] Found ${devices.length} devices`);
           }
 
-          // Update cache
-          this.deviceCache = devices;
+          // Fetch complete device information for all devices and merge it
+          console.log(`[${timestamp}] [Haier Evo] Fetching complete device information for ${devices.length} devices...`);
+          const devicesWithCompleteInfo = await this.enrichDevicesWithCompleteInfo(devices);
+
+          // Update cache with complete device information
+          this.deviceCache = devicesWithCompleteInfo;
           this.deviceCacheTimestamp = now;
 
-          return devices;
+          return devicesWithCompleteInfo;
         } else {
           if (this.config.debug) {
             console.log(`[${timestamp}] [Haier Evo] Endpoint ${url} returned data but no valid devices found`);
@@ -591,6 +704,114 @@ export class HaierAPI extends EventEmitter {
     }
 
     return [];
+  }
+
+  /**
+   * Enriches basic device data with complete configuration information
+   * @param devices Basic device data from API_DEVICES
+   * @returns Devices with complete information including model, firmware, serial
+   */
+  private async enrichDevicesWithCompleteInfo(devices: any[]): Promise<DeviceInfo[]> {
+    const enrichedDevices: DeviceInfo[] = [];
+
+    for (const device of devices) {
+      try {
+        // Start with basic device info
+        let enrichedDevice = { ...device };
+
+        // Get MAC address for API_DEVICE_CONFIG call
+        const macAddress = device.mac || device.macAddress;
+
+        if (macAddress) {
+          console.log(`[${new Date().toLocaleString()}] [Haier Evo] Fetching config for ${device.name || device.id} (${macAddress})`);
+
+          try {
+            // Fetch complete device configuration
+            const deviceConfig = await this.getDeviceConfigForEnrichment(macAddress);
+
+            // Merge complete device information
+            enrichedDevice = {
+              ...enrichedDevice,
+              model: deviceConfig.model || enrichedDevice.model,
+              serialNumber: deviceConfig.serialNumber || enrichedDevice.serialNumber,
+              firmwareVersion: deviceConfig.firmwareVersion || enrichedDevice.firmwareVersion,
+              deviceName: deviceConfig.deviceName || enrichedDevice.name
+            };
+
+            console.log(`[${new Date().toLocaleString()}] [Haier Evo] Enriched ${device.name}: model=${enrichedDevice.model}, serial=${enrichedDevice.serialNumber}, firmware=${enrichedDevice.firmwareVersion}`);
+          } catch (configError) {
+            console.warn(`[${new Date().toLocaleString()}] [Haier Evo] Failed to fetch config for ${device.name} (${macAddress}):`, configError instanceof Error ? configError.message : String(configError));
+            // Continue with basic device info
+          }
+        } else {
+          console.warn(`[${new Date().toLocaleString()}] [Haier Evo] No MAC address for device ${device.name || device.id}, skipping config fetch`);
+        }
+
+        enrichedDevices.push(enrichedDevice);
+      } catch (error) {
+        console.error(`[${new Date().toLocaleString()}] [Haier Evo] Error enriching device ${device.name || device.id}:`, error instanceof Error ? error.message : String(error));
+        // Add basic device info if enrichment fails
+        enrichedDevices.push({ ...device });
+      }
+    }
+
+    return enrichedDevices;
+  }
+
+  /**
+   * Fetches device configuration without using the main getDeviceStatus cache
+   * This is used during device discovery to build the complete cache
+   */
+  private async getDeviceConfigForEnrichment(mac: string): Promise<any> {
+    try {
+      // Ensure token is valid before making the request
+      await this.ensureValidToken();
+
+      const response = await this.executeWithRateLimit(() =>
+        this.http.get(
+          API_DEVICE_CONFIG.replace('{mac}', mac)
+        )
+      );
+
+      // Trim all string values in the response data
+      if (response.data) {
+        response.data = this.trimData(response.data);
+      }
+
+      if (response.data.error) {
+        throw new Error(`Failed to get device configuration: ${JSON.stringify(response.data.error)}`);
+      }
+
+      // Extract device information from API_DEVICE_CONFIG response
+      const deviceConfig: any = {};
+
+      if (response.data) {
+        // Extract model from info.model
+        if (response.data.info && response.data.info.model) {
+          deviceConfig.model = response.data.info.model;
+        }
+
+        // Extract serial number from info.serialNumber
+        if (response.data.info && response.data.info.serialNumber) {
+          deviceConfig.serialNumber = response.data.info.serialNumber;
+        }
+
+        // Extract firmware version from settings.firmware.value
+        if (response.data.settings && response.data.settings.firmware && response.data.settings.firmware.value) {
+          deviceConfig.firmwareVersion = response.data.settings.firmware.value;
+        }
+
+        // Extract device name from settings.name.name (if available)
+        if (response.data.settings && response.data.settings.name && response.data.settings.name.name) {
+          deviceConfig.deviceName = response.data.settings.name.name.trim();
+        }
+      }
+
+      return deviceConfig;
+    } catch (error) {
+      console.error(`[${new Date().toLocaleString()}] [Haier Evo] Device configuration error for ${mac}:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -652,12 +873,14 @@ export class HaierAPI extends EventEmitter {
                     id: item.macAddress || item.name, // Use MAC address as ID if available
                     name: item.name,
                     type: this.extractDeviceType(item),
-                    model: this.extractDeviceType(item), // Use device type as model for now
+                    model: this.extractDeviceModel(item),
                     mac: item.macAddress, // Add mac field for BaseDevice compatibility
                     macAddress: item.macAddress,
                     serialNumber: this.extractSerialNumber(item),
+                    firmwareVersion: this.extractFirmwareVersion(item),
                     room: room.name,
                     status: item.status || [],
+                    attributes: item.attributes || [],
                     action: item.action
                   }));
 
@@ -717,7 +940,12 @@ export class HaierAPI extends EventEmitter {
   }
 
   private extractSerialNumber(item: any): string | undefined {
-    // Extract serial number from action link
+    // First try to get from API_DEVICE_CONFIG structure (info.serialNumber)
+    if (item.info && item.info.serialNumber) {
+      return item.info.serialNumber;
+    }
+
+    // Fallback: Extract serial number from action link
     if (item.action?.link) {
       const link = item.action.link;
       const serialMatch = link.match(/serialNum=([^&]+)/);
@@ -725,7 +953,63 @@ export class HaierAPI extends EventEmitter {
         return decodeURIComponent(serialMatch[1]);
       }
     }
+
+    // Additional fallback: Check direct serialNumber field
+    if (item.serialNumber) {
+      return item.serialNumber;
+    }
+
     return undefined;
+  }
+
+  private extractDeviceModel(item: any): string {
+    // First try to get from API_DEVICE_CONFIG structure (info.model)
+    if (item.info && item.info.model) {
+      return item.info.model;
+    }
+
+    // Fallback: Try direct model field
+    if (item.model) {
+      return item.model;
+    }
+
+    // Additional fallback: Check settings for model information
+    if (item.settings && item.settings.name && item.settings.name.trackingData &&
+        item.settings.name.trackingData.data && item.settings.name.trackingData.data.model) {
+      return item.settings.name.trackingData.data.model;
+    }
+
+    // Final fallback to device type if no specific model found
+    return this.extractDeviceType(item);
+  }
+
+  private extractFirmwareVersion(item: any): string {
+    // First try to get from API_DEVICE_CONFIG structure (settings.firmware.value)
+    if (item.settings && item.settings.firmware && item.settings.firmware.value) {
+      return item.settings.firmware.value;
+    }
+
+    // Fallback: Try firmware object with value property
+    if (item.firmware && item.firmware.value) {
+      return item.firmware.value;
+    }
+
+    // Additional fallbacks: Direct firmware fields
+    if (item.firmwareVersion) {
+      return item.firmwareVersion;
+    }
+
+    if (item.version) {
+      return item.version;
+    }
+
+    // Check if there's firmware info in device info section
+    if (item.info && item.info.firmware) {
+      return item.info.firmware;
+    }
+
+    // Default fallback
+    return '1.0.0';
   }
 
   private isValidDeviceData(data: any[]): boolean {
@@ -761,7 +1045,7 @@ export class HaierAPI extends EventEmitter {
       // Ensure token is valid before making the request
       await this.ensureValidToken();
 
-      console.log(`[${new Date().toLocaleString()}] [Haier Evo] Getting initial configuration for device ${mac}`);
+      console.log(`[${new Date().toLocaleString()}] [Haier Evo] Getting device status for ${mac}`);
 
       if (this.config.debug) {
         console.log(`Device config endpoint: ${API_DEVICE_CONFIG.replace('{mac}', mac)}`);
@@ -790,6 +1074,29 @@ export class HaierAPI extends EventEmitter {
 
       // Extract useful information from the response, even if data field is empty
       const deviceStatus: DeviceStatus = {};
+
+      // Extract device information from API_DEVICE_CONFIG response
+      if (response.data) {
+        // Extract model from info.model
+        if (response.data.info && response.data.info.model) {
+          deviceStatus.model = response.data.info.model;
+        }
+
+        // Extract serial number from info.serialNumber
+        if (response.data.info && response.data.info.serialNumber) {
+          deviceStatus.serialNumber = response.data.info.serialNumber;
+        }
+
+        // Extract firmware version from settings.firmware.value
+        if (response.data.settings && response.data.settings.firmware && response.data.settings.firmware.value) {
+          deviceStatus.firmwareVersion = response.data.settings.firmware.value;
+        }
+
+        // Extract device name from settings.name.name (if available)
+        if (response.data.settings && response.data.settings.name && response.data.settings.name.name) {
+          deviceStatus.deviceName = response.data.settings.name.name.trim();
+        }
+      }
 
       // Extract attributes from the response if available
       if (response.data.attributes && Array.isArray(response.data.attributes)) {
@@ -902,7 +1209,7 @@ export class HaierAPI extends EventEmitter {
   }
 
   async connectWebSocket(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const timestamp = new Date().toLocaleString();
 
       // Clean up any existing connection
@@ -921,6 +1228,17 @@ export class HaierAPI extends EventEmitter {
       try {
         console.log(`[${timestamp}] [Haier Evo] 🔌 Connecting to WebSocket...`);
         console.log(`[${timestamp}] [Haier Evo] WebSocket status path: ${API_WEBSOCKET_STATUS}`);
+
+        // Ensure we have a valid token before connecting
+        try {
+          await this.ensureValidToken();
+          console.log(`[${timestamp}] [Haier Evo] Token validated for WebSocket connection`);
+        } catch (tokenError) {
+          console.error(`[${timestamp}] [Haier Evo] Failed to validate token for WebSocket:`, tokenError);
+          reject(new Error(`Token validation failed: ${tokenError}`));
+          return;
+        }
+
         console.log(`[${timestamp}] [Haier Evo] Access token available:`, !!this.accessToken);
 
         // Connect to WebSocket with JWT token in the path
@@ -966,10 +1284,13 @@ export class HaierAPI extends EventEmitter {
         this.ws.on('close', (code, reason) => {
           clearTimeout(connectionTimeout);
           const closeTimestamp = new Date().toLocaleString();
-          console.log(`[${closeTimestamp}] [Haier Evo] 🔌 WebSocket closed. Code: ${code}, Reason: ${reason || 'No reason provided'}`);
+          const reasonString = reason ? reason.toString() : 'No reason provided';
+          console.log(`[${closeTimestamp}] [Haier Evo] 🔌 WebSocket closed. Code: ${code}, Reason: ${reasonString}`);
 
           // Log specific close codes for debugging
           let closeReason = '';
+          let isAuthError = false;
+
           switch (code) {
             case 1000:
               closeReason = 'Normal closure';
@@ -988,6 +1309,11 @@ export class HaierAPI extends EventEmitter {
               break;
             case 1007:
               closeReason = 'Invalid frame payload data';
+              // Check if this is an authentication error
+              if (reasonString.includes('Auth token not valid') || reasonString.includes('token')) {
+                isAuthError = true;
+                closeReason = 'Authentication token invalid';
+              }
               break;
             case 1008:
               closeReason = 'Policy violation';
@@ -1007,8 +1333,26 @@ export class HaierAPI extends EventEmitter {
           this.emit('disconnected');
           this.stopHeartbeat();
 
-          // If the connection was never established (e.g., during initialization)
-          if (code === 1006 && !this.connectionEstablished) {
+          // Handle authentication errors
+          if (isAuthError) {
+            console.log(`[${closeTimestamp}] [Haier Evo] 🔑 WebSocket authentication failed. Will refresh token and retry.`);
+
+            // Try to refresh the token before reconnecting
+            this.refreshAccessToken().then(() => {
+              console.log(`[${closeTimestamp}] [Haier Evo] Token refreshed after WebSocket auth failure. Scheduling reconnect.`);
+              this.scheduleReconnect();
+            }).catch(error => {
+              console.error(`[${closeTimestamp}] [Haier Evo] Failed to refresh token after WebSocket auth failure:`, error);
+              this.scheduleReconnect();
+            });
+
+            // If the connection was never established due to auth error, reject immediately
+            if (!this.connectionEstablished) {
+              reject(new Error(`WebSocket authentication failed: ${closeReason}`));
+              return;
+            }
+          } else if (code === 1006 && !this.connectionEstablished) {
+            // If the connection was never established (e.g., during initialization)
             console.log(`[${closeTimestamp}] [Haier Evo] ⚠️ WebSocket closed before connection was established. Will retry with exponential backoff.`);
             reject(new Error(`WebSocket was closed before the connection was established: ${closeReason}`));
           } else {
@@ -1374,6 +1718,9 @@ export class HaierAPI extends EventEmitter {
     console.log(`[${timestamp}] [Haier Evo] 🔄 Requesting device statuses...`);
 
     try {
+      // Ensure we have a valid token first
+      await this.ensureValidToken();
+
       if (!this.isConnected) {
         console.log(`[${timestamp}] [Haier Evo] 🔌 WebSocket not connected, connecting first...`);
         await this.connectWebSocket();
@@ -1432,14 +1779,21 @@ export class HaierAPI extends EventEmitter {
       delay = 300000; // 5 minutes
     }
 
-    this.reconnectTimer = setTimeout(() => {
+    this.reconnectTimer = setTimeout(async () => {
       console.log(`[${new Date().toLocaleString()}] [Haier Evo] 🔌 Attempting to reconnect...`);
-      this.connectWebSocket().catch(error => {
+
+      try {
+        // Ensure we have a valid token before attempting to reconnect
+        await this.ensureValidToken();
+        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Token validated for reconnection`);
+
+        await this.connectWebSocket();
+      } catch (error) {
         console.error(`[${new Date().toLocaleString()}] [Haier Evo] ❌ Reconnection failed:`, error);
         this.emit('error', `Reconnection failed: ${error}`);
         // Schedule next attempt
         this.scheduleReconnect();
-      });
+      }
     }, delay);
   }
 
@@ -1472,6 +1826,9 @@ export class HaierAPI extends EventEmitter {
      */
     async setDeviceProperties(macAddress: string, properties: Array<{propertyId: string, value: string | number | boolean}>): Promise<void> {
       const timestamp = new Date().toLocaleString();
+
+      // Ensure we have a valid token first
+      await this.ensureValidToken();
 
       if (!this.ws || !this.isConnected) {
         console.log(`[${timestamp}] [Haier Evo] 🔌 WebSocket not connected, connecting...`);
@@ -1509,14 +1866,137 @@ export class HaierAPI extends EventEmitter {
     }
 
     /**
-     * Set a single device property
+     * Set a single device property with batching support
      * @param macAddress The MAC address of the device
      * @param propertyId The ID of the property to set
      * @param value The value to set
      */
     async setDeviceProperty(macAddress: string, propertyId: string, value: string | number | boolean): Promise<void> {
-      // Simply call the batch method with a single property
-      return this.setDeviceProperties(macAddress, [{ propertyId, value }]);
+      return new Promise((resolve, reject) => {
+        this.addToBatch(macAddress, propertyId, value, resolve, reject);
+      });
+    }
+
+    /**
+     * Add a command to the batch queue for a device
+     * @param macAddress The MAC address of the device
+     * @param propertyId The ID of the property to set
+     * @param value The value to set
+     * @param resolve Promise resolve function
+     * @param reject Promise reject function
+     */
+    private addToBatch(
+      macAddress: string,
+      propertyId: string,
+      value: string | number | boolean,
+      resolve: () => void,
+      reject: (error: any) => void
+    ): void {
+      const timestamp = new Date().toLocaleString();
+
+      // Get or create batch for this device
+      let batch = this.commandBatches.get(macAddress);
+
+      if (!batch) {
+        console.log(`[${timestamp}] [Haier Evo] 📦 Creating new command batch for device ${macAddress}`);
+        batch = {
+          commands: [],
+          promises: [],
+          timeout: setTimeout(() => {
+            this.processBatch(macAddress);
+          }, this.batchTimeout)
+        };
+        this.commandBatches.set(macAddress, batch);
+      } else {
+        console.log(`[${timestamp}] [Haier Evo] 📦 Adding to existing batch for device ${macAddress} (${batch.commands.length} commands)`);
+      }
+
+      // Check if this property is already in the batch - if so, update it
+      const existingIndex = batch.commands.findIndex(cmd => cmd.propertyId === propertyId);
+      if (existingIndex >= 0) {
+        console.log(`[${timestamp}] [Haier Evo] 🔄 Updating existing property ${propertyId} in batch (old: ${batch.commands[existingIndex].value}, new: ${value})`);
+        batch.commands[existingIndex].value = value;
+        // Don't add another promise, the existing one will handle it
+      } else {
+        console.log(`[${timestamp}] [Haier Evo] ➕ Adding new property ${propertyId}=${value} to batch`);
+        batch.commands.push({ propertyId, value });
+      }
+
+      // Always add the promise (even for updates, so all callers get resolved)
+      batch.promises.push({ resolve, reject });
+    }
+
+    /**
+     * Process and send a batch of commands for a device
+     * @param macAddress The MAC address of the device
+     */
+    private async processBatch(macAddress: string): Promise<void> {
+      const batch = this.commandBatches.get(macAddress);
+      if (!batch) {
+        return;
+      }
+
+      const timestamp = new Date().toLocaleString();
+      console.log(`[${timestamp}] [Haier Evo] 🚀 Processing batch for device ${macAddress} with ${batch.commands.length} commands`);
+
+      // Remove the batch from the map
+      this.commandBatches.delete(macAddress);
+
+      // Clear the timeout
+      clearTimeout(batch.timeout);
+
+      try {
+        // Send all commands in a single batch request
+        await this.setDeviceProperties(macAddress, batch.commands);
+
+        // Resolve all promises
+        console.log(`[${timestamp}] [Haier Evo] ✅ Batch completed successfully, resolving ${batch.promises.length} promises`);
+        batch.promises.forEach(promise => promise.resolve());
+
+      } catch (error) {
+        console.error(`[${timestamp}] [Haier Evo] ❌ Batch failed, rejecting ${batch.promises.length} promises:`, error);
+        batch.promises.forEach(promise => promise.reject(error));
+      }
+    }
+
+    /**
+     * Force immediate processing of any pending batches for a device
+     * @param macAddress The MAC address of the device (optional - if not provided, processes all batches)
+     */
+    async flushBatches(macAddress?: string): Promise<void> {
+      const timestamp = new Date().toLocaleString();
+
+      if (macAddress) {
+        // Flush specific device batch
+        if (this.commandBatches.has(macAddress)) {
+          console.log(`[${timestamp}] [Haier Evo] 🚀 Force flushing batch for device ${macAddress}`);
+          await this.processBatch(macAddress);
+        }
+      } else {
+        // Flush all pending batches
+        const deviceMacs = Array.from(this.commandBatches.keys());
+        console.log(`[${timestamp}] [Haier Evo] 🚀 Force flushing all batches (${deviceMacs.length} devices)`);
+
+        for (const mac of deviceMacs) {
+          await this.processBatch(mac);
+        }
+      }
+    }
+
+    /**
+     * Get the current batch timeout setting
+     */
+    getBatchTimeout(): number {
+      return this.batchTimeout;
+    }
+
+    /**
+     * Set the batch timeout (time to wait before sending batched commands)
+     * @param timeoutMs Timeout in milliseconds
+     */
+    setBatchTimeout(timeoutMs: number): void {
+      this.batchTimeout = Math.max(10, Math.min(1000, timeoutMs)); // Clamp between 10ms and 1000ms
+      console.log(`[${new Date().toLocaleString()}] [Haier Evo] 📦 Batch timeout set to ${this.batchTimeout}ms`);
     }
 
     /**
@@ -1566,6 +2046,17 @@ export class HaierAPI extends EventEmitter {
       this.statusRequestTimer = null;
     }
 
+    // Clear command batches and reject pending promises
+    for (const [macAddress, batch] of this.commandBatches.entries()) {
+      console.log(`[${new Date().toLocaleString()}] [Haier Evo] Clearing pending batch for ${macAddress} (${batch.commands.length} commands)`);
+      clearTimeout(batch.timeout);
+      batch.promises.forEach(promise => promise.reject(new Error('API disconnected')));
+    }
+    this.commandBatches.clear();
+
+    // Clear token refresh timer
+    this.clearTokenRefreshTimer();
+
     this.isConnected = false;
   }
 
@@ -1577,15 +2068,8 @@ export class HaierAPI extends EventEmitter {
     this.isConnected = false;
   }
 
-  isTokenValid(): boolean {
-    if (!this.accessToken || !this.tokenExpire) {
-      return false;
-    }
-    return new Date() < this.tokenExpire;
-  }
-
   /**
-   * Check if token needs to be refreshed soon (within the next 5 minutes)
+   * Check if token needs to be refreshed soon (based on configured threshold)
    */
   needsTokenRefresh(): boolean {
     if (!this.accessToken || !this.tokenExpire) {
@@ -1596,18 +2080,55 @@ export class HaierAPI extends EventEmitter {
     const now = new Date();
     const timeUntilExpire = this.tokenExpire.getTime() - now.getTime();
 
-    // Refresh if token expires within 5 minutes
-    return timeUntilExpire < 5 * 60 * 1000;
+    // Get threshold from config (default: 300 seconds = 5 minutes)
+    const threshold = (this.config.tokenRefreshThreshold || 300) * 1000;
+
+    // Refresh if token expires within threshold
+    return timeUntilExpire < threshold;
+  }
+
+  /**
+   * Check if the current access token is still valid
+   */
+  isTokenValid(): boolean {
+    if (!this.accessToken || !this.tokenExpire) {
+      return false;
+    }
+
+    // Token is valid if it hasn't expired yet
+    const now = new Date();
+    return now < this.tokenExpire;
   }
 
   /**
    * Ensures the token is valid and refreshes it if needed
    */
   async ensureValidToken(): Promise<void> {
-    if (!this.isTokenValid() || this.needsTokenRefresh()) {
-      if (this.config.debug) {
-        console.log('Token needs refresh, refreshing...');
+    // If token is invalid, we need to refresh or reauthenticate
+    if (!this.isTokenValid()) {
+      console.log(`[${new Date().toLocaleString()}] [Haier Evo] 🔑 Access token invalid/expired`);
+
+      // Check if we have a valid refresh token
+      if (!this.refreshToken || !this.refreshExpire || new Date() >= this.refreshExpire) {
+        console.log(`[${new Date().toLocaleString()}] [Haier Evo] 🔑 Refresh token also invalid/expired, performing full authentication`);
+        await this.authenticate();
+        return;
       }
+
+      // Try to refresh with valid refresh token
+      console.log(`[${new Date().toLocaleString()}] [Haier Evo] 🔄 Attempting token refresh`);
+      await this.refreshAccessToken();
+      return;
+    }
+
+    // If token refresh is disabled, only refresh if token is invalid
+    if (this.config.tokenRefreshMode === 'disabled') {
+      return;
+    }
+
+    // For auto mode, refresh if token is about to expire
+    if (this.config.tokenRefreshMode === 'auto' && this.needsTokenRefresh()) {
+      console.log(`[${new Date().toLocaleString()}] [Haier Evo] ⏰ Token about to expire, refreshing proactively`);
       await this.refreshAccessToken();
     }
   }
@@ -1625,6 +2146,10 @@ export class HaierAPI extends EventEmitter {
 
   getDeviceMap(): Map<string, HaierDevice> {
     return this.devices;
+  }
+
+  getDevice(deviceId: string): HaierDevice | undefined {
+    return this.devices.get(deviceId);
   }
 
   addDevice(device: HaierDevice): void {

@@ -1,7 +1,7 @@
 import { BaseDevice } from './base-device';
 import { HaierAC, DeviceInfo } from '../types';
 import { HaierAPI } from '../haier-api';
-import { HVAC_MODES, FAN_MODES, SWING_MODES, HORIZONTAL_SWING_MODES, HVACMode, FanMode, SwingMode } from '../constants';
+import { HVAC_MODES, FAN_MODES, SWING_MODES, HVACMode, FanMode, SwingMode } from '../constants';
 
 export class HaierACDevice extends BaseDevice implements HaierAC {
   // Command mappings based on AC data
@@ -1183,6 +1183,9 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
       } else {
         console.log(`[${new Date().toLocaleString()}] [Haier Evo] No direct status changes detected for ${this.device_name}`);
       }
+
+      // Call the base class updateFromStatus to handle device information and other base properties
+      super.updateFromStatus(status as any);
     }
   }
 
@@ -1316,10 +1319,6 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
   get_swing_modes(): string[] {
     return Object.values(SWING_MODES);
-  }
-
-  get_swing_horizontal_modes(): string[] {
-    return Object.values(HORIZONTAL_SWING_MODES);
   }
 
   get_preset_modes(): string[] {

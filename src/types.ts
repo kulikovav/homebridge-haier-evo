@@ -13,6 +13,14 @@ export interface HaierEvoConfig {
   minRequestDelay?: number;        // Minimum delay between requests in ms (default: 100)
   maxRequestDelay?: number;        // Maximum delay between requests in ms (default: 1000)
 
+  // Token refresh options
+  tokenRefreshMode?: 'auto' | 'manual' | 'disabled';  // Token refresh mode (default: 'auto')
+  tokenRefreshInterval?: number;   // Manual refresh interval in seconds (default: use expire header)
+  tokenRefreshThreshold?: number;  // Time in seconds before expiration to refresh token (default: 300)
+
+  // Command batching options
+  batchTimeout?: number;           // Time in milliseconds to wait before sending batched commands (default: 100)
+
   // Device filtering options
   includeDevices?: string[];       // List of device IDs to include (if specified, only these devices will be added)
   excludeDevices?: string[];       // List of device IDs to exclude
@@ -20,6 +28,17 @@ export interface HaierEvoConfig {
   excludeDeviceTypes?: string[];   // List of device types to exclude
   includeNamePattern?: string;     // Regex pattern for device names to include
   excludeNamePattern?: string;     // Regex pattern for device names to exclude
+
+  // AC Accessory Options
+  enableFanService?: boolean;      // Enable separate Fan service (default: true)
+  enableBlindsControl?: boolean;   // Enable blinds control with Fan v2 service (default: true)
+  enableBlindsAutoSwitch?: boolean; // Enable blinds auto mode switch (default: true)
+  enableBlindsComfortSwitch?: boolean; // Enable blinds comfort mode switch (default: true)
+  enableLightControl?: boolean;    // Enable light control service (default: true)
+  enableHealthModeSwitch?: boolean; // Enable health mode switch (default: true)
+  enableQuietModeSwitch?: boolean; // Enable quiet mode switch (default: true)
+  enableTurboModeSwitch?: boolean; // Enable turbo mode switch (default: true)
+  enableComfortModeSwitch?: boolean; // Enable comfort mode switch (default: true)
 }
 
 export interface AuthResponse {
@@ -42,6 +61,9 @@ export interface DeviceInfo {
   mac: string;
   status: number;
   attributes: DeviceAttribute[];
+  serialNumber?: string;
+  firmwareVersion?: string;
+  initialStatus?: DeviceStatus; // Initial status data from API_DEVICE_CONFIG to avoid redundant calls
 }
 
 export interface DeviceAttribute {
@@ -63,7 +85,6 @@ export interface DeviceStatus {
   mode?: string;
   fan_mode?: string;
   swing_mode?: string;
-  swing_horizontal_mode?: string;
   quiet?: boolean;
   turbo?: boolean;
   comfort?: boolean;
@@ -80,6 +101,12 @@ export interface DeviceStatus {
   // WebSocket and API response formats
   properties?: Record<string, unknown>;
   attributes?: any[];
+
+  // Device information from API_DEVICE_CONFIG
+  model?: string;
+  serialNumber?: string;
+  firmwareVersion?: string;
+  deviceName?: string;
 }
 
 export interface HaierDevice {
@@ -88,6 +115,8 @@ export interface HaierDevice {
   device_model: string;
   device_type: string;
   mac: string;
+  serialNumber?: string;
+  firmwareVersion?: string;
   status: number;
   available: boolean;
   current_temperature: number;
@@ -95,7 +124,6 @@ export interface HaierDevice {
   mode: string;
   fan_mode: string;
   swing_mode: string;
-  swing_horizontal_mode: string;
   max_temperature: number;
   min_temperature: number;
   quiet: boolean;
@@ -113,11 +141,11 @@ export interface HaierDevice {
 
   // Methods
   set_temperature(temp: number): Promise<void>;
-  switch_on(mode?: string): Promise<void>;
+  switch_on(): Promise<void>;
   switch_off(): Promise<void>;
+  set_operation_mode(mode: string): Promise<void>;
   set_fan_mode(mode: string): Promise<void>;
   set_swing_mode(mode: string): Promise<void>;
-  set_swing_horizontal_mode(mode: string): Promise<void>;
   set_preset_mode(mode: string): Promise<void>;
   set_quiet(enabled: boolean): Promise<void>;
   set_turbo(enabled: boolean): Promise<void>;
@@ -139,6 +167,10 @@ export interface HaierDevice {
   // Status update method
   updateFromStatus(status: any): void;
 
+  // Configuration methods
+  setSkipInitialFetch(skip?: boolean): void;
+  updateDeviceInfo(info: { model?: string; serialNumber?: string; firmwareVersion?: string; deviceName?: string }): void;
+
   // Cleanup method
   destroy(): void;
 }
@@ -148,7 +180,6 @@ export interface HaierAC extends HaierDevice {
   get_hvac_modes(): string[];
   get_fan_modes(): string[];
   get_swing_modes(): string[];
-  get_swing_horizontal_modes(): string[];
   get_preset_modes(): string[];
 }
 

@@ -79,6 +79,41 @@
         "default": 1000,
         "description": "Maximum delay between requests in milliseconds (default: 1000)"
       },
+      "tokenRefreshMode": {
+        "title": "Token Refresh Mode",
+        "type": "string",
+        "default": "auto",
+        "oneOf": [
+          { "title": "Auto (Based on Expiration)", "enum": ["auto"] },
+          { "title": "Manual (Fixed Interval)", "enum": ["manual"] },
+          { "title": "Disabled", "enum": ["disabled"] }
+        ],
+        "description": "How token refreshes should be handled"
+      },
+      "tokenRefreshInterval": {
+        "title": "Token Refresh Interval",
+        "type": "integer",
+        "minimum": 60,
+        "maximum": 86400,
+        "default": 3600,
+        "description": "Interval in seconds for manual token refresh (default: 3600 - 1 hour)"
+      },
+      "tokenRefreshThreshold": {
+        "title": "Token Refresh Threshold",
+        "type": "integer",
+        "minimum": 60,
+        "maximum": 3600,
+        "default": 300,
+        "description": "Time in seconds before token expiration to trigger refresh (default: 300 - 5 minutes)"
+      },
+      "batchTimeout": {
+        "title": "Command Batch Timeout",
+        "type": "integer",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 100,
+        "description": "Time in milliseconds to wait before sending batched commands (default: 100ms)"
+      },
       "includeDevices": {
         "title": "Include Devices",
         "type": "array",
@@ -122,6 +157,60 @@
         "title": "Exclude Name Pattern",
         "type": "string",
         "description": "Regex pattern for device names to exclude"
+      },
+      "enableFanService": {
+        "title": "Enable Fan Service",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable separate Fan v2 service for AC devices"
+      },
+      "enableBlindsControl": {
+        "title": "Enable Blinds Control",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable vertical blinds control using Fan v2 service"
+      },
+      "enableBlindsAutoSwitch": {
+        "title": "Enable Blinds Auto Switch",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable blinds auto mode switch"
+      },
+      "enableBlindsComfortSwitch": {
+        "title": "Enable Blinds Comfort Switch",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable blinds comfort mode switch"
+      },
+      "enableLightControl": {
+        "title": "Enable Light Control",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable light control service for AC devices"
+      },
+      "enableHealthModeSwitch": {
+        "title": "Enable Health Mode Switch",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable health mode switch for AC devices"
+      },
+      "enableQuietModeSwitch": {
+        "title": "Enable Quiet Mode Switch",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable quiet mode switch for AC devices"
+      },
+      "enableTurboModeSwitch": {
+        "title": "Enable Turbo Mode Switch",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable turbo mode switch for AC devices"
+      },
+      "enableComfortModeSwitch": {
+        "title": "Enable Comfort Mode Switch",
+        "type": "boolean",
+        "default": true,
+        "description": "Enable comfort mode switch for AC devices"
       }
     }
   },
@@ -147,7 +236,23 @@
         "deviceCacheTTL",
         "requestRandomization",
         "minRequestDelay",
-        "maxRequestDelay"
+        "maxRequestDelay",
+        {
+          "type": "fieldset",
+          "title": "Token Refresh Settings",
+          "items": [
+            "tokenRefreshMode",
+            "tokenRefreshInterval",
+            "tokenRefreshThreshold"
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Command Batching",
+          "items": [
+            "batchTimeout"
+          ]
+        }
       ]
     },
     {
@@ -162,6 +267,35 @@
         "excludeDeviceTypes",
         "includeNamePattern",
         "excludeNamePattern"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "AC Accessory Options",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "enableFanService",
+        "enableBlindsControl",
+        {
+          "type": "fieldset",
+          "title": "Blinds Control Switches",
+          "items": [
+            "enableBlindsAutoSwitch",
+            "enableBlindsComfortSwitch"
+          ]
+        },
+        "enableLightControl",
+        {
+          "type": "fieldset",
+          "title": "AC Mode Switches",
+          "items": [
+            "enableHealthModeSwitch",
+            "enableQuietModeSwitch",
+            "enableTurboModeSwitch",
+            "enableComfortModeSwitch"
+          ]
+        }
       ]
     }
   ]
