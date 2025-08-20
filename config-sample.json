@@ -22,13 +22,32 @@
       "minRequestDelay": 100,
       "maxRequestDelay": 1000,
 
+      "_comment_token": "Token refresh options (all are optional)",
+      "tokenRefreshMode": "auto",
+      "tokenRefreshInterval": 3600,
+      "tokenRefreshThreshold": 300,
+
+      "_comment_batch": "Command batching options",
+      "batchTimeout": 100,
+
       "_comment": "Device filtering options (all are optional)",
       "includeDevices": ["device-id-1", "device-id-2"],
       "excludeDevices": ["device-id-3"],
       "includeDeviceTypes": ["air_conditioner"],
       "excludeDeviceTypes": ["refrigerator"],
       "includeNamePattern": "Living Room|Kitchen",
-      "excludeNamePattern": "Basement"
+      "excludeNamePattern": "Basement",
+
+      "_comment_ac_accessories": "AC Accessory Options (all default to true)",
+      "enableFanService": true,
+      "enableBlindsControl": true,
+      "enableBlindsAutoSwitch": true,
+      "enableBlindsComfortSwitch": true,
+      "enableLightControl": true,
+      "enableHealthModeSwitch": true,
+      "enableQuietModeSwitch": true,
+      "enableTurboModeSwitch": true,
+      "enableComfortModeSwitch": true
     }
   ]
 }

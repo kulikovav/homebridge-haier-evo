@@ -346,7 +346,7 @@ publish_to_npm() {
     fi
 
     # Publish
-    if npm publish --no-color; then
+    if npm publish --no-color --tag dev; then
         log_success "Successfully published $new_version to npm!"
     else
         log_error "Failed to publish to npm"

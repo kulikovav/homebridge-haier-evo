@@ -401,6 +401,11 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Implement missing abstract methods from BaseDevice
+  async set_operation_mode(mode: string): Promise<void> {
+    // Refrigerators don't have operation modes like AC units
+    console.log(`Operation mode not supported for refrigerator: ${mode}`);
+  }
+
   async set_fan_mode(mode: string): Promise<void> {
     // Refrigerators don't have fan modes
     throw new Error('Fan mode not supported by refrigerator devices');

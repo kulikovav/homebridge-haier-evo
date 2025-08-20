@@ -8,6 +8,8 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   public device_model: string;
   public device_type: string;
   public mac: string;
+  public serialNumber?: string;
+  public firmwareVersion?: string;
   public status: number = 0;
   public available: boolean = false;
   public current_temperature: number = 20;
@@ -15,7 +17,6 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   public mode: string = 'auto';
   public fan_mode: string = 'auto';
   public swing_mode: string = 'off';
-  public swing_horizontal_mode: string = 'auto';
   public max_temperature: number = 30;
   public min_temperature: number = 16;
   public quiet: boolean = false;
@@ -43,6 +44,8 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     this.device_model = deviceInfo.model;
     this.device_type = deviceInfo.type;
     this.mac = deviceInfo.mac;
+    this.serialNumber = deviceInfo.serialNumber;
+    this.firmwareVersion = deviceInfo.firmwareVersion;
     this.api = api;
 
     // Don't start status updates immediately - let subclasses set temperature limits first
@@ -68,9 +71,43 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     this.startStatusUpdates();
   }
 
+  private skipInitialFetch: boolean = false;
+
+  public setSkipInitialFetch(skip: boolean = true): void {
+    this.skipInitialFetch = skip;
+  }
+
+  public updateDeviceInfo(info: { model?: string; serialNumber?: string; firmwareVersion?: string; deviceName?: string }): void {
+    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Updating device info for ${this.device_name}`);
+
+    if (info.model !== undefined) {
+      this.device_model = info.model;
+    }
+
+    if (info.serialNumber !== undefined) {
+      this.serialNumber = info.serialNumber;
+    }
+
+    if (info.firmwareVersion !== undefined) {
+      this.firmwareVersion = info.firmwareVersion;
+    }
+
+    if (info.deviceName !== undefined) {
+      this.device_name = info.deviceName;
+    }
+
+    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Device info updated: model=${this.device_model}, serial=${this.serialNumber}, firmware=${this.firmwareVersion}`);
+  }
+
     // Fetch initial configuration once at startup
   protected async fetchInitialStatus(): Promise<void> {
     try {
+      // Skip if initial fetch was already done at platform level
+      if (this.skipInitialFetch) {
+        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Skipping initial config fetch for ${this.device_name} - already done at platform level`);
+        return;
+      }
+
       // Check if MAC address is available before making API call
       if (!this.mac) {
         this.emit('warning', `Device ${this.device_id} has no MAC address, skipping initial configuration fetch`);
@@ -116,6 +153,20 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
         // Update the device status with the configuration data
         this.updateFromStatus(config);
         this.lastStatusUpdate = new Date();
+
+        // Check if we have device information updates from API_DEVICE_CONFIG
+        if (config.model || config.serialNumber || config.firmwareVersion || config.deviceName) {
+          console.log(`[${new Date().toLocaleString()}] [Haier Evo] Found device information updates for ${this.device_name}`);
+
+          // Emit device info update to notify platform
+          this.emit('deviceInfoUpdated', {
+            mac: this.mac,
+            model: config.model,
+            serialNumber: config.serialNumber,
+            firmwareVersion: config.firmwareVersion,
+            deviceName: config.deviceName
+          });
+        }
 
         // Ensure the statusUpdated event is emitted to notify the accessory
         this.emit('statusUpdated', config);
@@ -182,11 +233,6 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
       this.swing_mode = status.swing_mode;
     }
 
-    if (status.swing_horizontal_mode !== undefined && this.swing_horizontal_mode !== status.swing_horizontal_mode) {
-      changes.swing_horizontal_mode = { old: this.swing_horizontal_mode, new: status.swing_horizontal_mode };
-      this.swing_horizontal_mode = status.swing_horizontal_mode;
-    }
-
     if (status.quiet !== undefined && this.quiet !== status.quiet) {
       changes.quiet = { old: this.quiet, new: status.quiet };
       this.quiet = status.quiet;
@@ -247,6 +293,28 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
       this.preset_mode_boost = status.preset_mode_boost;
     }
 
+    // Handle device information updates if present in status
+    // Only update if the fields are present and different to preserve device info
+    if (status.model !== undefined && this.device_model !== status.model) {
+      changes.device_model = { old: this.device_model, new: status.model };
+      this.device_model = status.model;
+    }
+
+    if (status.serialNumber !== undefined && this.serialNumber !== status.serialNumber) {
+      changes.serialNumber = { old: this.serialNumber, new: status.serialNumber };
+      this.serialNumber = status.serialNumber;
+    }
+
+    if (status.firmwareVersion !== undefined && this.firmwareVersion !== status.firmwareVersion) {
+      changes.firmwareVersion = { old: this.firmwareVersion, new: status.firmwareVersion };
+      this.firmwareVersion = status.firmwareVersion;
+    }
+
+    if (status.deviceName !== undefined && this.device_name !== status.deviceName) {
+      changes.device_name = { old: this.device_name, new: status.deviceName };
+      this.device_name = status.deviceName;
+    }
+
     const oldAvailable = this.available;
     this.available = this.status > 0;
 
@@ -266,9 +334,9 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   abstract set_temperature(temp: number): Promise<void>;
   abstract switch_on(mode?: string): Promise<void>;
   abstract switch_off(): Promise<void>;
+  abstract set_operation_mode(mode: string): Promise<void>;
   abstract set_fan_mode(mode: string): Promise<void>;
   abstract set_swing_mode(mode: string): Promise<void>;
-  abstract set_swing_horizontal_mode(mode: string): Promise<void>;
   abstract set_preset_mode(mode: string): Promise<void>;
   abstract set_quiet(enabled: boolean): Promise<void>;
   abstract set_turbo(enabled: boolean): Promise<void>;
@@ -335,6 +403,8 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
       device_model: this.device_model,
       device_type: this.device_type,
       mac: this.mac,
+      serialNumber: this.serialNumber,
+      firmwareVersion: this.firmwareVersion,
       status: this.status,
       available: this.available,
       current_temperature: this.current_temperature,
@@ -342,7 +412,6 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
       mode: this.mode,
       fan_mode: this.fan_mode,
       swing_mode: this.swing_mode,
-      swing_horizontal_mode: this.swing_horizontal_mode,
       max_temperature: this.max_temperature,
       min_temperature: this.min_temperature,
       quiet: this.quiet,

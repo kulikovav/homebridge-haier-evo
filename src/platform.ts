@@ -169,6 +169,7 @@ export class HaierEvoPlatform {
       const filteredDevices = this.filterDevices(devices);
       this.log.info(`${filteredDevices.length} of ${devices.length} devices passed filtering criteria`);
 
+      // Fetch device configurations and create accessories with complete data
       for (const deviceInfo of filteredDevices) {
         try {
           if (!deviceInfo || typeof deviceInfo !== 'object') {
@@ -181,6 +182,7 @@ export class HaierEvoPlatform {
             continue;
           }
 
+          // Device info is already complete from fetchDevices()
           await this.createAccessory(deviceInfo);
         } catch (error) {
           this.log.error(`Failed to create accessory for device ${deviceInfo?.name || 'unknown'}:`, error);
@@ -299,6 +301,9 @@ export class HaierEvoPlatform {
       const accessory = new HaierEvoAccessory(this, existingAccessory, deviceInfo);
       this.accessories.set(deviceInfo.id, accessory);
 
+      // Set up device info update listener
+      this.setupDeviceInfoListener(deviceInfo.id, accessory);
+
       // Update the accessory
       this.api.updatePlatformAccessories([existingAccessory]);
     } else {
@@ -312,9 +317,51 @@ export class HaierEvoPlatform {
       const haierAccessory = new HaierEvoAccessory(this, accessory, deviceInfo);
       this.accessories.set(deviceInfo.id, haierAccessory);
 
+      // Set up device info update listener
+      this.setupDeviceInfoListener(deviceInfo.id, haierAccessory);
+
       // Register the accessory
       this.api.registerPlatformAccessories(PLATFORM_NAME, PLATFORM_NAME, [accessory]);
     }
+  }
+
+  private setupDeviceInfoListener(deviceId: string, accessory: HaierEvoAccessory): void {
+    // Get the device instance from the API
+    const device = this.haierAPI.getDevice(deviceId);
+    if (device) {
+      // Listen for device info updates
+      device.on('deviceInfoUpdated', (info: any) => {
+        this.handleDeviceInfoUpdate(deviceId, info, accessory);
+      });
+    }
+  }
+
+  private handleDeviceInfoUpdate(deviceId: string, info: any, accessory: HaierEvoAccessory): void {
+    this.log.info(`Received device info update for ${deviceId}:`, JSON.stringify(info));
+
+    // Update the device info with the new information
+    const currentDeviceInfo = accessory.accessory.context.device;
+    const updatedDeviceInfo = {
+      ...currentDeviceInfo,
+      model: info.model || currentDeviceInfo.model,
+      serialNumber: info.serialNumber || currentDeviceInfo.serialNumber,
+      firmwareVersion: info.firmwareVersion || currentDeviceInfo.firmwareVersion
+    };
+
+    // Update the name if provided and different
+    if (info.deviceName && info.deviceName !== currentDeviceInfo.name) {
+      updatedDeviceInfo.name = info.deviceName;
+      this.log.info(`Device name updated from "${currentDeviceInfo.name}" to "${info.deviceName}"`);
+    }
+
+    // Update the accessory context
+    accessory.accessory.context.device = updatedDeviceInfo;
+
+    // Update the accessory with the new device info
+    accessory.updateDeviceInfo(updatedDeviceInfo);
+
+    // Update the platform accessory
+    this.api.updatePlatformAccessories([accessory.accessory]);
   }
 
   private handleDeviceStatusUpdate(data: any): void {
@@ -437,8 +484,12 @@ export class HaierEvoPlatform {
     }
   }
 
-  public getHaierAPI(): HaierAPI {
+  public   getHaierAPI(): HaierAPI {
     return this.haierAPI;
+  }
+
+  getConfig(): HaierEvoConfig {
+    return this.config as unknown as HaierEvoConfig;
   }
 
   public getAccessory(deviceId: string): HaierEvoAccessory | undefined {
