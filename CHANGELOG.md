@@ -45,4 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update CHANGELOG and README for versioning and repository ownership changes
 
+## [1.2.0] - 2025-08-20
+- Update CHANGELOG, README, and configuration files to include new token refresh and command batching options; add legal documentation.
+
 ## [Unreleased]
