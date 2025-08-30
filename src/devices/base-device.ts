@@ -228,9 +228,12 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
       this.fan_mode = status.fan_mode;
     }
 
-    if (status.swing_mode !== undefined && this.swing_mode !== status.swing_mode) {
-      changes.swing_mode = { old: this.swing_mode, new: status.swing_mode };
-      this.swing_mode = status.swing_mode;
+    // swing_mode applies to AC only; ignore for refrigerators
+    if (this.device_type?.toLowerCase().includes('ac') || this.device_type?.toLowerCase().includes('conditioner')) {
+      if (status.swing_mode !== undefined && this.swing_mode !== status.swing_mode) {
+        changes.swing_mode = { old: this.swing_mode, new: status.swing_mode };
+        this.swing_mode = status.swing_mode;
+      }
     }
 
     if (status.quiet !== undefined && this.quiet !== status.quiet) {

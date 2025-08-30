@@ -39,6 +39,29 @@ export interface HaierEvoConfig {
   enableQuietModeSwitch?: boolean; // Enable quiet mode switch (default: true)
   enableTurboModeSwitch?: boolean; // Enable turbo mode switch (default: true)
   enableComfortModeSwitch?: boolean; // Enable comfort mode switch (default: true)
+  /**
+   * Interval in seconds to emit HomeKit temperature update events for AC devices.
+   * Set to 0 or a negative value to disable periodic events. Default: 60 seconds.
+   */
+  temperatureEventInterval?: number;
+
+  /**
+   * When true, publish a HomeKit temperature event every interval even if
+   * the temperature value did not change. Default: true.
+   */
+  temperatureEventForcePublish?: boolean;
+
+  /**
+   * Minimum delta in degrees Celsius required to publish a temperature event
+   * when force publish is disabled. Default: 0 (no threshold).
+   */
+  temperatureEventMinDelta?: number;
+
+  /**
+   * Optional jitter in seconds added as initial random delay before starting
+   * periodic temperature events to avoid synchronized bursts. Default: 0.
+   */
+  temperatureEventJitter?: number;
 }
 
 export interface AuthResponse {

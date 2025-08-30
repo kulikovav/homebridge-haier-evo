@@ -186,8 +186,9 @@ show_version_options() {
     echo "1) patch - Bug fixes and minor changes (1.0.0 → 1.0.1)"
     echo "2) minor - New features, backward compatible (1.0.0 → 1.1.0)"
     echo "3) major - Breaking changes (1.0.0 → 2.0.0)"
-    echo "4) custom - Specify custom version"
-    echo "5) cancel - Exit without publishing"
+    echo "4) prerelease - Pre-release (e.g., 1.0.0-beta.0)"
+    echo "5) custom - Specify custom version"
+    echo "6) cancel - Exit without publishing"
     echo
 }
 
@@ -209,20 +210,32 @@ get_version_bump() {
                 break
                 ;;
             4)
-                read -p "Enter custom version (e.g., 1.2.3): " custom_version
+                echo "Pre-release identifiers: beta, alpha, rc"
+                read -p "Enter pre-release identifier (default: beta): " preid
+                preid=${preid:-beta}
+                echo "prerelease:$preid"
+                break
+                ;;
+            5)
+                read -p "Enter custom version (e.g., 1.2.3 or 1.2.3-beta.1): " custom_version
                 if [[ $custom_version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                     echo "custom:$custom_version"
                     break
                 else
-                    log_error "Invalid version format. Please use format X.Y.Z"
+                    # Allow semver with pre-release too
+                    if [[ $custom_version =~ ^[0-9]+\.[0-9]+\.[0-9]+-[0-9A-Za-z\.\-]+$ ]]; then
+                        echo "custom:$custom_version"
+                        break
+                    fi
+                    log_error "Invalid version format. Use X.Y.Z or X.Y.Z-prerelease.N"
                 fi
                 ;;
-            5)
+            6)
                 echo "cancel"
                 break
                 ;;
             *)
-                log_error "Invalid choice. Please select 1-5"
+                log_error "Invalid choice. Please select 1-6"
                 ;;
         esac
     done
@@ -240,6 +253,10 @@ bump_version() {
         # Custom version
         new_version=${version_type#custom:}
         npm version "$new_version" --no-git-tag-version --no-color --silent > /dev/null 2>&1
+    elif [[ "$version_type" == prerelease:* ]]; then
+        # Pre-release bump with identifier
+        local preid=${version_type#prerelease:}
+        npm version prerelease --preid "$preid" --no-git-tag-version --no-color --silent > /dev/null 2>&1
     else
         # Standard bump - completely suppress output and disable colors
         npm version "$version_type" --no-git-tag-version --no-color --silent > /dev/null 2>&1
@@ -249,7 +266,7 @@ bump_version() {
     new_version=$(node -p "require('$PACKAGE_JSON').version")
 
     # Ensure we have a clean version
-    if [[ ! "$new_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    if [[ ! "$new_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z\.\-]+)?$ ]]; then
         log_error "Invalid version format: $new_version" >&2
         exit 1
     fi
@@ -329,8 +346,9 @@ get_version_description() {
 # Publish to npm
 publish_to_npm() {
     local new_version=$1
+    local npm_tag=${2:-dev}
 
-    log_info "Publishing to npm..."
+    log_info "Publishing to npm (tag: $npm_tag)..."
 
     # Check package contents
     log_info "Checking package contents..."
@@ -338,7 +356,7 @@ publish_to_npm() {
 
     # Confirm publishing
     echo
-    read -p "Ready to publish version $new_version to npm? (y/N): " -n 1 -r
+    read -p "Ready to publish version $new_version to npm with tag '$npm_tag'? (y/N): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         log_info "Publishing cancelled"
@@ -346,8 +364,8 @@ publish_to_npm() {
     fi
 
     # Publish
-    if npm publish --no-color --tag dev; then
-        log_success "Successfully published $new_version to npm!"
+    if npm publish --no-color --tag "$npm_tag"; then
+        log_success "Successfully published $new_version to npm (tag: $npm_tag)!"
     else
         log_error "Failed to publish to npm"
         exit 1
@@ -441,17 +459,25 @@ main() {
         exit 0
     fi
 
+    # Determine npm tag based on release type
+    local npm_tag="dev"
+    if [[ "$version_choice" == prerelease:* ]]; then
+        npm_tag="beta"
+    fi
+
     # Bump version
     local new_version=$(bump_version "$version_choice")
 
+    # Publish to npm with appropriate tag
+    publish_to_npm "$new_version" "$npm_tag"
+
+    if [ -n "${GIT_PUBLISH:-}" ]; then
     # Update changelog
     update_changelog "$new_version"
 
-    # Publish to npm
-    publish_to_npm "$new_version"
-
     # Create git tag and push
     create_git_tag "$new_version"
+    fi
 
     # Show post-publishing information
     show_post_publish_info "$new_version"
@@ -467,6 +493,7 @@ case "${1:-}" in
         echo "  --patch        Bump patch version (1.0.0 → 1.0.1)"
         echo "  --minor        Bump minor version (1.0.0 → 1.1.0)"
         echo "  --major        Bump major version (1.0.0 → 2.0.0)"
+        echo "  --beta         Pre-release beta (bumps prerelease and publish with tag 'beta')"
         echo "  --auto         Auto-publish without prompts (use with care!)"
         echo
         echo "Examples:"
@@ -483,9 +510,11 @@ case "${1:-}" in
         check_npm_auth
         run_prepublish_checks
         new_version=$(bump_version "patch")
-        update_changelog "$new_version"
         publish_to_npm "$new_version"
-        create_git_tag "$new_version"
+        if [ -n "${GIT_PUBLISH:-}" ]; then
+            update_changelog "$new_version"
+            create_git_tag "$new_version"
+        fi
         show_post_publish_info "$new_version"
         ;;
     --minor)
@@ -495,9 +524,25 @@ case "${1:-}" in
         check_npm_auth
         run_prepublish_checks
         new_version=$(bump_version "minor")
-        update_changelog "$new_version"
         publish_to_npm "$new_version"
-        create_git_tag "$new_version"
+        if [ -n "${GIT_PUBLISH:-}" ]; then
+            update_changelog "$new_version"
+            create_git_tag "$new_version"
+        fi
+        show_post_publish_info "$new_version"
+        ;;
+    --beta)
+        # Quick beta pre-release
+        check_project_structure
+        check_git_status
+        check_npm_auth
+        run_prepublish_checks
+        new_version=$(bump_version "prerelease:beta")
+        publish_to_npm "$new_version" "beta"
+        if [ -n "${GIT_PUBLISH:-}" ]; then
+            update_changelog "$new_version"
+            create_git_tag "$new_version"
+        fi
         show_post_publish_info "$new_version"
         ;;
     --major)
@@ -507,9 +552,11 @@ case "${1:-}" in
         check_npm_auth
         run_prepublish_checks
         new_version=$(bump_version "major")
-        update_changelog "$new_version"
         publish_to_npm "$new_version"
-        create_git_tag "$new_version"
+        if [ -n "${GIT_PUBLISH:-}" ]; then
+            update_changelog "$new_version"
+            create_git_tag "$new_version"
+        fi
         show_post_publish_info "$new_version"
         ;;
     --auto)
@@ -520,9 +567,11 @@ case "${1:-}" in
         check_npm_auth
         run_prepublish_checks
         new_version=$(bump_version "patch")
-        update_changelog "$new_version"
         publish_to_npm "$new_version"
-        create_git_tag "$new_version"
+        if [ -n "${GIT_PUBLISH:-}" ]; then
+            update_changelog "$new_version"
+            create_git_tag "$new_version"
+        fi
         show_post_publish_info "$new_version"
         ;;
     "")

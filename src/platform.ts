@@ -388,13 +388,10 @@ export class HaierEvoPlatform {
       return;
     }
 
-    // Find accessory by MAC address (which is stored as ID in our system)
+    // Devices themselves are subscribed to API events and will emit 'statusUpdated'.
+    // We avoid forwarding here to prevent duplicate updates/logs.
     const accessory = this.accessories.get(deviceId);
-
-    if (accessory) {
-      this.log.debug(`Updating status for accessory ${accessory.displayName}`);
-      accessory.updateStatus(status);
-    } else {
+    if (!accessory) {
       this.log.warn(`No accessory found for device ID ${deviceId}`);
     }
   }
