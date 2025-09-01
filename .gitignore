@@ -134,5 +134,6 @@ npm-debug.log*
 
 tests/integration/test-config.ts
 # Environment variables for testing
-.env
-.vars
+.*
+!.gitignore
+!.npmignore

@@ -49,29 +49,29 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
     // Set a valid default target temperature for refrigerators
     // Use the middle of the valid range (typically 5°C for refrigerators)
     this.target_temperature = Math.round((this.min_temperature + this.max_temperature) / 2);
+
+    // Initialize status updates (WebSocket listeners and initial status fetch policy)
+    this.initializeStatusUpdates();
   }
 
   // Enhanced temperature control methods with proper command mapping
   async set_temperature(temp: number): Promise<void> {
-    // For refrigerators, this sets the main compartment temperature
-    // No temperature validation - accept any value
-
+    // Map degrees to list code for command '3'
     const command = {
       commandName: HaierRefrigeratorDevice.COMMANDS.REFRIGERATOR_TEMP,
-      values: [temp.toString()]
+      values: [this.mapRefrigeratorTempToCommand(temp)]
     };
 
     await this.sendCommand(command);
     this.refrigerator_temperature = temp;
+    this.target_temperature = temp;
     this.emit('refrigeratorTemperatureChanged', temp);
   }
 
   async set_freezer_temperature(temp: number): Promise<void> {
-    // No temperature validation - accept any value
-
     const command = {
       commandName: HaierRefrigeratorDevice.COMMANDS.FREEZER_TEMP,
-      values: [temp.toString()]
+      values: [this.mapFreezerTempToCommand(temp)]
     };
 
     await this.sendCommand(command);
@@ -204,9 +204,141 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
     }
   }
 
+  private mapFreezerTempToCommand(temp: number): string {
+    const clamped = Math.max(HaierRefrigeratorDevice.TEMP_RANGES.FREEZER.min, Math.min(HaierRefrigeratorDevice.TEMP_RANGES.FREEZER.max, temp));
+    // -24 maps to 6, -23→7 ... -16→14
+    const code = 6 + (Math.round(clamped - (-24)));
+    return String(code);
+  }
+
+  private mapRefrigeratorTempToCommand(temp: number): string {
+    const clamped = Math.max(HaierRefrigeratorDevice.TEMP_RANGES.REFRIGERATOR.min, Math.min(HaierRefrigeratorDevice.TEMP_RANGES.REFRIGERATOR.max, temp));
+    // 2→3, 3→4, ... 8→9
+    return String(clamped + 1);
+  }
+
   // Enhanced status update from refrigerator data
   updateFromStatus(status: unknown): void {
     console.log(`[${new Date().toLocaleString()}] [Haier Evo] Updating refrigerator status for ${this.device_name}`);
+
+    // Handle WebSocket properties format
+    if (status && typeof status === 'object' && 'properties' in status && (status as any).properties) {
+      const props = (status as any).properties as Record<string, string>;
+      const changes: Record<string, { old: any, new: any }> = {};
+
+      const parseIntSafe = (v: any): number => {
+        const n = parseInt(String(v));
+        return isNaN(n) ? 0 : n;
+      };
+
+      // 0: Refrigerator current temperature (℃)
+      if (props['0'] !== undefined) {
+        const temp = parseIntSafe(props['0']);
+        if (temp >= HaierRefrigeratorDevice.TEMP_RANGES.REFRIGERATOR.min && temp <= HaierRefrigeratorDevice.TEMP_RANGES.REFRIGERATOR.max) {
+          if (this.current_temperature !== temp) {
+            changes.current_temperature = { old: this.current_temperature, new: temp };
+          }
+          if (this.refrigerator_temperature !== temp) {
+            changes.refrigerator_temperature = { old: this.refrigerator_temperature, new: temp };
+          }
+          this.current_temperature = temp;
+          this.refrigerator_temperature = temp;
+        }
+      }
+
+      // 1: Freezer current temperature (℃)
+      if (props['1'] !== undefined) {
+        const temp = parseIntSafe(props['1']);
+        if (temp >= HaierRefrigeratorDevice.TEMP_RANGES.FREEZER.min && temp <= HaierRefrigeratorDevice.TEMP_RANGES.FREEZER.max) {
+          if (this.freezer_temperature !== temp) {
+            changes.freezer_temperature = { old: this.freezer_temperature, new: temp };
+          }
+          this.freezer_temperature = temp;
+        }
+      }
+
+      // 2: Ambient temperature (℃)
+      if (props['2'] !== undefined) {
+        const temp = parseIntSafe(props['2']);
+        if (temp >= HaierRefrigeratorDevice.TEMP_RANGES.AMBIENT.min && temp <= HaierRefrigeratorDevice.TEMP_RANGES.AMBIENT.max) {
+          if (this.ambient_temperature !== temp) {
+            changes.ambient_temperature = { old: this.ambient_temperature, new: temp };
+          }
+          this.ambient_temperature = temp;
+        }
+      }
+
+      // 3: Refrigerator target level (list code 3..9 -> 2..8 ℃)
+      if (props['3'] !== undefined) {
+        const level = parseIntSafe(props['3']);
+        const mapped = (level >= 3 && level <= 9) ? (level - 1) : level;
+        if (mapped >= HaierRefrigeratorDevice.TEMP_RANGES.REFRIGERATOR.min && mapped <= HaierRefrigeratorDevice.TEMP_RANGES.REFRIGERATOR.max) {
+          if (this.target_temperature !== mapped) {
+            changes.target_temperature = { old: this.target_temperature, new: mapped };
+          }
+          this.target_temperature = mapped;
+        }
+      }
+
+      // 4: Freezer target level (list code -> mapped temp)
+      if (props['4'] !== undefined) {
+        const code = parseIntSafe(props['4']);
+        const mapped = this.mapFreezerCommandToTemp(code);
+        if (this.freezer_temperature !== mapped) {
+          changes.freezer_temperature = { old: this.freezer_temperature, new: mapped };
+        }
+        this.freezer_temperature = mapped;
+      }
+
+      // 6: Super cool (0/1)
+      if (props['6'] !== undefined) {
+        const newValue = String(props['6']).trim() === '1';
+        if (this.super_cool_mode !== newValue) {
+          changes.super_cool_mode = { old: this.super_cool_mode, new: newValue };
+          this.super_cool_mode = newValue;
+        }
+      }
+
+      // 7: Super freeze (0/1)
+      if (props['7'] !== undefined) {
+        const newValue = String(props['7']).trim() === '1';
+        if (this.super_freeze_mode !== newValue) {
+          changes.super_freeze_mode = { old: this.super_freeze_mode, new: newValue };
+          this.super_freeze_mode = newValue;
+        }
+      }
+
+      // 8: Vacation mode (0/1)
+      if (props['8'] !== undefined) {
+        const newValue = String(props['8']).trim() === '1';
+        if (this.vacation_mode !== newValue) {
+          changes.vacation_mode = { old: this.vacation_mode, new: newValue };
+          this.vacation_mode = newValue;
+        }
+      }
+
+      // 9: Freezer door (0 closed, 1 open)
+      if (props['9'] !== undefined) {
+        const newValue = String(props['9']).trim() === '1';
+        if (this.freezer_door_open !== newValue) {
+          changes.freezer_door_open = { old: this.freezer_door_open, new: newValue };
+          this.freezer_door_open = newValue;
+        }
+      }
+
+      // 10: Refrigerator door (0 closed, 1 open)
+      if (props['10'] !== undefined) {
+        const newValue = String(props['10']).trim() === '1';
+        if (this.refrigerator_door_open !== newValue) {
+          changes.refrigerator_door_open = { old: this.refrigerator_door_open, new: newValue };
+          this.refrigerator_door_open = newValue;
+        }
+      }
+
+      if (Object.keys(changes).length > 0) {
+        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Refrigerator ${this.device_name} status (properties) changes:`, JSON.stringify(changes, null, 2));
+      }
+    }
 
     // Only call super if status is DeviceStatus
     if (status && typeof status === 'object' && 'current_temperature' in status) {
@@ -231,6 +363,8 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
                 if (this.refrigerator_temperature !== temp) {
                   changes.refrigerator_temperature = { old: this.refrigerator_temperature, new: temp };
                   this.refrigerator_temperature = temp;
+                  // Map primary compartment temperature to generic current_temperature for HomeKit
+                  this.current_temperature = temp;
                 }
               }
             }
@@ -259,13 +393,13 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
               }
             }
             break;
-          case '3': // Refrigerator compartment setting
+          case '3': // Refrigerator compartment setting (target)
             if (attrObj.currentValue !== undefined) {
-              const temp = parseInt(attrObj.currentValue);
-              // Accept any temperature value without strict validation
-              if (this.refrigerator_temperature !== temp) {
-                changes.refrigerator_temperature = { old: this.refrigerator_temperature, new: temp };
-                this.refrigerator_temperature = temp;
+              const value = parseInt(attrObj.currentValue);
+              const mappedTemp = (value >= 3 && value <= 9) ? (value - 1) : value;
+              if (this.target_temperature !== mappedTemp) {
+                changes.target_temperature = { old: this.target_temperature, new: mappedTemp };
+                this.target_temperature = mappedTemp;
               }
             }
             break;
@@ -301,7 +435,8 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
             break;
           case '7': // Super freezing mode
             if (attrObj.currentValue !== undefined) {
-              const newValue = attrObj.currentValue === 'true';
+              const raw = String(attrObj.currentValue).toLowerCase();
+              const newValue = raw === 'true' || raw === '1';
               if (this.super_freeze_mode !== newValue) {
                 changes.super_freeze_mode = { old: this.super_freeze_mode, new: newValue };
                 this.super_freeze_mode = newValue;
@@ -310,40 +445,35 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
             break;
           case '8': // Vacation mode
             if (attrObj.currentValue !== undefined) {
-              const newValue = attrObj.currentValue === 'true';
+              const raw = String(attrObj.currentValue).toLowerCase();
+              const newValue = raw === 'true' || raw === '1';
               if (this.vacation_mode !== newValue) {
                 changes.vacation_mode = { old: this.vacation_mode, new: newValue };
                 this.vacation_mode = newValue;
               }
             }
             break;
-          case '9': // Freezer door status
+          case '9': // Freezer door status (0 closed, 1 open)
             if (attrObj.currentValue !== undefined) {
-              const newValue = attrObj.currentValue === 'true';
+              const raw = String(attrObj.currentValue).trim();
+              const newValue = raw === '1';
               if (this.freezer_door_open !== newValue) {
                 changes.freezer_door_open = { old: this.freezer_door_open, new: newValue };
                 this.freezer_door_open = newValue;
               }
             }
             break;
-          case '10': // Refrigerator door status
+          case '10': // Refrigerator door status (0 closed, 1 open)
             if (attrObj.currentValue !== undefined) {
-              const newValue = attrObj.currentValue === 'true';
+              const raw = String(attrObj.currentValue).trim();
+              const newValue = raw === '1';
               if (this.refrigerator_door_open !== newValue) {
                 changes.refrigerator_door_open = { old: this.refrigerator_door_open, new: newValue };
                 this.refrigerator_door_open = newValue;
               }
             }
             break;
-          case 'freezer2DoorStatus': // Freezer 2 door status
-            if (attrObj.currentValue !== undefined) {
-              const newValue = attrObj.currentValue === 'true';
-              if (this.freezer2_door_open !== newValue) {
-                changes.freezer2_door_open = { old: this.freezer2_door_open, new: newValue };
-                this.freezer2_door_open = newValue;
-              }
-            }
-            break;
+          // Remove freezer2DoorStatus as it does nothing per data
           }
         }
       }

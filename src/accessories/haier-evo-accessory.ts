@@ -24,6 +24,7 @@ export class HaierEvoAccessory {
   private blindsFanService?: Service;
   private freezerTemperatureService?: Service;
   private myzoneTemperatureService?: Service;
+  private ambientTemperatureService?: Service;
   private refrigeratorDoorService?: Service;
   private freezerDoorService?: Service;
   private healthService?: Service;
@@ -33,6 +34,11 @@ export class HaierEvoAccessory {
   private blindsAutoService?: Service;
   private blindsComfortService?: Service;
   private powerSwitchService?: Service;
+
+  // Periodic HomeKit temperature events
+  private temperatureEventTimer: NodeJS.Timeout | null = null;
+  // Internal last published temperature cache for delta comparison
+  private _lastPublishedTemp?: number;
 
   constructor(
     private readonly platform: HaierEvoPlatform,
@@ -62,6 +68,9 @@ export class HaierEvoAccessory {
       // Find existing services instead of creating new ones
       this.mainService = this.findMainService();
       this.findAdditionalServices();
+
+      // Reattach characteristic handlers for restored services
+      this.setupHandlersForFoundServices();
     } else {
       this.log.debug(`Creating new accessory: ${this.deviceInfo.name}`);
 
@@ -81,6 +90,9 @@ export class HaierEvoAccessory {
 
     // Set up event handlers
     this.setupEventHandlers();
+
+    // Start periodic HomeKit temperature events if configured
+    this.startTemperatureEventsIfNeeded();
 
     this.log.info(`${isExistingAccessory ? 'Restored' : 'Created'} accessory: ${this.deviceInfo.name} (${this.deviceInfo.type})`);
   }
@@ -164,6 +176,86 @@ export class HaierEvoAccessory {
     if (this.powerSwitchService) this.services.push(this.powerSwitchService);
   }
 
+  // Ensure handlers are attached for services found during restore
+  private setupHandlersForFoundServices(): void {
+    if (DeviceFactory.isAirConditioner(this.device)) {
+      if (this.mainService) {
+        this.setupHeaterCoolerCharacteristics(this.mainService);
+      }
+    } else if (DeviceFactory.isRefrigerator(this.device)) {
+      if (this.mainService) {
+        this.setupRefrigeratorCharacteristics(this.mainService);
+      }
+    } else if (this.mainService) {
+      this.setupSwitchCharacteristics(this.mainService);
+    }
+
+    if (this.temperatureSensorService) {
+      this.setupTemperatureSensorCharacteristics(this.temperatureSensorService);
+    }
+    if (this.fanService) {
+      this.setupFanServiceCharacteristics(this.fanService);
+    }
+    if (this.blindsFanService) {
+      this.setupBlindsFanServiceCharacteristics(this.blindsFanService);
+    }
+    if (this.lightService) {
+      this.setupLightCharacteristics(this.lightService);
+    }
+    if (this.healthService) {
+      this.setupSimpleSwitchCharacteristics(this.healthService, this.getHealthState.bind(this), async (v) => {
+        if (DeviceFactory.isAirConditioner(this.device)) {
+          await this.device.set_health(!!v);
+        }
+      });
+    }
+    if (this.quietService) {
+      this.setupSimpleSwitchCharacteristics(this.quietService, this.getQuietState.bind(this), async (v) => {
+        if (DeviceFactory.isAirConditioner(this.device)) {
+          await this.device.set_quiet(!!v);
+        }
+      });
+    }
+    if (this.turboService) {
+      this.setupSimpleSwitchCharacteristics(this.turboService, this.getTurboState.bind(this), async (v) => {
+        if (DeviceFactory.isAirConditioner(this.device)) {
+          await this.device.set_turbo(!!v);
+        }
+      });
+    }
+    if (this.comfortService) {
+      this.setupSimpleSwitchCharacteristics(this.comfortService, this.getComfortState.bind(this), async (v) => {
+        if (DeviceFactory.isAirConditioner(this.device)) {
+          await this.device.set_comfort(!!v);
+        }
+      });
+    }
+    if (this.blindsAutoService) {
+      this.setupSimpleSwitchCharacteristics(this.blindsAutoService, this.getBlindsAutoState.bind(this), async (v) => {
+        if (DeviceFactory.isAirConditioner(this.device)) {
+          await this.device.set_swing_mode(v ? 'auto' : 'position_3');
+        }
+      });
+    }
+    if (this.blindsComfortService) {
+      this.setupSimpleSwitchCharacteristics(this.blindsComfortService, this.getBlindsComfortState.bind(this), async (v) => {
+        if (DeviceFactory.isAirConditioner(this.device)) {
+          const isHeating = this.device.mode === 'heat';
+          await this.device.set_swing_mode(v ? (isHeating ? 'bottom' : 'upper') : 'position_3');
+        }
+      });
+    }
+    if (this.powerSwitchService) {
+      this.setupSimpleSwitchCharacteristics(this.powerSwitchService, this.getSwitchState.bind(this), async (v) => {
+        if (v) {
+          await this.device.switch_on();
+        } else {
+          await this.device.switch_off();
+        }
+      });
+    }
+  }
+
   private createMainService(): Service {
     if (DeviceFactory.isAirConditioner(this.device)) {
       return this.createHeaterCoolerService();
@@ -177,7 +269,13 @@ export class HaierEvoAccessory {
 
   private createHeaterCoolerService(): Service {
     const service = this.accessory.addService(this.platform.Service.HeaterCooler, this.accessoryName, 'heater-cooler');
+    this.setupHeaterCoolerCharacteristics(service);
 
+    this.services.push(service);
+    return service;
+  }
+
+  private setupHeaterCoolerCharacteristics(service: Service): void {
     // Set up characteristics for HeaterCooler
     service.getCharacteristic(this.platform.Characteristic.Active)
       .onGet(this.getActive.bind(this))
@@ -230,20 +328,20 @@ export class HaierEvoAccessory {
     service.getCharacteristic(this.platform.Characteristic.SwingMode)
       .onGet(this.getSwingMode.bind(this))
       .onSet(this.setSwingMode.bind(this));
+  }
+
+  private createSwitchService(): Service {
+    const service = this.accessory.addService(this.platform.Service.Switch, this.accessoryName, 'switch');
+    this.setupSwitchCharacteristics(service);
 
     this.services.push(service);
     return service;
   }
 
-  private createSwitchService(): Service {
-    const service = this.accessory.addService(this.platform.Service.Switch, this.accessoryName, 'switch');
-
+  private setupSwitchCharacteristics(service: Service): void {
     service.getCharacteristic(this.platform.Characteristic.On)
       .onGet(this.getSwitchState.bind(this))
       .onSet(this.setSwitchState.bind(this));
-
-    this.services.push(service);
-    return service;
   }
 
   private createRefrigeratorService(): Service {
@@ -251,45 +349,38 @@ export class HaierEvoAccessory {
     // This provides temperature control without the ability to turn off
     const service = this.accessory.addService(
       this.platform.Service.TemperatureSensor,
-      this.accessoryName,
+      `${this.accessoryName} Refrigerator Compartment`,
       'refrigerator-main'
     );
 
-    // Set up temperature characteristics
-    service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-      .onGet(this.getCurrentTemperature.bind(this));
-
-    // Add target temperature characteristic for refrigerator control
-    service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .onGet(this.getTargetTemperature.bind(this))
-      .onSet(this.setTargetTemperature.bind(this));
-
-    // Set temperature range for refrigerator
-    service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .setProps({
-        minValue: this.device.min_temperature,
-        maxValue: this.device.max_temperature,
-        minStep: 1
-      });
+    this.setupRefrigeratorCharacteristics(service);
 
     this.services.push(service);
     return service;
   }
 
+  private setupRefrigeratorCharacteristics(service: Service): void {
+    // Set up temperature characteristics
+    service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      .onGet(this.getCurrentTemperature.bind(this));
+  }
+
   private createAdditionalServices(): void {
     const config = this.platform.getConfig();
 
-    // Temperature sensor service
-    this.temperatureSensorService = this.accessory.addService(
-      this.platform.Service.TemperatureSensor,
-      `${this.accessoryName} Temperature`,
-      'temperature'
-    );
+    // For refrigerators, we will not add a generic duplicate temperature sensor
+    if (!DeviceFactory.isRefrigerator(this.device)) {
+      // Temperature sensor service for non-refrigerators
+      this.temperatureSensorService = this.accessory.addService(
+        this.platform.Service.TemperatureSensor,
+        `${this.accessoryName} Temperature`,
+        'temperature'
+      );
 
-    this.temperatureSensorService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-      .onGet(this.getCurrentTemperature.bind(this));
+      this.setupTemperatureSensorCharacteristics(this.temperatureSensorService);
 
-    this.services.push(this.temperatureSensorService);
+      this.services.push(this.temperatureSensorService);
+    }
 
     // Fan service for AC devices
     if (DeviceFactory.isAirConditioner(this.device) && (config.enableFanService !== false)) {
@@ -299,24 +390,7 @@ export class HaierEvoAccessory {
         'fan'
       );
 
-      // Use proper Fanv2 characteristics
-      this.fanService.getCharacteristic(this.platform.Characteristic.Active)
-        .onGet(this.getFanActiveState.bind(this))
-        .onSet(this.setFanActiveState.bind(this));
-
-      // Current Fan State - shows actual fan state
-      this.fanService.getCharacteristic(this.platform.Characteristic.CurrentFanState)
-        .onGet(this.getCurrentFanState.bind(this));
-
-      // Target Fan State - allows setting MANUAL or AUTO mode
-      this.fanService.getCharacteristic(this.platform.Characteristic.TargetFanState)
-        .onGet(this.getTargetFanState.bind(this))
-        .onSet(this.setTargetFanState.bind(this));
-
-      // Fan Rotation Speed - only available in MANUAL mode
-      this.fanService.getCharacteristic(this.platform.Characteristic.RotationSpeed)
-        .onGet(this.getFanSpeed.bind(this))
-        .onSet(this.setFanSpeed.bind(this));
+      this.setupFanServiceCharacteristics(this.fanService);
 
       this.services.push(this.fanService);
     }
@@ -330,28 +404,7 @@ export class HaierEvoAccessory {
       );
 
       // Active - controls if blinds are in manual or auto mode
-      this.blindsFanService.getCharacteristic(this.platform.Characteristic.Active)
-        .onGet(this.getBlindsActive.bind(this))
-        .onSet(this.setBlindsActive.bind(this));
-
-      // Current Fan State - shows blinds movement state
-      this.blindsFanService.getCharacteristic(this.platform.Characteristic.CurrentFanState)
-        .onGet(this.getBlindsCurrentState.bind(this));
-
-      // Target Fan State - manual control only for blinds
-      this.blindsFanService.getCharacteristic(this.platform.Characteristic.TargetFanState)
-        .onGet(this.getBlindsTargetState.bind(this))
-        .onSet(this.setBlindsTargetState.bind(this));
-
-      // Rotation Speed - maps to tilt angle (0-100% = -90° to +90°)
-      this.blindsFanService.getCharacteristic(this.platform.Characteristic.RotationSpeed)
-        .onGet(this.getBlindsRotationSpeed.bind(this))
-        .onSet(this.setBlindsRotationSpeed.bind(this))
-        .setProps({
-          minValue: 0,
-          maxValue: 100,
-          minStep: 5
-        });
+      this.setupBlindsFanServiceCharacteristics(this.blindsFanService);
 
       this.services.push(this.blindsFanService);
     }
@@ -364,9 +417,7 @@ export class HaierEvoAccessory {
         'light'
       );
 
-      this.lightService.getCharacteristic(this.platform.Characteristic.On)
-        .onGet(this.getLightState.bind(this))
-        .onSet(this.setLightState.bind(this));
+      this.setupLightCharacteristics(this.lightService);
 
       this.services.push(this.lightService);
     }
@@ -381,9 +432,7 @@ export class HaierEvoAccessory {
           'health'
         );
 
-        this.healthService.getCharacteristic(this.platform.Characteristic.On)
-          .onGet(this.getHealthState.bind(this))
-          .onSet(this.setHealthState.bind(this));
+        this.setupSimpleSwitchCharacteristics(this.healthService, this.getHealthState.bind(this), this.setHealthState.bind(this));
 
         this.services.push(this.healthService);
       }
@@ -396,9 +445,7 @@ export class HaierEvoAccessory {
           'quiet'
         );
 
-        this.quietService.getCharacteristic(this.platform.Characteristic.On)
-          .onGet(this.getQuietState.bind(this))
-          .onSet(this.setQuietState.bind(this));
+        this.setupSimpleSwitchCharacteristics(this.quietService, this.getQuietState.bind(this), this.setQuietState.bind(this));
 
         this.services.push(this.quietService);
       }
@@ -411,9 +458,7 @@ export class HaierEvoAccessory {
           'turbo'
         );
 
-        this.turboService.getCharacteristic(this.platform.Characteristic.On)
-          .onGet(this.getTurboState.bind(this))
-          .onSet(this.setTurboState.bind(this));
+        this.setupSimpleSwitchCharacteristics(this.turboService, this.getTurboState.bind(this), this.setTurboState.bind(this));
 
         this.services.push(this.turboService);
       }
@@ -426,9 +471,7 @@ export class HaierEvoAccessory {
           'comfort'
         );
 
-        this.comfortService.getCharacteristic(this.platform.Characteristic.On)
-          .onGet(this.getComfortState.bind(this))
-          .onSet(this.setComfortState.bind(this));
+        this.setupSimpleSwitchCharacteristics(this.comfortService, this.getComfortState.bind(this), this.setComfortState.bind(this));
 
         this.services.push(this.comfortService);
       }
@@ -441,9 +484,7 @@ export class HaierEvoAccessory {
           'blinds-auto'
         );
 
-        this.blindsAutoService.getCharacteristic(this.platform.Characteristic.On)
-          .onGet(this.getBlindsAutoState.bind(this))
-          .onSet(this.setBlindsAutoState.bind(this));
+        this.setupSimpleSwitchCharacteristics(this.blindsAutoService, this.getBlindsAutoState.bind(this), this.setBlindsAutoState.bind(this));
 
         this.services.push(this.blindsAutoService);
       }
@@ -456,9 +497,7 @@ export class HaierEvoAccessory {
           'blinds-comfort'
         );
 
-        this.blindsComfortService.getCharacteristic(this.platform.Characteristic.On)
-          .onGet(this.getBlindsComfortState.bind(this))
-          .onSet(this.setBlindsComfortState.bind(this));
+        this.setupSimpleSwitchCharacteristics(this.blindsComfortService, this.getBlindsComfortState.bind(this), this.setBlindsComfortState.bind(this));
 
         this.services.push(this.blindsComfortService);
       }
@@ -469,7 +508,7 @@ export class HaierEvoAccessory {
       // Freezer temperature sensor
       this.freezerTemperatureService = this.accessory.addService(
         this.platform.Service.TemperatureSensor,
-        `${this.accessoryName} Freezer`,
+        `${this.accessoryName} Freezer Compartment`,
         'freezer-temp'
       );
 
@@ -477,6 +516,18 @@ export class HaierEvoAccessory {
         .onGet(this.getFreezerTemperature.bind(this));
 
       this.services.push(this.freezerTemperatureService);
+
+      // Ambient temperature sensor (read-only)
+      this.ambientTemperatureService = this.accessory.addService(
+        this.platform.Service.TemperatureSensor,
+        `${this.accessoryName} Ambient`,
+        'ambient-temp'
+      );
+
+      this.ambientTemperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+        .onGet(this.getAmbientTemperature.bind(this));
+
+      this.services.push(this.ambientTemperatureService);
 
       // My Zone temperature sensor
       this.myzoneTemperatureService = this.accessory.addService(
@@ -493,7 +544,7 @@ export class HaierEvoAccessory {
       // Refrigerator door contact sensor
       this.refrigeratorDoorService = this.accessory.addService(
         this.platform.Service.ContactSensor,
-        `${this.accessoryName} Door`,
+        `${this.accessoryName} Refrigerator Door`,
         'refrigerator-door'
       );
 
@@ -513,6 +564,159 @@ export class HaierEvoAccessory {
         .onGet(this.getFreezerDoorState.bind(this));
 
       this.services.push(this.freezerDoorService);
+    }
+  }
+
+  private setupTemperatureSensorCharacteristics(service: Service): void {
+    service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      .onGet(this.getCurrentTemperature.bind(this));
+  }
+
+  private setupFanServiceCharacteristics(service: Service): void {
+    service.getCharacteristic(this.platform.Characteristic.Active)
+      .onGet(this.getFanActiveState.bind(this))
+      .onSet(this.setFanActiveState.bind(this));
+
+    service.getCharacteristic(this.platform.Characteristic.CurrentFanState)
+      .onGet(this.getCurrentFanState.bind(this));
+
+    service.getCharacteristic(this.platform.Characteristic.TargetFanState)
+      .onGet(this.getTargetFanState.bind(this))
+      .onSet(this.setTargetFanState.bind(this));
+
+    service.getCharacteristic(this.platform.Characteristic.RotationSpeed)
+      .onGet(this.getFanSpeed.bind(this))
+      .onSet(this.setFanSpeed.bind(this));
+  }
+
+  private setupBlindsFanServiceCharacteristics(service: Service): void {
+    service.getCharacteristic(this.platform.Characteristic.Active)
+      .onGet(this.getBlindsActive.bind(this))
+      .onSet(this.setBlindsActive.bind(this));
+
+    service.getCharacteristic(this.platform.Characteristic.CurrentFanState)
+      .onGet(this.getBlindsCurrentState.bind(this));
+
+    service.getCharacteristic(this.platform.Characteristic.TargetFanState)
+      .onGet(this.getBlindsTargetState.bind(this))
+      .onSet(this.setBlindsTargetState.bind(this));
+
+    service.getCharacteristic(this.platform.Characteristic.RotationSpeed)
+      .onGet(this.getBlindsRotationSpeed.bind(this))
+      .onSet(this.setBlindsRotationSpeed.bind(this))
+      .setProps({
+        minValue: 0,
+        maxValue: 100,
+        minStep: 5
+      });
+  }
+
+  private setupLightCharacteristics(service: Service): void {
+    service.getCharacteristic(this.platform.Characteristic.On)
+      .onGet(this.getLightState.bind(this))
+      .onSet(this.setLightState.bind(this));
+  }
+
+
+  private setupSimpleSwitchCharacteristics(
+    service: Service,
+    getter: () => boolean,
+    setter: (value: any) => Promise<void>
+  ): void {
+    service.getCharacteristic(this.platform.Characteristic.On)
+      .onGet(getter)
+      .onSet(setter);
+  }
+
+  // Prefer verbose logging when plugin config.debug is true; otherwise use debug level
+  private debugLog(message: string): void {
+    try {
+      const cfg = this.platform.getConfig();
+      if (cfg && (cfg as any).debug) {
+        this.log.info(message);
+      } else {
+        this.log.debug(message);
+      }
+    } catch (_e) {
+      this.log.debug(message);
+    }
+  }
+
+  private startTemperatureEventsIfNeeded(): void {
+    // Run if we have any TemperatureSensor service (AC or refrigerator)
+    if (!this.temperatureSensorService && !DeviceFactory.isAirConditioner(this.device)) {
+      return;
+    }
+
+    const config = this.platform.getConfig();
+    const intervalSeconds = (config.temperatureEventInterval ?? 0);
+    const forcePublish = (config.temperatureEventForcePublish ?? false);
+    const minDelta = (config.temperatureEventMinDelta ?? 0);
+    const jitterSeconds = (config.temperatureEventJitter ?? 0);
+
+    // Disable if non-positive interval
+    if (!intervalSeconds || intervalSeconds <= 0) {
+      return;
+    }
+
+    // Clear any previous timer
+    if (this.temperatureEventTimer) {
+      clearInterval(this.temperatureEventTimer);
+      this.temperatureEventTimer = null;
+    }
+
+    const publishTemperature = () => {
+      try {
+        const temperature = this.getCurrentTemperature();
+
+        // Optionally skip if change is below threshold and force is disabled
+        if (!forcePublish && typeof this._lastPublishedTemp === 'number') {
+          const delta = Math.abs(temperature - this._lastPublishedTemp);
+          if (delta < minDelta) {
+            this.debugLog(`Temperature event skipped (delta ${delta.toFixed(3)} < minDelta ${minDelta}). Current=${temperature}`);
+            return;
+          }
+        }
+
+        // Emit on HeaterCooler main service
+        if (this.mainService) {
+          this.mainService.updateCharacteristic(
+            this.platform.Characteristic.CurrentTemperature,
+            temperature
+          );
+        }
+
+        // Emit on dedicated TemperatureSensor service if present
+        if (this.temperatureSensorService) {
+          this.temperatureSensorService.updateCharacteristic(
+            this.platform.Characteristic.CurrentTemperature,
+            temperature
+          );
+        }
+
+        this._lastPublishedTemp = temperature;
+        this.debugLog(`Temperature event published: ${temperature}`);
+      } catch (error) {
+        this.log.debug(`Temperature event update failed: ${error}`);
+      }
+    };
+
+    // Optional initial jitter to avoid synchronized bursts across devices
+    const startInterval = () => {
+      this.temperatureEventTimer = setInterval(publishTemperature, intervalSeconds * 1000);
+    };
+
+    if (jitterSeconds && jitterSeconds > 0) {
+      const jitter = Math.floor(Math.random() * (jitterSeconds * 1000));
+      this.debugLog(`Starting temperature events with interval=${intervalSeconds}s, force=${forcePublish}, minDelta=${minDelta}, jitter=${Math.round(jitter/1000)}s`);
+      setTimeout(() => {
+        publishTemperature();
+        startInterval();
+      }, jitter);
+    } else {
+      this.debugLog(`Starting temperature events with interval=${intervalSeconds}s, force=${forcePublish}, minDelta=${minDelta}, jitter=0s`);
+      publishTemperature();
+      startInterval();
     }
   }
 
@@ -993,15 +1197,10 @@ export class HaierEvoAccessory {
           this.getSwingMode()
         );
       } else if (DeviceFactory.isRefrigerator(this.device)) {
-        // Update refrigerator main service (TemperatureSensor)
+        // Update refrigerator main service (TemperatureSensor) - current only
         this.mainService.updateCharacteristic(
           this.platform.Characteristic.CurrentTemperature,
           this.getCurrentTemperature()
-        );
-
-        this.mainService.updateCharacteristic(
-          this.platform.Characteristic.TargetTemperature,
-          this.getTargetTemperature()
         );
       } else {
         this.mainService.updateCharacteristic(
@@ -1073,6 +1272,21 @@ export class HaierEvoAccessory {
       );
     }
 
+    // Update refrigerator door sensors
+    if (this.refrigeratorDoorService) {
+      this.refrigeratorDoorService.updateCharacteristic(
+        this.platform.Characteristic.ContactSensorState,
+        this.getRefrigeratorDoorState()
+      );
+    }
+
+    if (this.freezerDoorService) {
+      this.freezerDoorService.updateCharacteristic(
+        this.platform.Characteristic.ContactSensorState,
+        this.getFreezerDoorState()
+      );
+    }
+
     // Update additional AC characteristics if available
     if (DeviceFactory.isAirConditioner(this.device)) {
       // Update swing mode if available
@@ -1133,6 +1347,10 @@ export class HaierEvoAccessory {
   }
 
   public destroy(): void {
+    if (this.temperatureEventTimer) {
+      clearInterval(this.temperatureEventTimer);
+      this.temperatureEventTimer = null;
+    }
     if (this.device) {
       this.device.destroy();
     }
@@ -1146,27 +1364,30 @@ export class HaierEvoAccessory {
 
   // Refrigerator-specific methods
   private getFreezerTemperature(): number {
-    // For now, return a default value since the property doesn't exist in the interface
-    // This should be updated when the actual refrigerator properties are defined
-    return -18;
+    return (this.device as any).freezer_temperature ?? -18;
   }
 
   private getMyZoneTemperature(): number {
-    // For now, return a default value since the property doesn't exist in the interface
-    // This should be updated when the actual refrigerator properties are defined
-    return -5;
+    return (this.device as any).myzone_temperature ?? -5;
+  }
+
+  private getAmbientTemperature(): number {
+    return (this.device as any).ambient_temperature ?? 25;
   }
 
   private getRefrigeratorDoorState(): number {
-    // For now, return a default value since the property doesn't exist in the interface
-    // This should be updated when the actual refrigerator properties are defined
-    return this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED;
+    // Map Haier door flag: true (open) -> NOT_DETECTED, false (closed) -> DETECTED
+    const isOpen: boolean = Boolean((this.device as any).refrigerator_door_open);
+    return isOpen
+      ? this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
+      : this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED;
   }
 
   private getFreezerDoorState(): number {
-    // For now, return a default value since the property doesn't exist in the interface
-    // This should be updated when the actual refrigerator properties are defined
-    return this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED;
+    const isOpen: boolean = Boolean((this.device as any).freezer_door_open);
+    return isOpen
+      ? this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
+      : this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED;
   }
 
   // AC-specific methods
@@ -1371,8 +1592,9 @@ export class HaierEvoAccessory {
       { service: this.comfortService, suffix: 'Comfort Mode' },
       { service: this.blindsAutoService, suffix: 'Blinds Auto' },
       { service: this.blindsComfortService, suffix: 'Blinds Comfort' },
-      { service: this.freezerTemperatureService, suffix: 'Freezer' },
+      { service: this.freezerTemperatureService, suffix: 'Freezer Compartment' },
       { service: this.myzoneTemperatureService, suffix: 'My Zone' },
+      { service: this.ambientTemperatureService, suffix: 'Ambient' },
       { service: this.refrigeratorDoorService, suffix: 'Door' },
       { service: this.freezerDoorService, suffix: 'Freezer Door' }
     ];

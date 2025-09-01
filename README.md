@@ -17,9 +17,8 @@ This plugin is adapted from the [Home Assistant Haier Evo integration](https://g
 
 ## Supported Devices
 
-- **Air Conditioners**: All Haier Evo compatible air conditioners
-- **Refrigerators**: All Haier Evo compatible refrigerators
-- **Other Devices**: Any device compatible with the Haier Evo app
+- **Air Conditioners**: AS20PHP1HRA
+- **Refrigerators**: A4F739CBXGU1
 
 ## Compatibility
 
@@ -252,12 +251,14 @@ The plugin uses an optimized two-stage process to ensure accessories are created
 This approach reduces API calls by **50%** during initialization:
 
 **Before Optimization:**
+
 - `API_DEVICES`: 1 call (device list)
 - `API_DEVICE_CONFIG`: N calls (device config)
 - `API_DEVICE_CONFIG`: N calls (initial status) → **Redundant!**
 - **Total**: 1 + 2N calls
 
 **After Optimization:**
+
 - `API_DEVICES`: 1 call (device list)
 - `API_DEVICE_CONFIG`: N calls (config + status combined)
 - **Total**: 1 + N calls
@@ -273,9 +274,11 @@ The plugin implements intelligent command batching to optimize API usage and imp
 When multiple HomeKit commands are received within a short time window (default: 100ms), they are automatically batched into a single API request:
 
 **Example Scenario:**
+
 - User adjusts AC via HomeKit: Turn on → Set mode to Cool → Set temperature to 23°C → Enable quiet mode → Turn off light
 
 **Without Batching (5 separate API calls):**
+
 ```json
 {"action": "operation", "macAddress": "...", "commands": [{"commandName": "21", "value": "1"}]}
 {"action": "operation", "macAddress": "...", "commands": [{"commandName": "2", "value": "1"}]}
@@ -285,6 +288,7 @@ When multiple HomeKit commands are received within a short time window (default:
 ```
 
 **With Batching (1 combined API call):**
+
 ```json
 {
   "action": "operation",

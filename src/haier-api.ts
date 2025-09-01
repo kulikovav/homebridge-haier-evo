@@ -1537,6 +1537,14 @@ export class HaierAPI extends EventEmitter {
           deviceStatus.autohumidity = value === '1';
           break;
 
+        // Refrigerator-specific door statuses
+        case '9': // Freezer door (0 closed, 1 open)
+          deviceStatus.freezer_door_open = String(value).trim() === '1';
+          break;
+        case '10': // Refrigerator door (0 closed, 1 open)
+          deviceStatus.refrigerator_door_open = String(value).trim() === '1';
+          break;
+
         // Display and sound
         case '12': // screenDisplayStatus (light)
           deviceStatus.light = value === '1';

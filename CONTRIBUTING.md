@@ -39,22 +39,26 @@ Feature suggestions are welcome! Please create an issue with:
 ## Development Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/haier-evo/homebridge-haier-evo.git
    cd homebridge-haier-evo
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Build the project:
+
    ```bash
    npm run build
    ```
 
 4. Link for development:
+
    ```bash
    npm link
    ```
@@ -64,11 +68,13 @@ Feature suggestions are welcome! Please create an issue with:
 We have several types of tests:
 
 ### Unit Tests
+
 ```bash
 npm run test:unit
 ```
 
 ### Standalone Tests
+
 ```bash
 # Device tests
 node test-devices.js
@@ -78,6 +84,7 @@ node test-rate-limiting.js
 ```
 
 ### Comprehensive Test Runner
+
 ```bash
 # Run all tests
 node run-tests.js --all
@@ -120,22 +127,26 @@ Releases are managed through GitHub Actions:
 For maintainers with npm publishing rights:
 
 1. Make sure you have npm access to the package
+
    ```bash
    npm owner ls homebridge-haier-evo
    ```
 
 2. Ensure you're logged in to npm
+
    ```bash
    npm login
    ```
 
 3. Run tests and build
+
    ```bash
    npm run test:unit
    npm run build
    ```
 
 4. Use the release script
+
    ```bash
    npm run release
    # Or for specific version bumps:
@@ -147,6 +158,7 @@ For maintainers with npm publishing rights:
 ### npm Package Requirements
 
 The npm package must include:
+
 - Compiled JavaScript files in the `dist/` directory
 - `config.schema.json` for Homebridge UI configuration
 - Proper metadata in `package.json`
