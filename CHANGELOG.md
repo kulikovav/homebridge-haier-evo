@@ -48,4 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.0] - 2025-08-20
 - Update CHANGELOG, README, and configuration files to include new token refresh and command batching options; add legal documentation.
 
+## [1.2.1] - 2025-09-01
+- Refactor BaseDevice to improve API client handling; add guards for event subscription and initial status fetch to prevent errors when API client is unavailable.
+- Enhance refrigerator features with door status tracking and temperature event management;  fix commands proccessing after restart
+
 ## [Unreleased]
