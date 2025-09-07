@@ -2136,8 +2136,14 @@ export class HaierAPI extends EventEmitter {
 
     // For auto mode, refresh if token is about to expire
     if (this.config.tokenRefreshMode === 'auto' && this.needsTokenRefresh()) {
-      console.log(`[${new Date().toLocaleString()}] [Haier Evo] ⏰ Token about to expire, refreshing proactively`);
-      await this.refreshAccessToken();
+      // Non-blocking proactive refresh: do not await here to avoid delaying commands
+      console.log(`[${new Date().toLocaleString()}] [Haier Evo] ⏰ Token about to expire, refreshing proactively (non-blocking)`);
+      if (!this.refreshInProgress) {
+        // Kick off refresh in background; errors are logged in refresh method/interceptor
+        this.refreshAccessToken().catch(err => {
+          console.error(`[${new Date().toLocaleString()}] [Haier Evo] ❌ Background token refresh failed:`, err);
+        });
+      }
     }
   }
 

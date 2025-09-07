@@ -485,6 +485,11 @@ export class HaierEvoPlatform {
     return this.haierAPI;
   }
 
+  // Expose a safe way for accessories to notify Homebridge about structure changes
+  public updatePlatformAccessory(accessory: PlatformAccessory): void {
+    this.api.updatePlatformAccessories([accessory]);
+  }
+
   getConfig(): HaierEvoConfig {
     return this.config as unknown as HaierEvoConfig;
   }
