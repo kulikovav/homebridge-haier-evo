@@ -52,4 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor BaseDevice to improve API client handling; add guards for event subscription and initial status fetch to prevent errors when API client is unavailable.
 - Enhance refrigerator features with door status tracking and temperature event management;  fix commands proccessing after restart
 
+## [1.2.2] - 2025-09-07
+- Update configuration schema; enhance accessory management by adding service removal logic and updating platform accessories for better state handling.
+- Refactor token refresh mechanism in HaierAPI to enable non-blocking background refresh; log errors during refresh process for better error handling.
+
 ## [Unreleased]
