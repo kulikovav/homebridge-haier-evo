@@ -38,9 +38,9 @@
       "refreshInterval": {
         "title": "Refresh Interval",
         "type": "integer",
-        "minimum": 30,
-        "maximum": 3600,
-        "default": 300,
+        "minimum": 300,
+        "maximum": 2592000,
+        "default": 3600,
         "description": "Device refresh interval in seconds (default: 300)"
       },
       "debug": {
@@ -52,9 +52,9 @@
       "deviceCacheTTL": {
         "title": "Device Cache TTL",
         "type": "integer",
-        "minimum": 30,
-        "maximum": 3600,
-        "default": 300,
+        "minimum": 300,
+        "maximum": 86400,
+        "default": 3600,
         "description": "Time in seconds to cache device list (default: 300)"
       },
       "requestRandomization": {

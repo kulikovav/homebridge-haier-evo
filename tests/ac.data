@@ -1,0 +1,2582 @@
+Full status response: {
+  "macAddress": "12:34:56:78:99",
+  "sensors": {
+    "items": [
+      {
+        "value": {
+          "type": "STEP",
+          "name": "36",
+          "description": "indoorTemperature"
+        },
+        "preview": {
+          "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/44445bdd-5db7-4a7f-96ee-5c9533cc6ffe?response-content-disposition=attachment%3B%20filename%3D%22sensor-temperature.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=ff355d337cf1d9a3abacedbb8ecd0f5742958bd5b599e04cbf4ddd3b3444af01",
+          "unit": "°C",
+          "analyticsEvent": {
+            "eventName": "ac_base_device_indoorTemperature"
+          }
+        },
+        "detail": {
+          "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/44445bdd-5db7-4a7f-96ee-5c9533cc6ffe?response-content-disposition=attachment%3B%20filename%3D%22sensor-temperature.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=ff355d337cf1d9a3abacedbb8ecd0f5742958bd5b599e04cbf4ddd3b3444af01",
+          "unit": "°C",
+          "title": "Температура в комнате",
+          "description": "Встроенный датчик считывает текущую температуру воздуха в комнате"
+        }
+      }
+    ]
+  },
+  "temperature": {
+    "value": {
+      "type": "STEP",
+      "name": "0",
+      "description": "targetTemperature"
+    }
+  },
+  "operationModes": {
+    "value": {
+      "type": "LIST",
+      "name": "2",
+      "description": "operationMode"
+    },
+    "descriptions": [
+      {
+        "value": "0",
+        "title": "Авто",
+        "description": "В автоматическом режиме работы, переключение режимов охлаждения и нагрева происходит автоматически, в соответствии с установленной пользователем температурой, и температурой в помещении",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/9d7f635c-cc84-4cce-ada1-a10a9ad86e96?response-content-disposition=attachment%3B%20filename%3D%22mode-ai-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=503a3b9dcf29b5bbf303128304051279617c08a6d9613394545e2170b20e184c"
+      },
+      {
+        "value": "1",
+        "title": "Охлаждение",
+        "description": "Охлаждает воздух в помещении до установленной температуры и поддерживает её",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/beed18b7-806c-4b25-9275-c716d839e2ef?response-content-disposition=attachment%3B%20filename%3D%22mode-cold-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=af5c676e4f04f51a9a1271367cfe88235d904587a71cddf54fc36fc4a3779701"
+      },
+      {
+        "value": "2",
+        "title": "Осушение",
+        "description": "Позволяет снизить уровень влажности в помещении",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/1756f074-4599-483a-8524-ce4b35e4a735?response-content-disposition=attachment%3B%20filename%3D%22mode-drainage-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=d752d65337e60892122eeb6e6a3a3c77d993e5f41c26b10345da733bbbdc279e"
+      },
+      {
+        "value": "4",
+        "title": "Нагрев",
+        "description": "Нагревает воздух в комнате до установленной температуры и поддерживает её",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/36808388-7db4-48b4-958f-278475ee509f?response-content-disposition=attachment%3B%20filename%3D%22mode-heat-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=b06aa2b60565a4b42957a669699209baa592bb079400bf4fe4ae62f581d2ca18"
+      },
+      {
+        "value": "6",
+        "title": "Вентилятор",
+        "description": "Обеспечивает циркуляцию воздуха в помещении без изменения температуры",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/9fe48e1a-f04e-4165-9c8f-76d15e16207c?response-content-disposition=attachment%3B%20filename%3D%22mode-fan-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e3c215275a3eaee7e31934614d32eb213e2db2cd67d33405debf5ea1ebd797b3"
+      }
+    ],
+    "currentValue": "",
+    "title": "Режим",
+    "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/beed18b7-806c-4b25-9275-c716d839e2ef?response-content-disposition=attachment%3B%20filename%3D%22mode-cold-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=af5c676e4f04f51a9a1271367cfe88235d904587a71cddf54fc36fc4a3779701"
+  },
+  "power": {
+    "value": {
+      "type": "LIST",
+      "name": "21",
+      "description": "onOffStatus"
+    },
+    "title": "Питание",
+    "offTitle": ""
+  },
+  "muteStatus": {
+    "value": {
+      "type": "LIST",
+      "name": "17",
+      "description": "muteStatus"
+    },
+    "title": "Тихий",
+    "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/267a45d1-5b9f-42da-afb1-9ae02bf1374a?response-content-disposition=attachment%3B%20filename%3D%22AC_MUTE_STATUS_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=3ed1f7954f301caf0ddbb009b869f03d331eddabd6e56c42772e32c284b1241b",
+    "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/9ab6bb81-b1e5-4c05-94e1-625f619a284c?response-content-disposition=attachment%3B%20filename%3D%22AC_MUTE_STATUS_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=2b10ecf020226d060460341a80e74d15fad49d85660fb838401348898bf87822",
+    "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/3b7ee835-6fa4-47c5-bc1e-d64d63d8a6ba?response-content-disposition=attachment%3B%20filename%3D%22AC_MUTE_STATUS_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=367eda5cf902a7e4ed91068553c27846718b0e10413bccd983efdaf7a95de3c3"
+  },
+  "windSpeed": {
+    "value": {
+      "type": "LIST",
+      "name": "4",
+      "description": "windSpeed"
+    },
+    "title": "Скорость вентилятора",
+    "descriptions": [
+      {
+        "data": "3",
+        "desc": "Низкая",
+        "title": "1"
+      },
+      {
+        "data": "2",
+        "desc": "Средняя",
+        "title": "2"
+      },
+      {
+        "data": "1",
+        "desc": "Высокая",
+        "title": "3"
+      },
+      {
+        "data": "5",
+        "desc": "Авто",
+        "title": "Авто"
+      }
+    ]
+  },
+  "modes": {
+    "items": [
+      {
+        "value": {
+          "type": "LIST",
+          "name": "1",
+          "description": "windDirectionVertical"
+        },
+        "title": "Вертикальные жалюзи",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2024-06-03/5f7058eb-f6d6-4279-a99b-2e6e5aaccda0?response-content-disposition=attachment%3B%20filename%3D%22dashboard_vertical.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=8ed76b5cee63b1145bc59632b0e8155d406c82eacc1c72256a911d82afd8fd95",
+        "description": {
+          "windDirectionVertical": {
+            "title": "Вертикальные жалюзи",
+            "description": "Режим работы заслонок",
+            "hint": "Выберите режим, в котором будут работать вертикальные жалюзи кондиционера",
+            "types": [
+              {
+                "auto": {
+                  "name": "Авто режим",
+                  "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/a8c122b1-405e-405f-ab52-be59cfb4e0d9?response-content-disposition=attachment%3B%20filename%3D%22vertical-preview-auto.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=53bc3573fdbf9038b972d1a32b07bc735c7da0331ac661bd3a44063a017aef63",
+                  "value": "8"
+                }
+              },
+              {
+                "direction": {
+                  "name": "Направление",
+                  "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/22b0f46b-63f0-46c2-8b71-882376a21b0d?response-content-disposition=attachment%3B%20filename%3D%22vertical-preview-direction.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=b95fc901c6863aa546ad562b3f4f667d1cd1ba6b2235a0e26d9709043b2003e5",
+                  "description": "Направление заслонок",
+                  "hint": "Выберите направление воздушного потока по вертикали",
+                  "modes": [
+                    {
+                      "name": "90",
+                      "value": "7",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/10c43ac9-6e16-466f-8fe9-7f6cbcf6b46e?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-7.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=6fd3944288bce26b34bd7e3af70f071fda130cc70cc4401bf4d2f1f964a445a2"
+                    },
+                    {
+                      "name": "60",
+                      "value": "6",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/2b2bb7c0-be27-4bf2-8ff4-c27a527e6ca5?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-6.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=2db85593154490cd882991ac508f29cbb2327dfbd8f3d334de5d0970428eb7e6"
+                    },
+                    {
+                      "name": "45",
+                      "value": "5",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/0e07e2db-6cbb-4510-ad70-4326918737b1?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-5.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=cba8ada95945d07c01499e99619aed3c9b00aff33ac701522eaec9b6224c28b5"
+                    },
+                    {
+                      "name": "30",
+                      "value": "4",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/5f5dcb4c-bca6-48f4-bbe6-3790668e18a6?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-4.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=79d03e573e5bced1d557323316c5872427946c61069603011cc2b310670456c3"
+                    },
+                    {
+                      "name": "0",
+                      "value": "2",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/43f17c4b-3194-426d-9b98-9f8d3a9b8ee6?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-2.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=44776e848b6695175d685e01d340b8455a02329fb6e48ba3e4482e867ff85ed1"
+                    }
+                  ]
+                }
+              },
+              {
+                "comfort": {
+                  "name": "Комфорт-поток",
+                  "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/a9165b0d-9f16-405d-9aec-e817c9c2b058?response-content-disposition=attachment%3B%20filename%3D%22vertical-preview-comfort.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=4cedd055cb3fa25bcc56e44fa14261d1effd828ec7270f84c0703fa85a142b2f",
+                  "description": "Направление заслонок",
+                  "hint": "Автоматический выбор направления воздушного потока в зависимости от режима работы кондиционера. Теплый воздух направляется вниз, а холодный вверх.",
+                  "modes": [
+                    {
+                      "name": "Вверх",
+                      "value": "1",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/c640a20f-4b8e-40ff-aad6-0c17218e5641?response-content-disposition=attachment%3B%20filename%3D%22vertical-choice-up.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=1bb01eb99361c25dada40c7b13c8d91eaaa898c05d0c431d7be2ac829ed859c6"
+                    },
+                    {
+                      "name": "Вниз",
+                      "value": "3",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/395cb435-ca4c-4db2-8420-3a49ad1e69ea?response-content-disposition=attachment%3B%20filename%3D%22vertical-choice-down.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=0e91e76387e8febd06058427e5af686494230fa99398a67eb9f6ae2a67479132"
+                    }
+                  ]
+                }
+              }
+            ],
+            "value": {
+              "type": "LIST",
+              "name": "1",
+              "description": "windDirectionVertical"
+            }
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "BOOLEAN",
+          "name": "16",
+          "description": "silentSleepStatus"
+        },
+        "title": "Комфортный сон",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/6f352e15-b3e7-4446-90dd-221ff98a457d?response-content-disposition=attachment%3B%20filename%3D%22moon-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=662c71895af74bf7fbbec30049a0e5231ad7593bb2f0149c2d316835e2b686ac",
+        "description": {
+          "toggleControl": {
+            "title": "Комфортный сон",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Максимальное снижение уровня шума и скорости воздушного потока. Установленная температура корректируется автоматически в начале и в конце программы «Комфортный сон» для комфортного засыпания и пробуждения."
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "BOOLEAN",
+          "name": "12",
+          "description": "screenDisplayStatus"
+        },
+        "title": "Подсветка блока",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/495fda32-7b06-49cc-9423-26a567442b07?response-content-disposition=attachment%3B%20filename%3D%22lamp-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=cd69c0cdd4c0128c65463cd1b11009fd222f20093689376b6ac2f2f9b586c42b",
+        "description": {
+          "toggleControl": {
+            "title": "Подсветка блока",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Управление подсветкой дисплея внутреннего блока кондиционера"
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "BOOLEAN",
+          "name": "18",
+          "description": "rapidMode"
+        },
+        "title": "Турбо",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/21c9075d-adf3-4a28-9bf2-15e6b9e9fe4d?response-content-disposition=attachment%3B%20filename%3D%22turbo-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=78ede86597290745b3737cdcb8f367d2a689667643d9d74478f0b9a6f0a8a8b9",
+        "description": {
+          "toggleControl": {
+            "title": "Турбо",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Повышение производительности  кондиционера для быстрого достижения заданной температуры воздуха"
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "BOOLEAN",
+          "name": "13",
+          "description": "10degreeHeatingStatus"
+        },
+        "title": "10 градусов",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/e4a9cbe1-08ba-4c66-bb79-1d326fe29133?response-content-disposition=attachment%3B%20filename%3D%22mode-10degree-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=be134f828ff20d870e2adcd5a7117d8228dc2403d18d0f1d37cedceffaded5c5",
+        "description": {
+          "toggleControl": {
+            "title": "10 градусов",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Автоматическое поддержание температуры воздуха в помещении на уровне +10°C"
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "BOOLEAN",
+          "name": "20",
+          "description": "healthMode"
+        },
+        "title": "Здоровье",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/e4a9cbe1-08ba-4c66-bb79-1d326fe29133?response-content-disposition=attachment%3B%20filename%3D%22mode-10degree-active.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=be134f828ff20d870e2adcd5a7117d8228dc2403d18d0f1d37cedceffaded5c5",
+        "description": {
+          "toggleControl": {
+            "title": "Здоровье",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Очищает воздух от бактерий и вирусов. Рекомендуется включать опцию на 1-2 часа в день."
+          }
+        }
+      }
+    ],
+    "itemsV2": [
+      {
+        "value": {
+          "type": "LIST",
+          "name": "1",
+          "description": "windDirectionVertical"
+        },
+        "title": "Вертикальные жалюзи",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2024-06-03/5f7058eb-f6d6-4279-a99b-2e6e5aaccda0?response-content-disposition=attachment%3B%20filename%3D%22dashboard_vertical.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=8ed76b5cee63b1145bc59632b0e8155d406c82eacc1c72256a911d82afd8fd95",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2024-05-22/96a19ca4-ce21-4058-9839-67404eedd57e?response-content-disposition=attachment%3B%20filename%3D%22dashboard_vertical_off.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=a74d00ce03cbb68965f07694fa7671adb69ed2691a58416b925cc9b4411257b7",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2024-05-22/b058bf2a-1bbc-44ee-b467-bdabc6803753?response-content-disposition=attachment%3B%20filename%3D%22dashboard_vertical_disable.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=4bc38419f50cd23a6fbb1a3d4a92798d1fb49912588e9037c0aa224d469c164c",
+        "description": {
+          "windDirectionVertical": {
+            "title": "Вертикальные жалюзи",
+            "description": "Режим работы заслонок",
+            "hint": "Выберите режим, в котором будут работать вертикальные жалюзи кондиционера",
+            "types": [
+              {
+                "auto": {
+                  "name": "Авто режим",
+                  "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/a8c122b1-405e-405f-ab52-be59cfb4e0d9?response-content-disposition=attachment%3B%20filename%3D%22vertical-preview-auto.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=53bc3573fdbf9038b972d1a32b07bc735c7da0331ac661bd3a44063a017aef63",
+                  "value": "8"
+                }
+              },
+              {
+                "direction": {
+                  "name": "Направление",
+                  "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/22b0f46b-63f0-46c2-8b71-882376a21b0d?response-content-disposition=attachment%3B%20filename%3D%22vertical-preview-direction.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=b95fc901c6863aa546ad562b3f4f667d1cd1ba6b2235a0e26d9709043b2003e5",
+                  "description": "Направление заслонок",
+                  "hint": "Выберите направление воздушного потока по вертикали",
+                  "modes": [
+                    {
+                      "name": "90",
+                      "value": "7",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/10c43ac9-6e16-466f-8fe9-7f6cbcf6b46e?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-7.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=6fd3944288bce26b34bd7e3af70f071fda130cc70cc4401bf4d2f1f964a445a2"
+                    },
+                    {
+                      "name": "60",
+                      "value": "6",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/2b2bb7c0-be27-4bf2-8ff4-c27a527e6ca5?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-6.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=2db85593154490cd882991ac508f29cbb2327dfbd8f3d334de5d0970428eb7e6"
+                    },
+                    {
+                      "name": "45",
+                      "value": "5",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/0e07e2db-6cbb-4510-ad70-4326918737b1?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-5.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=cba8ada95945d07c01499e99619aed3c9b00aff33ac701522eaec9b6224c28b5"
+                    },
+                    {
+                      "name": "30",
+                      "value": "4",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/5f5dcb4c-bca6-48f4-bbe6-3790668e18a6?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-4.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=79d03e573e5bced1d557323316c5872427946c61069603011cc2b310670456c3"
+                    },
+                    {
+                      "name": "0",
+                      "value": "2",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/43f17c4b-3194-426d-9b98-9f8d3a9b8ee6?response-content-disposition=attachment%3B%20filename%3D%22vertical-slider-2.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=44776e848b6695175d685e01d340b8455a02329fb6e48ba3e4482e867ff85ed1"
+                    }
+                  ]
+                }
+              },
+              {
+                "comfort": {
+                  "name": "Комфорт-поток",
+                  "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/a9165b0d-9f16-405d-9aec-e817c9c2b058?response-content-disposition=attachment%3B%20filename%3D%22vertical-preview-comfort.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=4cedd055cb3fa25bcc56e44fa14261d1effd828ec7270f84c0703fa85a142b2f",
+                  "description": "Направление заслонок",
+                  "hint": "Автоматический выбор направления воздушного потока в зависимости от режима работы кондиционера. Теплый воздух направляется вниз, а холодный вверх.",
+                  "modes": [
+                    {
+                      "name": "Вверх",
+                      "value": "1",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/c640a20f-4b8e-40ff-aad6-0c17218e5641?response-content-disposition=attachment%3B%20filename%3D%22vertical-choice-up.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=1bb01eb99361c25dada40c7b13c8d91eaaa898c05d0c431d7be2ac829ed859c6"
+                    },
+                    {
+                      "name": "Вниз",
+                      "value": "3",
+                      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2022-11-15/395cb435-ca4c-4db2-8420-3a49ad1e69ea?response-content-disposition=attachment%3B%20filename%3D%22vertical-choice-down.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041723Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=0e91e76387e8febd06058427e5af686494230fa99398a67eb9f6ae2a67479132"
+                    }
+                  ]
+                }
+              }
+            ],
+            "value": {
+              "type": "LIST",
+              "name": "1",
+              "description": "windDirectionVertical"
+            }
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "LIST",
+          "name": "16",
+          "description": "silentSleepStatus"
+        },
+        "title": "Комфортный сон",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/618d6abd-d0d7-4c7c-9b15-4e163e233c3f?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SILENT_SLEEP_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=7e39c27b819faa60aa8c338f5d4fbb1de0526ece66356d5ffac01d346ae4825b",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/cdf4a3c7-a5da-4440-a53d-7a4cffeda9fc?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SILENT_SLEEP_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=84fa0e0e05fc8155260286a5a85de26437d56a0e1aaf747329a5e1a58e7f4e18",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/566c8de3-0a9e-442d-b654-6c08d5e9fd01?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SILENT_SLEEP_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=a8612f203ae1af5bb514d17f3f81cb1d4a76cceb82266e210b395de854e2497e",
+        "description": {
+          "toggleControl": {
+            "title": "Комфортный сон",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Максимальное снижение уровня шума и скорости воздушного потока. Установленная температура корректируется автоматически в начале и в конце программы «Комфортный сон» для комфортного засыпания и пробуждения.",
+            "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/618d6abd-d0d7-4c7c-9b15-4e163e233c3f?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SILENT_SLEEP_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=7e39c27b819faa60aa8c338f5d4fbb1de0526ece66356d5ffac01d346ae4825b",
+            "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/cdf4a3c7-a5da-4440-a53d-7a4cffeda9fc?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SILENT_SLEEP_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=84fa0e0e05fc8155260286a5a85de26437d56a0e1aaf747329a5e1a58e7f4e18",
+            "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/566c8de3-0a9e-442d-b654-6c08d5e9fd01?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SILENT_SLEEP_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=a8612f203ae1af5bb514d17f3f81cb1d4a76cceb82266e210b395de854e2497e"
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "LIST",
+          "name": "12",
+          "description": "screenDisplayStatus"
+        },
+        "title": "Подсветка блока",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/e43f0851-8d9c-423f-9d58-329061bfca85?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SCREEN_DISPLAY_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=bde0b5be50ea29a2a3ad95da31022d0d695cad46980278f196761ff9da4fb6ae",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/3041d497-7eff-4c38-9b02-f796ae25b611?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SCREEN_DISPLAY_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=8740892824dd993114751dbdcb955512b7d80b329a066fbbad016a77dd20c039",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/ee4cf5e1-6c5c-47ec-a5e3-ab8325091255?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SCREEN_DISPLAY_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e7b764a57cf153559c7f7ae7c40e722c148369f5ba2faef6e25415304532627a",
+        "description": {
+          "toggleControl": {
+            "title": "Подсветка блока",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Управление подсветкой дисплея внутреннего блока кондиционера",
+            "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/e43f0851-8d9c-423f-9d58-329061bfca85?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SCREEN_DISPLAY_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=bde0b5be50ea29a2a3ad95da31022d0d695cad46980278f196761ff9da4fb6ae",
+            "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/3041d497-7eff-4c38-9b02-f796ae25b611?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SCREEN_DISPLAY_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=8740892824dd993114751dbdcb955512b7d80b329a066fbbad016a77dd20c039",
+            "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/ee4cf5e1-6c5c-47ec-a5e3-ab8325091255?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SCREEN_DISPLAY_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e7b764a57cf153559c7f7ae7c40e722c148369f5ba2faef6e25415304532627a"
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "LIST",
+          "name": "18",
+          "description": "rapidMode"
+        },
+        "title": "Турбо",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/84bca48e-40df-4eed-8e2a-91b1fba749f7?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_RAPID_MODE_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=50f0120009515de968f1ff2c77df31b6671b79a4eed517b95f1272cc45a22847",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/dcf0c657-542b-43d4-8e6d-e7979bc20e47?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_RAPID_MODE_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e3dce258e2f16422c5f2b7c1790fe00fa107e103910811134873c6bf701fbbae",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/f43142ba-5284-467a-ae09-2e4341734b85?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_RAPID_MODE_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=04e8efaa69a79d583492093e938e0b7f606014212da7c3f105b552b79349f822",
+        "description": {
+          "toggleControl": {
+            "title": "Турбо",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Повышение производительности  кондиционера для быстрого достижения заданной температуры воздуха",
+            "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/84bca48e-40df-4eed-8e2a-91b1fba749f7?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_RAPID_MODE_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=50f0120009515de968f1ff2c77df31b6671b79a4eed517b95f1272cc45a22847",
+            "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/dcf0c657-542b-43d4-8e6d-e7979bc20e47?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_RAPID_MODE_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e3dce258e2f16422c5f2b7c1790fe00fa107e103910811134873c6bf701fbbae",
+            "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/f43142ba-5284-467a-ae09-2e4341734b85?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_RAPID_MODE_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=04e8efaa69a79d583492093e938e0b7f606014212da7c3f105b552b79349f822"
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "LIST",
+          "name": "13",
+          "description": "10degreeHeatingStatus"
+        },
+        "title": "10 градусов",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/6788f77e-5588-4201-889d-d760c76671dd?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_10_DEGREE_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=c955e4c85af447cb12106180c247eaa1ce44eb7d309f87f887a1fdf9f1694249",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/69797c22-394f-455e-ad9f-de6468cb6ec0?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_10_DEGREE_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=fa5d276ab491d4d7354a1dc217bc120b89459f8abba6f2ffe17b6b1161e505c9",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/8b5bf919-d01a-48b0-8e13-def1010e149b?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_10_DEGREE_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=6dd445e8fadc59f86fb9ecad2b307d5e2e733285f697a300e917b5828944e253",
+        "description": {
+          "toggleControl": {
+            "title": "10 градусов",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Автоматическое поддержание температуры воздуха в помещении на уровне +10°C",
+            "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/6788f77e-5588-4201-889d-d760c76671dd?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_10_DEGREE_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=c955e4c85af447cb12106180c247eaa1ce44eb7d309f87f887a1fdf9f1694249",
+            "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/69797c22-394f-455e-ad9f-de6468cb6ec0?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_10_DEGREE_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=fa5d276ab491d4d7354a1dc217bc120b89459f8abba6f2ffe17b6b1161e505c9",
+            "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/8b5bf919-d01a-48b0-8e13-def1010e149b?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_10_DEGREE_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=6dd445e8fadc59f86fb9ecad2b307d5e2e733285f697a300e917b5828944e253"
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "LIST",
+          "name": "20",
+          "description": "healthMode"
+        },
+        "title": "Здоровье",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2025-01-24/b7387111-a3cd-4730-8db1-25593373400a?response-content-disposition=attachment%3B%20filename%3D%22AC_HEALTH_MODE_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e7220accde39f8ee91601579b51c4febe13f0556b33052cc444bc3aad9672dd2",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2025-01-24/aaaf0d4a-9060-420e-83cb-706c09ab6778?response-content-disposition=attachment%3B%20filename%3D%22AC_HEALTH_MODE_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=56b62288b1665d1467e179a3ace2ca95e634af087958f3da0349a6dda115c92f",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2025-01-24/35f8ad86-92c6-4f72-b07d-04f5981608a5?response-content-disposition=attachment%3B%20filename%3D%22AC_HEALTH_MODE_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=773dbbb14101d55f31dce6cb774ef6fedbfef091862dc7c274f9f9eaf8910a60",
+        "description": {
+          "toggleControl": {
+            "title": "Здоровье",
+            "activeHint": "Активен",
+            "disableHint": "Выключен",
+            "description": "Очищает воздух от бактерий и вирусов. Рекомендуется включать опцию на 1-2 часа в день.",
+            "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2025-01-24/b7387111-a3cd-4730-8db1-25593373400a?response-content-disposition=attachment%3B%20filename%3D%22AC_HEALTH_MODE_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e7220accde39f8ee91601579b51c4febe13f0556b33052cc444bc3aad9672dd2",
+            "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2025-01-24/aaaf0d4a-9060-420e-83cb-706c09ab6778?response-content-disposition=attachment%3B%20filename%3D%22AC_HEALTH_MODE_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=56b62288b1665d1467e179a3ace2ca95e634af087958f3da0349a6dda115c92f",
+            "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2025-01-24/35f8ad86-92c6-4f72-b07d-04f5981608a5?response-content-disposition=attachment%3B%20filename%3D%22AC_HEALTH_MODE_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=773dbbb14101d55f31dce6cb774ef6fedbfef091862dc7c274f9f9eaf8910a60"
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "LIST",
+          "name": "31",
+          "description": "selfCleaningStatus"
+        },
+        "title": "Самоочистка",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/8cd42c17-8581-43dc-abe9-e842333c8970?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=f87845c43ca7640bc76c919e1f523719af978c0e3e290e9f95b542358771025c",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/dd95bd40-5bb6-444a-9ae9-ef4e0d5eae8d?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=f899127ca230cf7a1834a5223bf7772c688b80f1cc212db9b37eaca16f90942d",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/b65df1c1-394a-4883-930b-c269b1d09236?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=07e5e85c1d9d8d12d663acaa0b35be1ff1e38783b5f131d1058b9c40f99e8d36",
+        "description": {
+          "warningToggleControl": {
+            "toggleControl": {
+              "title": "Самоочистка",
+              "activeHint": "Активен",
+              "disableHint": "Выключен",
+              "description": "Запуск цикла самоочистки теплообменника кондиционера от загрязнений и вредоносных частиц",
+              "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/8cd42c17-8581-43dc-abe9-e842333c8970?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=f87845c43ca7640bc76c919e1f523719af978c0e3e290e9f95b542358771025c",
+              "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/dd95bd40-5bb6-444a-9ae9-ef4e0d5eae8d?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=f899127ca230cf7a1834a5223bf7772c688b80f1cc212db9b37eaca16f90942d",
+              "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/b65df1c1-394a-4883-930b-c269b1d09236?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=07e5e85c1d9d8d12d663acaa0b35be1ff1e38783b5f131d1058b9c40f99e8d36"
+            },
+            "warning": {
+              "title": "Данный режим рекомендовано включать под вашим наблюдением",
+              "description": "Во время работы этого режима есть вероятность закупорки в дренажном поддоне или утечки конденсата, что может привести к порче имущества.\nРекомендуем включать этот режим, когда вы находитесь рядом с кондиционером и можете контролировать его работу.",
+              "continueBtn": "Включить режим",
+              "cancelBtn": "Отмена"
+            }
+          }
+        }
+      },
+      {
+        "value": {
+          "type": "LIST",
+          "name": "6",
+          "description": "selfCleaning56Status"
+        },
+        "title": "Стерильная очистка",
+        "icon": "https://storage.yandexcloud.net/admin-console-bucket/2024-02-07/8e2c1170-112a-455c-a775-6df5eb6c56ec?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_56_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=100f863ca594406a40b138489345b815c746ca65891e3172d2bbb85da92b209b",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2024-02-07/ab70b860-8ad0-476e-a904-13e10cd6c91b?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_56_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=c453619e4f0784b0ee3eca14d59c0fc6ac09295ddaaa06df9bc9ca89656f0d2a",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2024-02-07/5f535c68-cf53-49a4-b722-74ee6832e1fb?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_56_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e564d27293da16e344545b8ce236d12fb41648b2a330984dd54fc014ec5ee738",
+        "description": {
+          "warningToggleControl": {
+            "toggleControl": {
+              "title": "Стерильная очистка",
+              "activeHint": "Активен",
+              "disableHint": "Выключен",
+              "description": "Запуск цикла стерилизации теплообменника внутреннего блока кондиционера при 56С",
+              "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2024-02-07/8e2c1170-112a-455c-a775-6df5eb6c56ec?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_56_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=100f863ca594406a40b138489345b815c746ca65891e3172d2bbb85da92b209b",
+              "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2024-02-07/ab70b860-8ad0-476e-a904-13e10cd6c91b?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_56_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=c453619e4f0784b0ee3eca14d59c0fc6ac09295ddaaa06df9bc9ca89656f0d2a",
+              "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2024-02-07/5f535c68-cf53-49a4-b722-74ee6832e1fb?response-content-disposition=attachment%3B%20filename%3D%22AC_MODE_V2_SELF_CLEANING_56_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e564d27293da16e344545b8ce236d12fb41648b2a330984dd54fc014ec5ee738"
+            },
+            "warning": {
+              "title": "Данный режим рекомендовано включать под вашим наблюдением",
+              "description": "Во время работы этого режима есть вероятность закупорки в дренажном поддоне или утечки конденсата, что может привести к порче имущества.\nРекомендуем включать этот режим, когда вы находитесь рядом с кондиционером и можете контролировать его работу.",
+              "continueBtn": "Включить режим",
+              "cancelBtn": "Отмена"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "info": {
+    "macAddress": "12:34:56:78:99",
+    "model": "AS20PHP1HRA",
+    "serialNumber": "AABB11E0000XBM1A0111"
+  },
+  "settings": {
+    "name": {
+      "title": "Имя устройства",
+      "actionTitle": "Изменить имя устройства",
+      "actionDescription": "Имя отображается на дашборде",
+      "name": "Спальня ",
+      "analyticsEvent": {
+        "eventName": "device_settings_deviceName",
+        "trackingData": {
+          "data": {
+            "type": "AC",
+            "model": "AS20PHP1HRA"
+          },
+          "items": []
+        }
+      }
+    },
+    "firmware": {
+      "title": "Версия прошивки",
+      "value": "1.5.5",
+      "action": {
+        "link": "haierevo://hiHome/device/firmware-update?macAddress=12:34:56:78:99",
+        "params": {},
+        "type": "ACTION_TYPE_REDIRECT"
+      },
+      "updateRequired": false,
+      "autoUpdate": {
+        "description": "Автообновление прошивки",
+        "enabled": true
+      },
+      "analyticsEvent": {
+        "eventName": "device_settings_firmwareVersion",
+        "trackingData": {
+          "data": {
+            "type": "AC",
+            "model": "AS20PHP1HRA"
+          },
+          "items": []
+        }
+      }
+    },
+    "notifications": {
+      "title": "Уведомления",
+      "isEnabled": true
+    },
+    "about": {
+      "title": "Об устройстве",
+      "action": {
+        "link": "haierevo://iot/device?serialNum=AABB11E0000XBM1A0111&macAddress=12:34:56:78:99&iotDeviceId=817121&ip=192.168.0.99",
+        "params": {},
+        "type": "ACTION_TYPE_REDIRECT"
+      },
+      "analyticsEvent": {
+        "eventName": "device_settings_aboutDevice",
+        "trackingData": {
+          "data": {
+            "type": "AC",
+            "model": "AS20PHP1HRA"
+          },
+          "items": []
+        }
+      }
+    },
+    "removeDevice": {
+      "title": "Удалить устройство",
+      "analyticsEvent": {
+        "eventName": "device_settings_deviceDelete",
+        "trackingData": {
+          "data": {
+            "type": "AC",
+            "model": "AS20PHP1HRA"
+          },
+          "items": []
+        }
+      }
+    }
+  },
+  "status": "ONLINE",
+  "operationModesV2": {
+    "value": {
+      "type": "LIST",
+      "name": "2",
+      "description": "operationMode"
+    },
+    "preview": {
+      "value": "",
+      "title": "Режим",
+      "description": "",
+      "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/95affdc2-9a8f-4279-a2cd-9b2441c7269d?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_PREVIEW_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=9429d094c9c40a0e2ef8fd8a2edaf77cfb935cf91181630e2e8deec1c218aa1d",
+      "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/95affdc2-9a8f-4279-a2cd-9b2441c7269d?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_PREVIEW_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=9429d094c9c40a0e2ef8fd8a2edaf77cfb935cf91181630e2e8deec1c218aa1d",
+      "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/95affdc2-9a8f-4279-a2cd-9b2441c7269d?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_PREVIEW_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=9429d094c9c40a0e2ef8fd8a2edaf77cfb935cf91181630e2e8deec1c218aa1d"
+    },
+    "items": [
+      {
+        "value": "0",
+        "title": "Авто",
+        "description": "В автоматическом режиме работы, переключение режимов охлаждения и нагрева происходит автоматически, в соответствии с установленной пользователем температурой, и температурой в помещении",
+        "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/cd44b26e-02ae-4413-b8b8-6fad90ca9931?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_AUTO_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=e9cdb592d44c0e03c30cbf90abfbf7b343d61907b79792cb55968d5925665c00",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/5ddeb602-2e68-4505-90d8-c7a26f5fb58c?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_AUTO_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=74deaac1380cc2f157dd6a9340245235ab7fae45b8350e81a6937d16053ffb15",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/0b41487f-a1cd-42f4-8282-a1a4fb7b9232?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_AUTO_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=d3e7286bc5d502a2bdcd53f0785988c04d95e312d7b2a0e9698af30ba877dfa9"
+      },
+      {
+        "value": "1",
+        "title": "Охлаждение",
+        "description": "Охлаждает воздух в помещении до установленной температуры и поддерживает её",
+        "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/bac93318-ece1-4c90-9bca-9f1898676af6?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_COLD_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=35ecccf07cf3ab706e53fddb69d675b8cfe585b474e294b44184da52a4643d39",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/f7a99ad1-9de7-46f2-8b5c-4c63d392e408?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_COLD_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=76d5204cec9556a6fdb78edaaeffe2265d72c173a975333a5e7c1795c73a9cb2",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/badb165d-f654-4abc-b5aa-fb2caf70e44d?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_COLD_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=f83e701ff9a0b97ccf128ed88bb3842dac982c3f9f4956de9260e83a03701354"
+      },
+      {
+        "value": "2",
+        "title": "Осушение",
+        "description": "Позволяет снизить уровень влажности в помещении",
+        "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/49c14e29-60a8-4d13-b303-2564fa072cf4?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_DEHUMIDIFICATION_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=6724c9654ada69b6878127ffa30e1e8c9cf90b9d365b0b0c633b6c93aa3ef58b",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/17c91493-50ac-46c4-8779-009c6e807a2c?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_DEHUMIDIFICATION_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=7ea3800523efb2e8828f2a8b73aa821bf50f7493e032cf8da1305c2c20de3164",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/b98e3823-5c5b-44a5-983b-6c3d1ef744c3?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_DEHUMIDIFICATION_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=b718817521ce2c9fa7e701c4bb2a6d1b2369e0c3758008840b6aaeb6c8557e7f"
+      },
+      {
+        "value": "4",
+        "title": "Нагрев",
+        "description": "Нагревает воздух в комнате до установленной температуры и поддерживает её",
+        "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/07d26532-5383-43d1-8080-41f603873c2c?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_HEAT_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=d441aaaa5defd3dbe77d4d31c1e34878ea9a903a9848ac60ff207a6696fd84f5",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/a80f2b9c-5ee5-431b-9fc6-b56660cdea38?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_HEAT_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=9c4250ca6cdc10849519e89ed91d1214b6a048a538ce18192f707d548c047a7f",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/56640231-88b1-474a-994f-a13168e02e82?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_HEAT_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=f46902a09f8e1d4b0e53986a9d63deeac724f205b9255db287b96d5a3950ba7e"
+      },
+      {
+        "value": "6",
+        "title": "Вентилятор",
+        "description": "Обеспечивает циркуляцию воздуха в помещении без изменения температуры",
+        "onIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/b89bf589-5e77-4da8-b0a8-e317aa3fa4ea?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_FAN_ON_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=5084b4e6a627ffa1f2d0195b379371cca04a454ad3414a767a6233a36ad6df74",
+        "offIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/d4824cd5-bb24-4e17-9861-86b0c40967b6?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_FAN_OFF_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=9684bcec988d3cfdb670800ae805418983455715505937adb45f63a87267ceae",
+        "disableIcon": "https://storage.yandexcloud.net/admin-console-bucket/2023-11-09/321bf2b7-f538-4588-b735-fe8dd8355e2c?response-content-disposition=attachment%3B%20filename%3D%22AC_OP_MODE_V2_FAN_DISABLE_ICON.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=4473ab73fccb2d6650a87ff41fdbf881eaf2287d681517a3e6f782e3e4fe5c3f"
+      }
+    ]
+  },
+  "alarms": [],
+  "attributes": [
+    {
+      "type": "STEP",
+      "name": "38",
+      "description": "Температура в комнате",
+      "currentValue": "25",
+      "readable": true,
+      "writable": false,
+      "invisible": false,
+      "range": {
+        "type": "STEP",
+        "data": {
+          "dataType": "Double",
+          "step": "1.00",
+          "minValue": "-64.00",
+          "maxValue": "191.00"
+        }
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "14",
+      "description": "Звуковой сигнал",
+      "currentValue": "0",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "20",
+      "description": "Здоровый режим",
+      "currentValue": "1",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "18",
+      "description": "Турбо",
+      "currentValue": "0",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "1",
+      "description": "Вертикальные жалюзи",
+      "currentValue": "1",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "0",
+            "name": "Фиксированное верхнее и нижнее положение"
+          },
+          {
+            "data": "1",
+            "name": "Верхнее положение"
+          },
+          {
+            "data": "2",
+            "name": "Первое положение поворота"
+          },
+          {
+            "data": "3",
+            "name": "Нижнее положение"
+          },
+          {
+            "data": "4",
+            "name": "Второе положение поворота"
+          },
+          {
+            "data": "5",
+            "name": "Третье положение поворота"
+          },
+          {
+            "data": "6",
+            "name": "Вверх и вниз четвертая позиция"
+          },
+          {
+            "data": "7",
+            "name": "Пятая позиция поворота"
+          },
+          {
+            "data": "8",
+            "name": "Авто режим"
+          },
+          {
+            "data": "9",
+            "name": "Автоматический подъем и опускание (только для специальной модели)"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "12",
+      "description": "Подсветка блока",
+      "currentValue": "1",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "16",
+      "description": "Комфортный сон",
+      "currentValue": "0",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "2",
+      "description": "Режимы",
+      "currentValue": "1",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "0",
+            "name": "Авто"
+          },
+          {
+            "data": "1",
+            "name": "Охлаждение"
+          },
+          {
+            "data": "2",
+            "name": "Осушение"
+          },
+          {
+            "data": "4",
+            "name": "Нагрев"
+          },
+          {
+            "data": "6",
+            "name": "Вентилятор"
+          }
+        ]
+      }
+    },
+    {
+      "type": "STEP",
+      "name": "0",
+      "description": "Целевая температура",
+      "currentValue": "23",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "range": {
+        "type": "STEP",
+        "data": {
+          "dataType": "Double",
+          "step": "1.00",
+          "minValue": "16.00",
+          "maxValue": "30.00"
+        }
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "17",
+      "description": "Тихий",
+      "currentValue": "1",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "13",
+      "description": "10 градусов",
+      "currentValue": "0",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "STEP",
+      "name": "36",
+      "description": "Температура в комнате",
+      "currentValue": "27",
+      "readable": true,
+      "writable": false,
+      "invisible": false,
+      "range": {
+        "type": "STEP",
+        "data": {
+          "dataType": "Double",
+          "step": "0.50",
+          "minValue": "0.00",
+          "maxValue": "55.00"
+        }
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "4",
+      "description": "Скорость вентилятора",
+      "currentValue": "5",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "1",
+            "name": "Быстрый режим"
+          },
+          {
+            "data": "2",
+            "name": "Средний режим"
+          },
+          {
+            "data": "3",
+            "name": "Медленный режим"
+          },
+          {
+            "data": "5",
+            "name": "Автоматический режим"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "6",
+      "description": "Стерильная очистка",
+      "currentValue": "0",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "21",
+      "description": "Включение/выключение",
+      "currentValue": "0",
+      "operationType": "IG",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    },
+    {
+      "type": "LIST",
+      "name": "31",
+      "description": "Авто влажность",
+      "currentValue": "0",
+      "operationType": "G",
+      "commandName": "4",
+      "readable": true,
+      "writable": true,
+      "invisible": false,
+      "list": {
+        "type": "LIST",
+        "data": [
+          {
+            "data": "false",
+            "name": "Выключен"
+          },
+          {
+            "data": "true",
+            "name": "Активен"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": {
+    "alarmToResult": {
+      "zeroPassageErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorReturnAirSensorErr": {
+        "text": "[F7] Ошибка датчика температуры всасывания.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorEEPROMErr": {
+        "text": "[E4] Ошибка платы внутреннего блока, EEPROM.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorHeatingOverloadAlarm": {
+        "text": "[E9] Предупреждение о перегреве / перегрузке внутреннего блока, в режиме \"тепло\".",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "co2SensorErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "filterCleaningAlarm": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "ch2oSensorErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "alarmCancel": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorACProtection": {
+        "text": "[F22] Защита от перегрузки по току наружного блока.",
+        "description": "Проверьте эл.питание, перезапустите кондиционер."
+      },
+      "threePhaseSupplyErr": {
+        "text": "[Ошибка] Неправильно подключение модуля инвертора и компрессора. Необходимо обратиться на горячую линию Haier, вызвать мастера.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorFanErr": {
+        "text": "[E14] Ошибка мотора вентилятора внутреннего блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "returnAirOverheatAlarm": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorDCProtection": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorFreezingProtection": {
+        "text": "[E5] Защита внутреннего блока от обледенения.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorCoolingOverloadAlarm": {
+        "text": "[F34] Обледенение наружного блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorEnviSensorErr": {
+        "text": "[F6] Неисправность наружного датчика окружающей среды.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "waterLackProtection": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "humiditySensorErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "pressureProtection": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorOutdoorCommErr": {
+        "text": "[E7] Ошибка связи между внутренним и внешним блоками.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorModuleErr": {
+        "text": "[F1] Ошибка модуля инвертора наружного блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorCompressorOverheatProtection": {
+        "text": "[F20] Защита от высокого давления фреона.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorCoilerSensorErr": {
+        "text": "[E2] Ошибка датчика теплообменника внутреннего блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "wireCtrCommErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "differentModeRunningErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "ctCurrentErr": {
+        "text": "[F24] Ошибка платы управления внешнего блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "mechanicalArmLimitErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorPM2p5SensorErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorUnitIdConflictErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorFanErr": {
+        "text": "[F8] Ошибка мотора вентилятора наружного блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "tempCuttingOffProtection": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "fullWaterProtection": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorExhaustSensorErr": {
+        "text": "[F25] Неисправность датчика нагнетания компрессора.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorEEPROMErr": {
+        "text": "[F12] Ошибка платы наружного блока, EEPROM.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "waterPumpErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorDeforstSensorErr": {
+        "text": "[F21] Неисправность датчика фреона наружного блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "vocSensorErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "externalAlarmSwitchErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "powerProtection": {
+        "text": "[F19] Защита от повышенного/пониженного напряжения.",
+        "description": "Проверьте питание, перезапустите кондиционер. Если ошибка не исчезнет, обратитесь в отдел послепродажного обслуживания."
+      },
+      "panelCommErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorCompressorRunningErr": {
+        "text": "[F11] Неисправность компрессора наружного блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "fourWayValveErr": {
+        "text": "[Ошибка] Неисправность четырехходового клапана. Необходимо обратиться на горячую линию Haier, вызвать мастера.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorUnitErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorTempSensorErr": {
+        "text": "[E1] Неисправность датчика температуры в помещении внутреннего блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorUnloadedErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "outdoorEvaporationSensorErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "cbdCommErr": {
+        "text": "[F3] Ошибка связи между платой инвертора и PCB наружного блока.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "indoorPM2p5SensorErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "expansionValveErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "twErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "firewallErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      },
+      "doorErr": {
+        "text": "Ошибка устройства.",
+        "description": "Обратитесь в отдел послепродажного обслуживания."
+      }
+    },
+    "detailsText": "Подробнее",
+    "undefinedAlarm": {
+      "text": "Неизвестная ошибка",
+      "description": "Обратитесь в отдел послепродажного обслуживания"
+    },
+    "chatSupportBtn": {
+      "text": "Чат поддержки",
+      "deeplink": "haierevo://chat"
+    }
+  },
+  "constraint": [
+    {
+      "pendingCondition": {
+        "operator": "AND",
+        "commands": [
+          {
+            "commandName": "2",
+            "values": [
+              "0"
+            ]
+          }
+        ]
+      },
+      "additionalCommands": {
+        "mergeType": "APPEND",
+        "commands": [
+          {
+            "name": "0",
+            "value": "24.00"
+          },
+          {
+            "name": "4",
+            "value": "5"
+          },
+          {
+            "name": "13",
+            "value": "false"
+          }
+        ]
+      }
+    },
+    {
+      "pendingCondition": {
+        "operator": "AND",
+        "commands": [
+          {
+            "commandName": "2",
+            "values": [
+              "1"
+            ]
+          }
+        ]
+      },
+      "additionalCommands": {
+        "mergeType": "APPEND",
+        "commands": [
+          {
+            "name": "13",
+            "value": "false"
+          }
+        ]
+      }
+    },
+    {
+      "pendingCondition": {
+        "operator": "AND",
+        "commands": [
+          {
+            "commandName": "2",
+            "values": [
+              "2"
+            ]
+          }
+        ]
+      },
+      "additionalCommands": {
+        "mergeType": "APPEND",
+        "commands": [
+          {
+            "name": "13",
+            "value": "false"
+          },
+          {
+            "name": "17",
+            "value": "false"
+          },
+          {
+            "name": "18",
+            "value": "false"
+          }
+        ]
+      }
+    },
+    {
+      "pendingCondition": {
+        "operator": "AND",
+        "commands": [
+          {
+            "commandName": "2",
+            "values": [
+              "6"
+            ]
+          }
+        ]
+      },
+      "additionalCommands": {
+        "mergeType": "APPEND",
+        "commands": [
+          {
+            "name": "13",
+            "value": "false"
+          },
+          {
+            "name": "16",
+            "value": "false"
+          },
+          {
+            "name": "17",
+            "value": "false"
+          },
+          {
+            "name": "18",
+            "value": "false"
+          }
+        ]
+      }
+    },
+    {
+      "pendingCondition": {
+        "operator": "OR",
+        "commands": [
+          {
+            "commandName": "16",
+            "values": [
+              "true"
+            ]
+          },
+          {
+            "commandName": "17",
+            "values": [
+              "true"
+            ]
+          }
+        ]
+      },
+      "additionalCommands": {
+        "mergeType": "APPEND",
+        "commands": [
+          {
+            "name": "18",
+            "value": "false"
+          }
+        ]
+      }
+    },
+    {
+      "pendingCondition": {
+        "operator": "AND",
+        "commands": [
+          {
+            "commandName": "18",
+            "values": [
+              "true"
+            ]
+          }
+        ]
+      },
+      "additionalCommands": {
+        "mergeType": "APPEND",
+        "commands": [
+          {
+            "name": "17",
+            "value": "false"
+          }
+        ]
+      }
+    },
+    {
+      "pendingCondition": {
+        "operator": "AND",
+        "commands": [
+          {
+            "commandName": "21",
+            "values": [
+              "true"
+            ]
+          }
+        ]
+      },
+      "additionalCommands": {
+        "mergeType": "APPEND",
+        "commands": [
+          {
+            "name": "6",
+            "value": "false"
+          },
+          {
+            "name": "31",
+            "value": "false"
+          }
+        ]
+      }
+    },
+    {
+      "pendingCondition": {
+        "operator": "AND",
+        "commands": [
+          {
+            "commandName": "21",
+            "values": [
+              "false"
+            ]
+          }
+        ]
+      },
+      "additionalCommands": {
+        "mergeType": "APPEND",
+        "commands": [
+          {
+            "name": "6",
+            "value": "false"
+          },
+          {
+            "name": "31",
+            "value": "false"
+          }
+        ]
+      }
+    }
+  ],
+  "modifiers": [
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "OR",
+        "conditions": {
+          "condition": [
+            {
+              "mode": "6",
+              "values": [
+                "true"
+              ]
+            },
+            {
+              "mode": "21",
+              "values": [
+                "false"
+              ]
+            },
+            {
+              "mode": "31",
+              "values": [
+                "true"
+              ]
+            }
+          ]
+        },
+        "alarms": []
+      },
+      "actions": [
+        {
+          "name": "0",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "1",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "2",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "4",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "12",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "13",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "16",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "17",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "18",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "20",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "OR",
+        "alarms": [
+          "outdoorModuleErr",
+          "outdoorDeforstSensorErr",
+          "outdoorExhaustSensorErr",
+          "outdoorEEPROMErr",
+          "indoorCoilerSensorErr",
+          "indoorOutdoorCommErr",
+          "powerProtection",
+          "panelCommErr",
+          "outdoorCompressorOverheatProtection",
+          "outdoorEnviSensorErr",
+          "fullWaterProtection",
+          "indoorEEPROMErr",
+          "outdoorReturnAirSensorErr",
+          "cbdCommErr",
+          "indoorFanErr",
+          "outdoorFanErr",
+          "doorErr",
+          "filterCleaningAlarm",
+          "waterLackProtection",
+          "humiditySensorErr",
+          "indoorTempSensorErr",
+          "mechanicalArmLimitErr",
+          "indoorPM2p5SensorErr",
+          "outdoorPM2p5SensorErr",
+          "indoorHeatingOverloadAlarm",
+          "outdoorACProtection",
+          "outdoorCompressorRunningErr",
+          "outdoorDCProtection",
+          "outdoorUnloadedErr",
+          "ctCurrentErr",
+          "indoorFreezingProtection",
+          "pressureProtection",
+          "returnAirOverheatAlarm",
+          "outdoorEvaporationSensorErr",
+          "outdoorCoolingOverloadAlarm",
+          "waterPumpErr",
+          "threePhaseSupplyErr",
+          "fourWayValveErr",
+          "externalAlarmSwitchErr",
+          "tempCuttingOffProtection",
+          "differentModeRunningErr",
+          "expansionValveErr",
+          "twErr",
+          "wireCtrCommErr",
+          "indoorUnitIdConflictErr",
+          "zeroPassageErr",
+          "outdoorUnitErr",
+          "ch2oSensorErr",
+          "vocSensorErr",
+          "co2SensorErr",
+          "firewallErr"
+        ]
+      },
+      "actions": [
+        {
+          "name": "0",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "1",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "2",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "4",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "6",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "12",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "13",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "16",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "17",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "18",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "31",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "20",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "AND",
+        "conditions": {
+          "condition": [
+            {
+              "mode": "2",
+              "values": [
+                "0"
+              ]
+            }
+          ]
+        },
+        "alarms": []
+      },
+      "actions": [
+        {
+          "name": "6",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "13",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "17",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "18",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "31",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "AND",
+        "conditions": {
+          "condition": [
+            {
+              "mode": "2",
+              "values": [
+                "1"
+              ]
+            }
+          ]
+        },
+        "alarms": []
+      },
+      "actions": [
+        {
+          "name": "13",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "AND",
+        "conditions": {
+          "condition": [
+            {
+              "mode": "2",
+              "values": [
+                "2"
+              ]
+            }
+          ]
+        },
+        "alarms": []
+      },
+      "actions": [
+        {
+          "name": "13",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "17",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "18",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "AND",
+        "conditions": {
+          "condition": [
+            {
+              "mode": "2",
+              "values": [
+                "6"
+              ]
+            }
+          ]
+        },
+        "alarms": []
+      },
+      "actions": [
+        {
+          "name": "0",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "13",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "16",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "17",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "18",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "AND",
+        "conditions": {
+          "condition": [
+            {
+              "mode": "16",
+              "values": [
+                "true"
+              ]
+            }
+          ]
+        },
+        "alarms": []
+      },
+      "actions": [
+        {
+          "name": "6",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "18",
+          "rewriteFields": "W",
+          "writable": false
+        },
+        {
+          "name": "31",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "AND",
+        "conditions": {
+          "condition": [
+            {
+              "mode": "6",
+              "values": [
+                "true"
+              ]
+            }
+          ]
+        },
+        "alarms": []
+      },
+      "actions": [
+        {
+          "name": "31",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "priority": 0,
+      "trigger": {
+        "operator": "AND",
+        "conditions": {
+          "condition": [
+            {
+              "mode": "31",
+              "values": [
+                "true"
+              ]
+            }
+          ]
+        },
+        "alarms": []
+      },
+      "actions": [
+        {
+          "name": "6",
+          "rewriteFields": "W",
+          "writable": false
+        }
+      ]
+    }
+  ],
+  "groupCommands": [
+    {
+      "name": "4",
+      "desc": "Настройка параметров (групповая команда)",
+      "attrNameList": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "55",
+        "54",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34",
+        "35"
+      ]
+    }
+  ],
+  "pairingInfo": {
+    "info": {
+      "title": "Повторное подключение «%s»",
+      "subtitle": "На вашем устройстве было запущено повторное подключение к умному дому, если это действие активировано случайно, то нажмите «Отменить подключение»",
+      "continuePairingBtn": "Продолжить подключение",
+      "cancelPairingBtn": "Отменить подключение"
+    },
+    "progress": {
+      "title": "Отмена повторного подключения",
+      "subtitle": "Это может занять некоторое время, прежде чем устройство вернется в рабочее состояние"
+    },
+    "error": {
+      "title": "Не удалось отменить повторное подключение",
+      "subtitle": "Во время отмены повторного подключения «%s» возникла ошибка, из-за которой не удалось завершить процесс отмены",
+      "repeatBtn": "Повторить попытку"
+    }
+  },
+  "connectionStatus": {
+    "status": "UNDEFINED",
+    "connections": {
+      "LOST": {
+        "title": "Потеряно подключение к интернету",
+        "bottomSheetContent": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "BAD": {
+        "title": "Плохое подключение к интернету",
+        "bottomSheetContent": {
+          "title": "Плохое подключение «${deviceName}» к интернету",
+          "description": "Команды на устройстве могут обрабатываться с задержкой. Проверьте качество связи сети Wi-Fi, к которой подключено устройство, или смените точку подключения"
+        }
+      },
+      "GOOD": {
+        "title": "Подключение восстановлено",
+        "bottomSheetContent": {
+          "title": "",
+          "description": ""
+        }
+      }
+    },
+    "confirmBtnText": "Закрыть",
+    "detailsText": "Подробнее"
+  },
+  "scenarios": {
+    "default": {
+      "icon": "https://storage.yandexcloud.net/admin-console-bucket/2025-04-29/3317df97-b60b-4db0-9458-e128adec4dfd?response-content-disposition=attachment%3B%20filename%3D%22scenario_play_icon.png%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250813T041724Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=YCAJE4if2-hYlFJlkqaAwa15f%2F20250813%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Signature=1797a950acfd47df5a17502d2ca5c48b250505542314107c0269cc8fd68a2890",
+      "title": "Сценарии",
+      "count": 0,
+      "deeplink": "haierevo://hiHome/device/scenario?macAddress=12:34:56:78:99",
+      "trackingData": {
+        "data": {
+          "type": "AC"
+        },
+        "items": []
+      }
+    }
+  },
+  "analyticsEvents": [
+    {
+      "commandName": "21",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_powerOnOff",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "21",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_powerOnOff",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "17",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_mute",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "17",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_mute",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "16",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_silentSleep",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "16",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_silentSleep",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "12",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_unitLighting",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "12",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_unitLighting",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "18",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_rapidMode",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "18",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_rapidMode",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "20",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_healthMode",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "20",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_healthMode",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "31",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_selfCleaning",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "31",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_selfCleaning",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "6",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_purification",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "6",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_purification",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "13",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_10degreeHeating",
+        "trackingData": {
+          "data": {
+            "on": "false"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "13",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_10degreeHeating",
+        "trackingData": {
+          "data": {
+            "on": "true"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "2",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_mode",
+        "trackingData": {
+          "data": {
+            "operationMode": "0"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "2",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_mode",
+        "trackingData": {
+          "data": {
+            "operationMode": "1"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "2",
+      "commandValue": "2",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_mode",
+        "trackingData": {
+          "data": {
+            "operationMode": "2"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "2",
+      "commandValue": "4",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_mode",
+        "trackingData": {
+          "data": {
+            "operationMode": "4"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "2",
+      "commandValue": "6",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_mode",
+        "trackingData": {
+          "data": {
+            "operationMode": "6"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "4",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_windSpeed",
+        "trackingData": {
+          "data": {
+            "windSpeed": "1"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "4",
+      "commandValue": "2",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_windSpeed",
+        "trackingData": {
+          "data": {
+            "windSpeed": "2"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "4",
+      "commandValue": "3",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_windSpeed",
+        "trackingData": {
+          "data": {
+            "windSpeed": "3"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "4",
+      "commandValue": "5",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_windSpeed",
+        "trackingData": {
+          "data": {
+            "windSpeed": "5"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "0",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "0"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "1",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "1"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "2",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "2"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "3",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "3"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "4",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "4"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "5",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "5"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "6",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "6"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "7",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "7"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "8",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "8"
+          },
+          "items": []
+        }
+      }
+    },
+    {
+      "commandName": "1",
+      "commandValue": "9",
+      "analyticsEvent": {
+        "eventName": "ac_base_device_verticalBlinds",
+        "trackingData": {
+          "data": {
+            "windDirectionVertical": "9"
+          },
+          "items": []
+        }
+      }
+    }
+  ]
+}

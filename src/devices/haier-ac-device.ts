@@ -401,14 +401,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
     try {
       if (enabled) {
-        // If enabling quiet mode, send a batch command to disable turbo mode and enable quiet mode
-        console.log(`[${timestamp}] [Haier Evo] ℹ️ Quiet mode and turbo mode are mutually exclusive. Sending batch command.`);
-        console.log(`[${timestamp}] [Haier Evo] 📤 Sending batch command: quiet=${enabled ? 'ON' : 'OFF'}, turbo=OFF`);
-
-        await this.api.setDeviceProperties(this.mac, [
-          { propertyId: HaierACDevice.COMMANDS.QUIET, value: enabled },
-          { propertyId: HaierACDevice.COMMANDS.TURBO, value: false }
-        ]);
+        await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.QUIET, true);
 
         // Update local states
         this.quiet = enabled;
@@ -446,14 +439,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
     try {
       if (enabled) {
-        // If enabling turbo mode, send a batch command to disable quiet mode and enable turbo mode
-        console.log(`[${timestamp}] [Haier Evo] ℹ️ Turbo mode and quiet mode are mutually exclusive. Sending batch command.`);
-        console.log(`[${timestamp}] [Haier Evo] 📤 Sending batch command: turbo=${enabled ? 'ON' : 'OFF'}, quiet=OFF`);
-
-        await this.api.setDeviceProperties(this.mac, [
-          { propertyId: HaierACDevice.COMMANDS.TURBO, value: enabled },
-          { propertyId: HaierACDevice.COMMANDS.QUIET, value: false }
-        ]);
+        await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.TURBO, true);
 
         // Update local states
         this.turbo = enabled;

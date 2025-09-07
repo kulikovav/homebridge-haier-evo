@@ -131,6 +131,8 @@ npm-debug.log*
 *.backup.*test-devices.json
 
 *.data
+!tests/ac.data
+!tests/refrigerator.data
 
 tests/integration/test-config.ts
 # Environment variables for testing

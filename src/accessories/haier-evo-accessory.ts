@@ -120,43 +120,200 @@ export class HaierEvoAccessory {
     // Only find services that are enabled in config
     if (DeviceFactory.isAirConditioner(this.device)) {
       if (config.enableFanService !== false) {
-        this.fanService = this.accessory.getService(this.platform.Service.Fanv2);
+        this.fanService = this.accessory.getServiceById(this.platform.Service.Fanv2, 'fan');
+      }
+      // Remove Fan service if disabled
+      if (config.enableFanService === false && this.fanService) {
+        this.accessory.removeService(this.fanService);
+        this.fanService = undefined;
       }
       if (config.enableBlindsControl !== false) {
-        this.blindsFanService = this.accessory.getService('blinds-fan');
+        this.blindsFanService = this.accessory.getServiceById(this.platform.Service.Fanv2, 'blinds-fan');
+      }
+      // Remove Blinds Fan if disabled
+      if (config.enableBlindsControl === false && this.blindsFanService) {
+        this.accessory.removeService(this.blindsFanService);
+        this.blindsFanService = undefined;
       }
       if (config.enableLightControl !== false) {
         this.lightService = this.accessory.getService(this.platform.Service.Lightbulb);
       }
+      // Remove Light if disabled
+      if (config.enableLightControl === false && this.lightService) {
+        this.accessory.removeService(this.lightService);
+        this.lightService = undefined;
+      }
       if (config.enableHealthModeSwitch !== false) {
-        this.healthService = this.accessory.getService('health');
+        this.healthService = this.accessory.getServiceById(this.platform.Service.Switch, 'health');
+      }
+      if (config.enableHealthModeSwitch === false && this.healthService) {
+        this.accessory.removeService(this.healthService);
+        this.healthService = undefined;
       }
       if (config.enableQuietModeSwitch !== false) {
-        this.quietService = this.accessory.getService('quiet');
+        this.quietService = this.accessory.getServiceById(this.platform.Service.Switch, 'quiet');
+      }
+      if (config.enableQuietModeSwitch === false && this.quietService) {
+        this.accessory.removeService(this.quietService);
+        this.quietService = undefined;
       }
       if (config.enableTurboModeSwitch !== false) {
-        this.turboService = this.accessory.getService('turbo');
+        this.turboService = this.accessory.getServiceById(this.platform.Service.Switch, 'turbo');
+      }
+      if (config.enableTurboModeSwitch === false && this.turboService) {
+        this.accessory.removeService(this.turboService);
+        this.turboService = undefined;
       }
       if (config.enableComfortModeSwitch !== false) {
-        this.comfortService = this.accessory.getService('comfort');
+        this.comfortService = this.accessory.getServiceById(this.platform.Service.Switch, 'comfort');
+      }
+      if (config.enableComfortModeSwitch === false && this.comfortService) {
+        this.accessory.removeService(this.comfortService);
+        this.comfortService = undefined;
       }
       if (config.enableBlindsAutoSwitch !== false) {
-        this.blindsAutoService = this.accessory.getService('blinds-auto');
+        this.blindsAutoService = this.accessory.getServiceById(this.platform.Service.Switch, 'blinds-auto');
+      }
+      if (config.enableBlindsAutoSwitch === false && this.blindsAutoService) {
+        this.accessory.removeService(this.blindsAutoService);
+        this.blindsAutoService = undefined;
       }
       if (config.enableBlindsComfortSwitch !== false) {
-        this.blindsComfortService = this.accessory.getService('blinds-comfort');
+        this.blindsComfortService = this.accessory.getServiceById(this.platform.Service.Switch, 'blinds-comfort');
+      }
+      if (config.enableBlindsComfortSwitch === false && this.blindsComfortService) {
+        this.accessory.removeService(this.blindsComfortService);
+        this.blindsComfortService = undefined;
       }
     }
 
     // Find refrigerator-specific services
     if (DeviceFactory.isRefrigerator(this.device)) {
-      this.freezerTemperatureService = this.accessory.getService('freezer-temp');
-      this.myzoneTemperatureService = this.accessory.getService('myzone-temp');
-      this.refrigeratorDoorService = this.accessory.getService('refrigerator-door');
-      this.freezerDoorService = this.accessory.getService('freezer-door');
+      this.freezerTemperatureService = this.accessory.getServiceById(this.platform.Service.TemperatureSensor, 'freezer-temp');
+      this.ambientTemperatureService = this.accessory.getServiceById(this.platform.Service.TemperatureSensor, 'ambient-temp');
+      this.myzoneTemperatureService = this.accessory.getServiceById(this.platform.Service.TemperatureSensor, 'myzone-temp');
+      this.refrigeratorDoorService = this.accessory.getServiceById(this.platform.Service.ContactSensor, 'refrigerator-door');
+      this.freezerDoorService = this.accessory.getServiceById(this.platform.Service.ContactSensor, 'freezer-door');
     }
 
     this.powerSwitchService = this.accessory.getService('power-switch');
+
+    // Create any newly enabled services that don't exist yet (restored accessories)
+    if (DeviceFactory.isAirConditioner(this.device)) {
+      if (config.enableFanService !== false && !this.fanService) {
+        this.fanService = this.accessory.addService(
+          this.platform.Service.Fanv2,
+          `${this.accessoryName} Fan`,
+          'fan'
+        );
+      }
+
+      if (config.enableBlindsControl !== false && !this.blindsFanService) {
+        this.blindsFanService = this.accessory.addService(
+          this.platform.Service.Fanv2,
+          `${this.accessoryName} Blinds`,
+          'blinds-fan'
+        );
+      }
+
+      if (config.enableLightControl !== false && this.device.light !== undefined && !this.lightService) {
+        this.lightService = this.accessory.addService(
+          this.platform.Service.Lightbulb,
+          `${this.accessoryName} Light`,
+          'light'
+        );
+      }
+
+      if (config.enableHealthModeSwitch !== false && !this.healthService) {
+        this.healthService = this.accessory.addService(
+          this.platform.Service.Switch,
+          `${this.accessoryName} Health Mode`,
+          'health'
+        );
+      }
+
+      if (config.enableQuietModeSwitch !== false && !this.quietService) {
+        this.quietService = this.accessory.addService(
+          this.platform.Service.Switch,
+          `${this.accessoryName} Quiet Mode`,
+          'quiet'
+        );
+      }
+
+      if (config.enableTurboModeSwitch !== false && !this.turboService) {
+        this.turboService = this.accessory.addService(
+          this.platform.Service.Switch,
+          `${this.accessoryName} Turbo Mode`,
+          'turbo'
+        );
+      }
+
+      if (config.enableComfortModeSwitch !== false && !this.comfortService) {
+        this.comfortService = this.accessory.addService(
+          this.platform.Service.Switch,
+          `${this.accessoryName} Comfort Mode`,
+          'comfort'
+        );
+      }
+
+      if (config.enableBlindsAutoSwitch !== false && !this.blindsAutoService) {
+        this.blindsAutoService = this.accessory.addService(
+          this.platform.Service.Switch,
+          `${this.accessoryName} Blinds Auto`,
+          'blinds-auto'
+        );
+      }
+
+      if (config.enableBlindsComfortSwitch !== false && !this.blindsComfortService) {
+        this.blindsComfortService = this.accessory.addService(
+          this.platform.Service.Switch,
+          `${this.accessoryName} Blinds Comfort`,
+          'blinds-comfort'
+        );
+      }
+    }
+
+    if (DeviceFactory.isRefrigerator(this.device)) {
+      if (!this.freezerTemperatureService) {
+        this.freezerTemperatureService = this.accessory.addService(
+          this.platform.Service.TemperatureSensor,
+          `${this.accessoryName} Freezer Compartment`,
+          'freezer-temp'
+        );
+      }
+
+      if (!this.ambientTemperatureService) {
+        this.ambientTemperatureService = this.accessory.addService(
+          this.platform.Service.TemperatureSensor,
+          `${this.accessoryName} Ambient`,
+          'ambient-temp'
+        );
+      }
+
+      if (!this.myzoneTemperatureService) {
+        this.myzoneTemperatureService = this.accessory.addService(
+          this.platform.Service.TemperatureSensor,
+          `${this.accessoryName} My Zone`,
+          'myzone-temp'
+        );
+      }
+
+      if (!this.refrigeratorDoorService) {
+        this.refrigeratorDoorService = this.accessory.addService(
+          this.platform.Service.ContactSensor,
+          `${this.accessoryName} Refrigerator Door`,
+          'refrigerator-door'
+        );
+      }
+
+      if (!this.freezerDoorService) {
+        this.freezerDoorService = this.accessory.addService(
+          this.platform.Service.ContactSensor,
+          `${this.accessoryName} Freezer Door`,
+          'freezer-door'
+        );
+      }
+    }
 
     // Add found services to the services array
     if (this.temperatureSensorService) this.services.push(this.temperatureSensorService);
@@ -174,6 +331,39 @@ export class HaierEvoAccessory {
     if (this.blindsAutoService) this.services.push(this.blindsAutoService);
     if (this.blindsComfortService) this.services.push(this.blindsComfortService);
     if (this.powerSwitchService) this.services.push(this.powerSwitchService);
+
+    // If a service is disabled by config, also unregister any orphaned cached service by subtype
+    // This handles cases where Homebridge still has the service cached even after removal.
+    if (DeviceFactory.isAirConditioner(this.device)) {
+      const toCheck: Array<{flag: boolean | undefined, service: Service | undefined, subtype: string}> = [
+        { flag: config.enableFanService, service: this.fanService, subtype: 'fan' },
+        { flag: config.enableBlindsControl, service: this.blindsFanService, subtype: 'blinds-fan' },
+        { flag: this.device.light !== undefined ? config.enableLightControl : undefined, service: this.lightService, subtype: 'light' },
+        { flag: config.enableHealthModeSwitch, service: this.healthService, subtype: 'health' },
+        { flag: config.enableQuietModeSwitch, service: this.quietService, subtype: 'quiet' },
+        { flag: config.enableTurboModeSwitch, service: this.turboService, subtype: 'turbo' },
+        { flag: config.enableComfortModeSwitch, service: this.comfortService, subtype: 'comfort' },
+        { flag: config.enableBlindsAutoSwitch, service: this.blindsAutoService, subtype: 'blinds-auto' },
+        { flag: config.enableBlindsComfortSwitch, service: this.blindsComfortService, subtype: 'blinds-comfort' }
+      ];
+
+      toCheck.forEach(item => {
+        if (item.flag === false) {
+          // Try to find by subtype if the reference is missing
+          const existing = item.service || this.accessory.services.find(s => s.subtype === item.subtype);
+          if (existing) {
+            this.accessory.removeService(existing);
+          }
+        }
+      });
+    }
+
+    // Persist structural changes so Homebridge updates cached services
+    try {
+      this.platform.updatePlatformAccessory(this.accessory);
+    } catch (_e) {
+      // In tests or minimal environments, platform may not expose updater
+    }
   }
 
   // Ensure handlers are attached for services found during restore
