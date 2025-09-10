@@ -17,8 +17,11 @@ This plugin is adapted from the [Home Assistant Haier Evo integration](https://g
 
 ## Supported Devices
 
-- **Air Conditioners**: AS20PHP1HRA
+- **Air Conditioners**: AS20PHP1HRA, plus additional models via internal model-config
+  - Example: HSU-09HTT103 variants (e.g., HSU-09HTT103/R3(IN))
 - **Refrigerators**: A4F739CBXGU1
+
+For the full and most up-to-date list of model patterns and mappings, see `src/models/device-models.json`.
 
 ## Compatibility
 
@@ -71,7 +74,7 @@ This plugin supports devices that work with the Haier Evo app in the following r
 
 | Parameter | Required | Description | Default |
 |-----------|----------|-------------|---------|
-| `platform` | Yes | Must be `"HaierEvo"` | - |
+| `platform` | Yes | Must be `"homebridge-haier-evo"` | - |
 | `name` | Yes | Platform name for Homebridge | - |
 | `email` | Yes | Your Haier Evo account email | - |
 | `password` | Yes | Your Haier Evo account password | - |
@@ -538,11 +541,10 @@ Air conditioners support advanced vertical blinds control through multiple HomeK
 
 ### Refrigerators
 
-- **Primary Service**: Switch
-  - Power On/Off
 - **Additional Services**:
-  - Temperature Sensor
-  - Light (if supported)
+  - Ambient Temperature Sensor
+  - Compartment Temperature Sensor
+  - Door Sensor
 
 ## HomeKit Features
 
@@ -568,9 +570,8 @@ Air conditioners support advanced vertical blinds control through multiple HomeK
 
 ### Refrigerators
 
-- Turn device on/off
 - View current temperature
-- Control built-in light (if supported)
+- Door sensors
 
 ## Troubleshooting
 
@@ -664,6 +665,16 @@ node test-devices.js
 
 # Run rate limiting tests
 node test-rate-limiting.js
+
+# AC command/control basic checks (no real API)
+node test-ac-control.js
+
+# Accessory services checks (no real API)
+node test-accessory-services.js
+
+# Real API smoke test (requires valid credentials in env/config)
+# Use sparingly; typical development prefers mock/standalone tests
+node test-real-api.js
 ```
 
 #### Comprehensive Test Runner
@@ -778,6 +789,9 @@ src/
 │   ├── base-device.ts
 │   ├── haier-ac-device.ts
 │   └── haier-refrigerator-device.ts
+├── models/              # Per-model configuration and resolver
+│   ├── device-models.json   # Internal model mapping (ids, mappings, wrapper command)
+│   └── model-config.ts      # Loader + helper functions
 ├── constants.ts         # API constants and mappings
 ├── device-factory.ts    # Device creation factory
 ├── haier-api.ts        # Haier API client

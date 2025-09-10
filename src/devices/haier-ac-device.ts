@@ -2,6 +2,7 @@ import { BaseDevice } from './base-device';
 import { HaierAC, DeviceInfo } from '../types';
 import { HaierAPI } from '../haier-api';
 import { HVAC_MODES, FAN_MODES, SWING_MODES, HVACMode, FanMode, SwingMode } from '../constants';
+import { ModelConfigService } from '../models/model-config';
 
 export class HaierACDevice extends BaseDevice implements HaierAC {
   // Command mappings based on AC data
@@ -44,6 +45,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
   constructor(deviceInfo: DeviceInfo, api: HaierAPI) {
     super(deviceInfo, api);
+    this.modelConfig = ModelConfigService.getInstance();
 
     // Set temperature limits based on AC data
     this.max_temperature = 30;
@@ -56,6 +58,12 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
     // Now start status updates after temperature limits are set
     this.initializeStatusUpdates();
+  }
+
+  private readonly modelConfig: ModelConfigService;
+
+  private getId(canonical: string, fallback: string): string {
+    return this.modelConfig.getAttributeId(this.device_model, canonical, fallback);
   }
 
   /**
@@ -96,7 +104,9 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
       }
 
       console.log(`[${timestamp}] [Haier Evo] 📤 Sending operation mode command: ${mode} (value: ${commandValue})`);
-      await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.MODE, commandValue);
+      const propId = this.getId('mode', HaierACDevice.COMMANDS.MODE);
+      const valueToSend = this.modelConfig.mapValueToHaier(this.device_model, 'mode', mode);
+      await this.api.setDeviceProperty(this.mac, propId, valueToSend);
 
       // Update local state
       this.mode = mode;
@@ -123,7 +133,8 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
       const tempValue = temp.toFixed(2);
 
       console.log(`[${timestamp}] [Haier Evo] 📤 Sending temperature command: ${tempValue}°C`);
-      await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.TEMPERATURE, tempValue);
+      const propId = this.getId('target_temperature', HaierACDevice.COMMANDS.TEMPERATURE);
+      await this.api.setDeviceProperty(this.mac, propId, tempValue);
 
       // Update local state
       this.target_temperature = temp;
@@ -151,7 +162,8 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
       console.log(`[${timestamp}] [Haier Evo] 🔍 Current light state: ${this.light_on ? 'ON' : 'OFF'}`);
 
       // Send command via WebSocket
-      await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.LIGHT, value);
+      const propId = this.getId('light', HaierACDevice.COMMANDS.LIGHT);
+      await this.api.setDeviceProperty(this.mac, propId, value);
 
       // Update local state
       this.light_on = value;
@@ -175,7 +187,8 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
     try {
       // Then turn on the device using WebSocket API
       console.log(`[${timestamp}] [Haier Evo] 📤 Sending power ON command`);
-      await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.POWER, true);
+      const propId = this.getId('status', HaierACDevice.COMMANDS.POWER);
+      await this.api.setDeviceProperty(this.mac, propId, true);
 
       // Update local state
       this.status = 1;
@@ -199,7 +212,8 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
     try {
       // Send power off command using WebSocket API
       console.log(`[${timestamp}] [Haier Evo] 📤 Sending power OFF command`);
-      await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.POWER, false);
+      const propId = this.getId('status', HaierACDevice.COMMANDS.POWER);
+      await this.api.setDeviceProperty(this.mac, propId, false);
 
       // Update local state
       this.status = 0;
@@ -248,7 +262,9 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
       }
 
       console.log(`[${timestamp}] [Haier Evo] 📤 Sending fan mode command: ${mode} (value: ${commandValue})`);
-      await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.FAN_SPEED, commandValue);
+      const propId = this.getId('fan_mode', HaierACDevice.COMMANDS.FAN_SPEED);
+      const valueToSend = this.modelConfig.mapValueToHaier(this.device_model, 'fan_mode', mode);
+      await this.api.setDeviceProperty(this.mac, propId, valueToSend || commandValue);
 
       // Update local state
       this.fan_mode = mode;

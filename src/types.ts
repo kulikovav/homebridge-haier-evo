@@ -206,6 +206,46 @@ export interface HaierAC extends HaierDevice {
   get_preset_modes(): string[];
 }
 
+/**
+ * Device model configuration types for flexible per-model mapping
+ */
+export interface ModelModeMapping {
+  haier: string;
+  value: string;
+}
+
+export interface ModelAttributeConfig {
+  name: string;
+  id: string;
+  mappings?: ReadonlyArray<ModelModeMapping>;
+}
+
+export interface ModelDefinition {
+  // Regex string to match model, e.g.,
+  //
+  modelPattern: string;
+  // Wrapper group commandName for batching operations via WebSocket
+  groupCommandName: string; // e.g., "4" or "3"
+  // Canonical attributes for this model
+  attributes: ReadonlyArray<ModelAttributeConfig>;
+}
+
+export interface ModelsConfigSchema {
+  version: string;
+  models: ReadonlyArray<ModelDefinition>;
+}
+
+export interface PropertyMappings {
+  operationModeId: string;
+  fanSpeedId: string;
+  targetTempId: string;
+  currentTempIds: ReadonlyArray<string>; // some models expose multiple
+  powerStatusId: string;
+  verticalSwingId?: string;
+  lightId?: string;
+}
+
+
 export interface HaierRefrigerator extends HaierDevice {
   // Refrigerator-specific methods
   set_freezer_temperature(temp: number): Promise<void>;

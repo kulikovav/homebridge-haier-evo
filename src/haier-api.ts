@@ -11,6 +11,7 @@ import {
   HaierAC,
   HaierRefrigerator
 } from './types';
+import { ModelConfigService } from './models/model-config';
 import {
   API_PATH,
   API_LOGIN,
@@ -77,6 +78,7 @@ export class HaierAPI extends EventEmitter {
     timeout: NodeJS.Timeout;
   }> = new Map();
   private batchTimeout: number = 100; // 100ms timeout for batching
+  private readonly modelConfig = ModelConfigService.getInstance();
 
   constructor(private config: HaierEvoConfig) {
     super();
@@ -1430,7 +1432,8 @@ export class HaierAPI extends EventEmitter {
           const rawStatus = { properties: statusUpdate.properties };
 
           // Then convert to our standard format
-          const deviceStatus = this.convertPropertiesToDeviceStatus(statusUpdate.properties);
+          const model = this.getModelByMac(macAddress);
+          const deviceStatus = this.convertPropertiesToDeviceStatus(statusUpdate.properties, model);
 
           console.log(`[${new Date().toLocaleString()}] [Haier Evo] WebSocket properties for ${macAddress}:`,
             JSON.stringify(Object.keys(statusUpdate.properties).slice(0, 5).map(k => `${k}:${statusUpdate.properties[k]}`)) +
@@ -1470,10 +1473,81 @@ export class HaierAPI extends EventEmitter {
     }
   }
 
-  private convertPropertiesToDeviceStatus(properties: any): any {
+  private convertPropertiesToDeviceStatus(properties: any, model?: string): any {
     const deviceStatus: any = {};
 
-    // Map property IDs to device attributes based on ac.data configuration
+    // Try model-based dynamic mapping first
+    try {
+      const def = this.modelConfig.findDefinitionForModel(model || '');
+      if (def) {
+        const nameById: Record<string, string> = {};
+        def.attributes.forEach(attr => {
+          nameById[attr.id] = attr.name;
+        });
+        const handledIds = new Set(def.attributes.map(a => a.id));
+        Object.entries(properties).forEach(([propertyId, value]) => {
+          const canonical = nameById[propertyId];
+          if (!canonical) return; // skip if not mapped in this model
+
+          switch (canonical) {
+            case 'target_temperature':
+              deviceStatus.target_temperature = parseFloat(String(value));
+              break;
+            case 'current_temperature': {
+              const current = parseFloat(String(value));
+              if (!isNaN(current)) deviceStatus.current_temperature = current;
+              break;
+            }
+            case 'mode':
+              deviceStatus.mode = this.modelConfig.mapValueFromHaier(model, 'mode', String(value));
+              break;
+            case 'fan_mode':
+              deviceStatus.fan_mode = this.modelConfig.mapValueFromHaier(model, 'fan_mode', String(value));
+              break;
+            case 'status':
+              deviceStatus.status = String(value).trim() === '1' ? 1 : 0;
+              break;
+            case 'light':
+              deviceStatus.light = String(value).trim() === '1';
+              break;
+            case 'health':
+              deviceStatus.health = String(value).trim() === '1';
+              break;
+            case 'quiet':
+              deviceStatus.quiet = String(value).trim() === '1';
+              break;
+            case 'turbo':
+              deviceStatus.turbo = String(value).trim() === '1';
+              break;
+            default:
+              break;
+          }
+        });
+
+        // Fallback static mappings (only for IDs not covered by model config)
+        Object.entries(properties).forEach(([propertyId, value]) => {
+          if (handledIds.has(propertyId)) {
+            return;
+          }
+          switch (propertyId) {
+            case '12': // screenDisplayStatus (light)
+              deviceStatus.light = value === '1';
+              break;
+            case '14': // sound signal
+              deviceStatus.sound = value === '1';
+              break;
+            default:
+              break;
+          }
+        });
+
+        return deviceStatus;
+      }
+    } catch (_e) {
+      // fallback below
+    }
+
+    // Fallback static mappings (kept for models not in config)
     Object.entries(properties).forEach(([propertyId, value]) => {
       switch (propertyId) {
         // Temperature controls
@@ -1860,7 +1934,7 @@ export class HaierAPI extends EventEmitter {
       // Format based on the actual WebSocket sample
       const message = {
         action: "operation",
-        commandName: "4", // Group command for setting parameters
+        commandName: this.modelConfig.getGroupCommandNameForModel(this.getDevice(this.findDeviceIdByMac(macAddress))?.device_model),
         macAddress: macAddress,
         commands: commands,
         trace: uuidv4()
@@ -2164,6 +2238,31 @@ export class HaierAPI extends EventEmitter {
 
   getDevice(deviceId: string): HaierDevice | undefined {
     return this.devices.get(deviceId);
+  }
+
+  private findDeviceIdByMac(mac: string): string {
+    for (const [id, device] of this.devices.entries()) {
+      if ((device as any).mac === mac) {
+        return id;
+      }
+    }
+    return mac; // fallback when not found
+  }
+
+  private getModelByMac(mac: string): string | undefined {
+    // Try live device instances first
+    for (const device of this.devices.values()) {
+      const anyDevice = device as any;
+      if (anyDevice && anyDevice.mac === mac) {
+        return device.device_model;
+      }
+    }
+    // Fallback to cached discovery data
+    if (this.deviceCache && Array.isArray(this.deviceCache)) {
+      const found = this.deviceCache.find(d => (d as any).mac === mac || (d as any).macAddress === mac);
+      return found?.model;
+    }
+    return undefined;
   }
 
   addDevice(device: HaierDevice): void {
