@@ -56,4 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update configuration schema; enhance accessory management by adding service removal logic and updating platform accessories for better state handling.
 - Refactor token refresh mechanism in HaierAPI to enable non-blocking background refresh; log errors during refresh process for better error handling.
 
+## [1.3.0] - 2025-09-10
+- Enhance configuration schema with increased request delay limits and improve model-based device handling in HaierAPI for better command processing.
+
 ## [Unreleased]
