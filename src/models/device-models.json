@@ -1,0 +1,1049 @@
+{
+  "version": "1",
+  "models": [
+    {
+      "modelPattern": "^AS20PHP1HRA",
+      "groupCommandName": "4",
+      "attributes": [
+        { "name": "current_temperature", "id": "36" },
+        { "name": "target_temperature", "id": "0" },
+        { "name": "status", "id": "21" },
+        { "name": "light", "id": "12" },
+        { "name": "health", "id": "20" },
+        { "name": "quiet", "id": "17" },
+        { "name": "turbo", "id": "18" },
+        { "name": "mode", "id": "2", "mappings": [
+          { "haier": "0", "value": "auto" },
+          { "haier": "1", "value": "cool" },
+          { "haier": "2", "value": "dry" },
+          { "haier": "4", "value": "heat" },
+          { "haier": "6", "value": "fan_only" }
+        ] },
+        { "name": "fan_mode", "id": "4", "mappings": [
+          { "haier": "1", "value": "high" },
+          { "haier": "2", "value": "medium" },
+          { "haier": "3", "value": "low" },
+          { "haier": "5", "value": "auto" }
+        ] }
+      ]
+    },
+    {
+      "modelPattern": "^A4F739CBXGU1",
+      "groupCommandName": "4",
+      "attributes": [
+        { "name": "ambient_temperature", "id": "2" },
+        { "name": "refrigerator_temperature", "id": "3" },
+        { "name": "freezer_temperature", "id": "4" },
+        { "name": "myzone_temperature", "id": "5" },
+        { "name": "super_cool_mode", "id": "6" },
+        { "name": "super_freeze_mode", "id": "7" },
+        { "name": "vacation_mode", "id": "8" },
+        { "name": "freezer_door_open", "id": "9" },
+        { "name": "refrigerator_door_open", "id": "10" }
+      ]
+    },
+    {
+      "modelPattern": "^HSU-09HTT103",
+      "groupCommandName": "3",
+      "attributes": [
+        { "name": "current_temperature", "id": "0" },
+        { "name": "target_temperature", "id": "31" },
+        { "name": "status", "id": "21" },
+        { "name": "quiet", "id": "26" },
+        { "name": "turbo", "id": "27" },
+        { "name": "mode", "id": "5", "mappings": [
+          { "haier": "0", "value": "auto" },
+          { "haier": "1", "value": "cool" },
+          { "haier": "2", "value": "dry" },
+          { "haier": "4", "value": "heat" },
+          { "haier": "6", "value": "fan_only" }
+        ] },
+        { "name": "fan_mode", "id": "6", "mappings": [
+          { "haier": "1", "value": "high" },
+          { "haier": "2", "value": "medium" },
+          { "haier": "3", "value": "low" },
+          { "haier": "5", "value": "auto" }
+        ] }
+      ]
+    },
+    {
+      "modelPattern": "^AS20HPL1HRA",
+      "groupCommandName": "3",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "0"
+        },
+        {
+          "name": "target_temperature",
+          "id": "31"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "5",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "6",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^AS20HPL2HRA",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^AS25PHP2HRA",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^AS25PS1HRA",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^AS25S2SF2FA",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "AS35S2SF2FA",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "AS50HPL2HRA",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "AS50S2SF2FA",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "CAS25CX1R3W",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "21"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "HEC07HRC03R",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "swing_mode",
+          "id": "8",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "8",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "quiet",
+          "id": "26",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "1",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "health",
+          "id": "18",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "1",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "light",
+          "id": "23",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "off"
+            },
+            {
+              "haier": "0",
+              "value": "on"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^HEC09HRC03R",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "swing_mode",
+          "id": "8",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "8",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "quiet",
+          "id": "26",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "1",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "health",
+          "id": "18",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "1",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "light",
+          "id": "23",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "off"
+            },
+            {
+              "haier": "0",
+              "value": "on"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^HSU-07HPL203",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "19"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^HSU-07HRM203",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "swing_mode",
+          "id": "8",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "8",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "swing_horizontal_mode",
+          "id": "7",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "7",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "health",
+          "id": "18",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "off"
+            },
+            {
+              "haier": "1",
+              "value": "on"
+            }
+          ]
+        },
+        {
+          "name": "light",
+          "id": "23",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "off"
+            },
+            {
+              "haier": "0",
+              "value": "on"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^HSU-09HPL203",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "19"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelPattern": "^HSU-12HPL203",
+      "groupCommandName": "4",
+      "attributes": [
+        {
+          "name": "current_temperature",
+          "id": "36"
+        },
+        {
+          "name": "target_temperature",
+          "id": "0"
+        },
+        {
+          "name": "status",
+          "id": "19"
+        },
+        {
+          "name": "mode",
+          "id": "2",
+          "mappings": [
+            {
+              "haier": "0",
+              "value": "auto"
+            },
+            {
+              "haier": "1",
+              "value": "cool"
+            },
+            {
+              "haier": "2",
+              "value": "dry"
+            },
+            {
+              "haier": "4",
+              "value": "heat"
+            },
+            {
+              "haier": "6",
+              "value": "fan_only"
+            }
+          ]
+        },
+        {
+          "name": "fan_mode",
+          "id": "4",
+          "mappings": [
+            {
+              "haier": "1",
+              "value": "high"
+            },
+            {
+              "haier": "2",
+              "value": "medium"
+            },
+            {
+              "haier": "3",
+              "value": "low"
+            },
+            {
+              "haier": "5",
+              "value": "auto"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

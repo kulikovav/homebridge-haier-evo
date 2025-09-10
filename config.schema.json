@@ -67,7 +67,7 @@
         "title": "Minimum Request Delay",
         "type": "integer",
         "minimum": 50,
-        "maximum": 5000,
+        "maximum": 15000,
         "default": 100,
         "description": "Minimum delay between requests in milliseconds (default: 100)"
       },
@@ -75,7 +75,7 @@
         "title": "Maximum Request Delay",
         "type": "integer",
         "minimum": 100,
-        "maximum": 10000,
+        "maximum": 30000,
         "default": 1000,
         "description": "Maximum delay between requests in milliseconds (default: 1000)"
       },

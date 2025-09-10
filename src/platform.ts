@@ -299,6 +299,13 @@ export class HaierEvoPlatform {
 
       // Create the accessory wrapper
       const accessory = new HaierEvoAccessory(this, existingAccessory, deviceInfo);
+      // Register device with API for model lookup
+      try {
+        this.haierAPI.addDevice((accessory as any)['device'] || (accessory as any));
+      } catch {
+        // API addDevice expects a HaierDevice; HaierEvoAccessory will create and register during ctor
+        this.log.debug('API device registration skipped (restored accessory or mock environment)');
+      }
       this.accessories.set(deviceInfo.id, accessory);
 
       // Set up device info update listener
@@ -315,6 +322,11 @@ export class HaierEvoPlatform {
 
       // Create the accessory wrapper
       const haierAccessory = new HaierEvoAccessory(this, accessory, deviceInfo);
+      try {
+        this.haierAPI.addDevice((haierAccessory as any)['device'] || (haierAccessory as any));
+      } catch {
+        this.log.debug('API device registration skipped (new accessory or mock environment)');
+      }
       this.accessories.set(deviceInfo.id, haierAccessory);
 
       // Set up device info update listener

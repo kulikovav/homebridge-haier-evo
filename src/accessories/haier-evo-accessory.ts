@@ -36,7 +36,7 @@ export class HaierEvoAccessory {
   private powerSwitchService?: Service;
 
   // Periodic HomeKit temperature events
-  private temperatureEventTimer: NodeJS.Timeout | null = null;
+  private temperatureEventTimer: ReturnType<typeof setInterval> | null = null;
   // Internal last published temperature cache for delta comparison
   private _lastPublishedTemp?: number;
 
@@ -52,6 +52,12 @@ export class HaierEvoAccessory {
 
     // Create device instance
     this.device = DeviceFactory.createDevice(deviceInfo, platform.getHaierAPI());
+    try {
+      // Register device in API for model lookup when sending commands
+      platform.getHaierAPI().addDevice(this.device as any);
+    } catch {
+      this.log.debug('Device registration in API skipped (minimal/mock environment)');
+    }
 
     // Skip initial config fetch since we already have complete device info from platform
     this.device.setSkipInitialFetch(true);
