@@ -156,7 +156,14 @@ export class HaierAPI extends EventEmitter {
           config.headers['Device-Id'] = this.config.deviceId;
         }
 
-        if (this.accessToken) {
+        const requestUrl = (config.url || '').toLowerCase();
+        const isAuthRequest =
+          requestUrl.includes('/users/auth/sign-in') ||
+          requestUrl.includes('/users/auth/refresh');
+
+        if (isAuthRequest) {
+          delete config.headers['X-Auth-Token'];
+        } else if (this.accessToken) {
           config.headers['X-Auth-Token'] = this.accessToken;
         }
 
