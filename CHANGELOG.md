@@ -62,4 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.1] - 2025-11-02
 - Update HaierAPI to conditionally manage authentication headers based on request type.
 
+## [1.3.2] - 2025-11-02
+- Remove RATE_LIMITING.md documentation file, consolidating rate limiting and retry logic details into the main codebase for improved clarity and accessibility.
+
 ## [Unreleased]
