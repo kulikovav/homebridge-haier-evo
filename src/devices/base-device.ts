@@ -48,7 +48,8 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     super();
 
     this.api = api;
-    this.log = (this.api as unknown as { log: Logger }).log ?? { info: () => {}, error: () => {}, warn: () => {}, debug: () => {} };
+    const apiLog = (this.api as unknown as { log?: unknown } | null)?.log;
+    this.log = (apiLog && typeof apiLog === 'object' ? apiLog : { info: () => {}, error: () => {}, warn: () => {}, debug: () => {} }) as unknown as Logger;
 
     this.device_id = deviceInfo.id;
     this.device_name = deviceInfo.name;
