@@ -157,7 +157,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   switch_off(): Promise<void> {
-    throw new Error('Refrigerators cannot be turned off via API for safety reasons');
+    return Promise.reject(new Error('Refrigerators cannot be turned off via API for safety reasons'));
   }
 
   // Additional refrigerator-specific methods required by interface
@@ -541,15 +541,15 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   set_fan_mode(_mode: string): Promise<void> {
-    throw new Error('Fan mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Fan mode not supported by refrigerator devices'));
   }
 
   set_swing_mode(_mode: string): Promise<void> {
-    throw new Error('Swing mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Swing mode not supported by refrigerator devices'));
   }
 
   set_swing_horizontal_mode(_mode: string): Promise<void> {
-    throw new Error('Horizontal swing mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Horizontal swing mode not supported by refrigerator devices'));
   }
 
   async set_preset_mode(mode: string): Promise<void> {
@@ -569,50 +569,50 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   set_quiet(_enabled: boolean): Promise<void> {
-    throw new Error('Quiet mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Quiet mode not supported by refrigerator devices'));
   }
 
   set_turbo(_enabled: boolean): Promise<void> {
-    throw new Error('Turbo mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Turbo mode not supported by refrigerator devices'));
   }
 
   set_comfort(_enabled: boolean): Promise<void> {
-    throw new Error('Comfort mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Comfort mode not supported by refrigerator devices'));
   }
 
   set_health(_enabled: boolean): Promise<void> {
-    throw new Error('Health mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Health mode not supported by refrigerator devices'));
   }
 
   set_light(_enabled: boolean): Promise<void> {
-    throw new Error('Light control not supported by refrigerator devices');
+    return Promise.reject(new Error('Light control not supported by refrigerator devices'));
   }
 
   set_sound(_enabled: boolean): Promise<void> {
-    throw new Error('Sound control not supported by refrigerator devices');
+    return Promise.reject(new Error('Sound control not supported by refrigerator devices'));
   }
 
   set_antifreeze(_enabled: boolean): Promise<void> {
-    throw new Error('Antifreeze mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Antifreeze mode not supported by refrigerator devices'));
   }
 
   set_cleaning(_enabled: boolean): Promise<void> {
-    throw new Error('Cleaning mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Cleaning mode not supported by refrigerator devices'));
   }
 
   set_autohumidity(_enabled: boolean): Promise<void> {
-    throw new Error('Auto humidity control not supported by refrigerator devices');
+    return Promise.reject(new Error('Auto humidity control not supported by refrigerator devices'));
   }
 
   set_eco_sensor(_mode: string): Promise<void> {
-    throw new Error('Eco sensor not supported by refrigerator devices');
+    return Promise.reject(new Error('Eco sensor not supported by refrigerator devices'));
   }
 
   set_sleep_mode(_enabled: boolean): Promise<void> {
-    throw new Error('Sleep mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Sleep mode not supported by refrigerator devices'));
   }
 
   set_boost_mode(_enabled: boolean): Promise<void> {
-    throw new Error('Boost mode not supported by refrigerator devices');
+    return Promise.reject(new Error('Boost mode not supported by refrigerator devices'));
   }
 }

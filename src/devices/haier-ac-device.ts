@@ -1318,7 +1318,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
   // Implement missing abstract methods from BaseDevice
   set_swing_horizontal_mode(_mode: string): Promise<void> {
-    throw new Error('Horizontal swing mode not supported by this AC device');
+    return Promise.reject(new Error('Horizontal swing mode not supported by this AC device'));
   }
 
   async set_preset_mode(mode: string): Promise<void> {
@@ -1365,7 +1365,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
   // These methods are already implemented above with enhanced functionality
 
   set_eco_sensor(_mode: string): Promise<void> {
-    throw new Error('Eco sensor mode not supported by this AC device');
+    return Promise.reject(new Error('Eco sensor mode not supported by this AC device'));
   }
 
   async set_sleep_mode(enabled: boolean): Promise<void> {

@@ -3,6 +3,12 @@ import { DeviceInfo, DeviceStatus, HaierDevice } from '../types.js';
 import { HaierAPI } from '../haier-api.js';
 import { Logger } from 'homebridge';
 
+type ApiClientShim = {
+  on: (event: string, listener: (...args: unknown[]) => void) => void;
+  getDeviceStatus: (mac: string) => Promise<Record<string, unknown>>;
+  removeListener: (event: string, listener: (...args: unknown[]) => void) => void;
+};
+
 export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   public device_id: string;
   public device_name: string;
@@ -61,7 +67,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     this.log.info(`Device ${this.device_name} will receive status updates via WebSocket`);
 
     // Guard for tests/minimal API mocks
-    const apiClient = this.api as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void; getDeviceStatus: (mac: string) => Promise<Record<string, unknown>>; removeListener: (event: string, listener: (...args: unknown[]) => void) => void };
+    const apiClient = this.api as unknown as ApiClientShim;
     if (!apiClient || typeof apiClient.on !== 'function') {
       this.log.info(`API client not available; skipping event subscription for ${this.device_name}`);
       return;
@@ -111,7 +117,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     // Fetch initial configuration once at startup
   protected async fetchInitialStatus(): Promise<void> {
     try {
-      const apiClient = this.api as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void; getDeviceStatus: (mac: string) => Promise<Record<string, unknown>>; removeListener: (event: string, listener: (...args: unknown[]) => void) => void };
+      const apiClient = this.api as unknown as ApiClientShim;
       if (!apiClient || typeof apiClient.getDeviceStatus !== 'function') {
         this.log.info(`API client not available; skipping initial configuration fetch for ${this.device_name}`);
         return;
@@ -391,7 +397,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     }
 
     // Remove WebSocket event listeners
-    const apiClient = this.api as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void; getDeviceStatus: (mac: string) => Promise<Record<string, unknown>>; removeListener: (event: string, listener: (...args: unknown[]) => void) => void };
+    const apiClient = this.api as unknown as ApiClientShim;
     if (apiClient && typeof apiClient.removeListener === 'function') {
       apiClient.removeListener('device_status_update', this.handleDeviceStatusUpdate as (...args: unknown[]) => void);
       apiClient.removeListener('deviceStatusUpdate', this.handleLegacyStatusUpdate);
@@ -410,11 +416,16 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   }
 
   private handleLegacyStatusUpdate = (data: unknown) => {
-    const d = data as { macAddress?: string; status?: DeviceStatus };
+    const d = data as { macAddress?: string; status?: unknown };
     if (d.macAddress === this.mac) {
-      this.updateFromStatus(d.status as DeviceStatus);
-      this.lastStatusUpdate = new Date();
-      this.emit('statusUpdated', d.status);
+      if (d.status && typeof d.status === 'object') {
+        const status = d.status as DeviceStatus;
+        this.updateFromStatus(status);
+        this.lastStatusUpdate = new Date();
+        this.emit('statusUpdated', status);
+      } else {
+        this.log.warn(`Received legacy status update with malformed status for ${this.device_name}`);
+      }
     }
   }
 
