@@ -17,7 +17,9 @@ tsconfig.json
 
 # Test files
 test-*.js
+test-*.cjs
 run-tests.js
+run-tests.cjs
 *.test.ts
 *.test.js
 *.spec.ts

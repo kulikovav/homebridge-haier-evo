@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
-import { DeviceInfo, DeviceStatus, HaierDevice } from '../types';
-import { HaierAPI } from '../haier-api';
+import { DeviceInfo, DeviceStatus, HaierDevice } from '../types.js';
+import { HaierAPI } from '../haier-api.js';
+import { Logger } from 'homebridge';
 
 export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   public device_id: string;
@@ -33,11 +34,15 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   public preset_mode_boost: boolean = false;
 
   protected api: HaierAPI;
+  protected log: Logger;
   protected statusUpdateTimer: ReturnType<typeof setInterval> | null = null;
   protected lastStatusUpdate: Date = new Date();
 
   constructor(deviceInfo: DeviceInfo, api: HaierAPI) {
     super();
+
+    this.api = api;
+    this.log = (api as any).log;
 
     this.device_id = deviceInfo.id;
     this.device_name = deviceInfo.name;
@@ -46,7 +51,6 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     this.mac = deviceInfo.mac;
     this.serialNumber = deviceInfo.serialNumber;
     this.firmwareVersion = deviceInfo.firmwareVersion;
-    this.api = api;
 
     // Don't start status updates immediately - let subclasses set temperature limits first
     // this.startStatusUpdates();
@@ -54,12 +58,12 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
 
     protected startStatusUpdates(): void {
     // We no longer poll the API_DEVICE_CONFIG endpoint - instead we rely on WebSocket updates
-    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Device ${this.device_name} will receive status updates via WebSocket`);
+    this.log.info(`Device ${this.device_name} will receive status updates via WebSocket`);
 
     // Guard for tests/minimal API mocks
     const apiAny = this.api as any;
     if (!apiAny || typeof apiAny.on !== 'function') {
-      console.log(`[${new Date().toLocaleString()}] [Haier Evo] API client not available; skipping event subscription for ${this.device_name}`);
+      this.log.info(`API client not available; skipping event subscription for ${this.device_name}`);
       return;
     }
 
@@ -85,7 +89,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   }
 
   public updateDeviceInfo(info: { model?: string; serialNumber?: string; firmwareVersion?: string; deviceName?: string }): void {
-    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Updating device info for ${this.device_name}`);
+    this.log.info(`Updating device info for ${this.device_name}`);
 
     if (info.model !== undefined) {
       this.device_model = info.model;
@@ -103,7 +107,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
       this.device_name = info.deviceName;
     }
 
-    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Device info updated: model=${this.device_model}, serial=${this.serialNumber}, firmware=${this.firmwareVersion}`);
+    this.log.info(`Device info updated: model=${this.device_model}, serial=${this.serialNumber}, firmware=${this.firmwareVersion}`);
   }
 
     // Fetch initial configuration once at startup
@@ -111,12 +115,12 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     try {
       const apiAny = this.api as any;
       if (!apiAny || typeof apiAny.getDeviceStatus !== 'function') {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] API client not available; skipping initial configuration fetch for ${this.device_name}`);
+        this.log.info(`API client not available; skipping initial configuration fetch for ${this.device_name}`);
         return;
       }
       // Skip if initial fetch was already done at platform level
       if (this.skipInitialFetch) {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Skipping initial config fetch for ${this.device_name} - already done at platform level`);
+        this.log.info(`Skipping initial config fetch for ${this.device_name} - already done at platform level`);
         return;
       }
 
@@ -126,12 +130,12 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
         return;
       }
 
-      console.log(`[${new Date().toLocaleString()}] [Haier Evo] Fetching initial configuration for device ${this.device_name} (${this.mac})`);
+      this.log.info(`Fetching initial configuration for device ${this.device_name} (${this.mac})`);
       const config = await apiAny.getDeviceStatus(this.mac);
 
       // Update device with any extracted configuration data
       if (Object.keys(config).length > 0) {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Applying initial configuration for device ${this.device_name}`);
+        this.log.info(`Applying initial configuration for device ${this.device_name}`);
 
         // Extract key properties for logging
         if (config.attributes && Array.isArray(config.attributes)) {
@@ -140,14 +144,14 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
             attr && typeof attr === 'object' && 'name' in (attr as any) && (attr as any).name === '36' && 'currentValue' in (attr as any)
           );
           if (tempAttr) {
-            console.log(`[${new Date().toLocaleString()}] [Haier Evo] Found current temperature for device ${this.mac}: ${tempAttr.currentValue}°C`);
+            this.log.info(`Found current temperature for device ${this.mac}: ${tempAttr.currentValue}°C`);
           }
 
           const targetTempAttr = config.attributes.find((attr: unknown) =>
             attr && typeof attr === 'object' && 'name' in (attr as any) && (attr as any).name === '0' && 'currentValue' in (attr as any)
           );
           if (targetTempAttr) {
-            console.log(`[${new Date().toLocaleString()}] [Haier Evo] Found target temperature for device ${this.mac}: ${targetTempAttr.currentValue}°C`);
+            this.log.info(`Found target temperature for device ${this.mac}: ${targetTempAttr.currentValue}°C`);
           }
 
           const powerAttr = config.attributes.find((attr: unknown) =>
@@ -155,12 +159,12 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
           );
           if (powerAttr) {
             const powerStatus = powerAttr.currentValue === '1' ? 'ON' : 'OFF';
-            console.log(`[${new Date().toLocaleString()}] [Haier Evo] Found power status for device ${this.mac}: ${powerStatus}`);
+            this.log.info(`Found power status for device ${this.mac}: ${powerStatus}`);
           }
         }
 
         // Log the extracted initial status for debugging
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Extracted initial status for device ${this.mac}:`, JSON.stringify(config));
+        this.log.info(`Extracted initial status for device ${this.mac}:`, JSON.stringify(config));
 
         // Update the device status with the configuration data
         this.updateFromStatus(config);
@@ -168,7 +172,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
 
         // Check if we have device information updates from API_DEVICE_CONFIG
         if (config.model || config.serialNumber || config.firmwareVersion || config.deviceName) {
-          console.log(`[${new Date().toLocaleString()}] [Haier Evo] Found device information updates for ${this.device_name}`);
+          this.log.info(`Found device information updates for ${this.device_name}`);
 
           // Emit device info update to notify platform
           this.emit('deviceInfoUpdated', {
@@ -185,22 +189,22 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
 
         // Force a full status update to ensure all characteristics are updated
         setTimeout(() => {
-          console.log(`[${new Date().toLocaleString()}] [Haier Evo] Triggering additional status update for ${this.device_name}`);
+          this.log.info(`Triggering additional status update for ${this.device_name}`);
           this.emit('statusUpdated', this.toJSON());
         }, 1000);
       } else {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] No initial configuration data available for ${this.device_name}`);
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Will wait for WebSocket updates for device ${this.device_name}`);
+        this.log.info(`No initial configuration data available for ${this.device_name}`);
+        this.log.info(`Will wait for WebSocket updates for device ${this.device_name}`);
       }
     } catch (error) {
-      console.error(`[${new Date().toLocaleString()}] [Haier Evo] Failed to fetch initial device configuration: ${String(error)}`);
+      this.log.error(`Failed to fetch initial device configuration: ${String(error)}`);
       this.emit('error', `Failed to fetch initial device configuration: ${String(error)}`);
-      console.log(`[${new Date().toLocaleString()}] [Haier Evo] Will wait for WebSocket updates for device ${this.device_name}`);
+      this.log.info(`Will wait for WebSocket updates for device ${this.device_name}`);
     }
   }
 
   public updateFromStatus(status: DeviceStatus): void {
-    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Updating status for device ${this.device_name} (${this.device_type})`);
+    this.log.info(`Updating status for device ${this.device_name} (${this.device_type})`);
 
     const changes: Record<string, { old: any, new: any }> = {};
 
@@ -212,7 +216,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
         }
         this.current_temperature = status.current_temperature;
       } else {
-        console.warn(`[${new Date().toLocaleString()}] [Haier Evo] Invalid current temperature ${String(status.current_temperature)}, keeping current value ${this.current_temperature}`);
+        this.log.warn(`Invalid current temperature ${String(status.current_temperature)}, keeping current value ${this.current_temperature}`);
         this.emit('warning', `Invalid current temperature ${String(status.current_temperature)}, keeping current value ${this.current_temperature}`);
       }
     }
@@ -339,9 +343,9 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
 
     // Log changes if any were detected
     if (Object.keys(changes).length > 0) {
-      console.log(`[${new Date().toLocaleString()}] [Haier Evo] Device ${this.device_name} status changes:`, JSON.stringify(changes, null, 2));
+      this.log.info(`Device ${this.device_name} status changes:`, JSON.stringify(changes, null, 2));
     } else {
-      console.log(`[${new Date().toLocaleString()}] [Haier Evo] No changes detected for device ${this.device_name}`);
+      this.log.info(`No changes detected for device ${this.device_name}`);
     }
   }
 
@@ -361,7 +365,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   // Sound mode has been removed as requested
   // Default implementation that does nothing
   async set_sound(enabled: boolean): Promise<void> {
-    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Sound mode has been removed from the plugin`);
+    this.log.info(`Sound mode has been removed from the plugin`);
   }
   abstract set_antifreeze(enabled: boolean): Promise<void>;
   abstract set_cleaning(enabled: boolean): Promise<void>;
@@ -371,7 +375,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   abstract set_boost_mode(enabled: boolean): Promise<void>;
 
   // Common utility methods
-  protected async sendCommand(command: any): Promise<void> {
+  protected async sendCommand(command: { commandName: string; values: string[] }): Promise<void> {
     try {
       await this.api.sendCommand(this.device_id, command);
       this.emit('commandSent', command);
@@ -414,7 +418,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     }
   }
 
-  public toJSON(): any {
+  public toJSON(): Record<string, unknown> {
     return {
       device_id: this.device_id,
       device_name: this.device_name,

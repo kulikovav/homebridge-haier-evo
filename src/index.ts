@@ -1,6 +1,6 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
-import { HaierEvoPlatform } from './platform';
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
+import { HaierEvoPlatform } from './platform.js';
+import { PLATFORM_NAME, PLUGIN_NAME } from './settings.js';
 
 export class HaierEvoHomebridgePlugin implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;

@@ -1,6 +1,6 @@
-import { BaseDevice } from './base-device';
-import { HaierRefrigerator, DeviceInfo, DeviceStatus } from '../types';
-import { HaierAPI } from '../haier-api';
+import { BaseDevice } from './base-device.js';
+import { HaierRefrigerator, DeviceInfo, DeviceStatus } from '../types.js';
+import { HaierAPI } from '../haier-api.js';
 
 export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefrigerator {
   // Refrigerator-specific properties
@@ -219,7 +219,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
 
   // Enhanced status update from refrigerator data
   updateFromStatus(status: unknown): void {
-    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Updating refrigerator status for ${this.device_name}`);
+    this.log.info(`Updating refrigerator status for ${this.device_name}`);
 
     // Handle WebSocket properties format
     if (status && typeof status === 'object' && 'properties' in status && (status as any).properties) {
@@ -336,7 +336,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
       }
 
       if (Object.keys(changes).length > 0) {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Refrigerator ${this.device_name} status (properties) changes:`, JSON.stringify(changes, null, 2));
+        this.log.info(`Refrigerator ${this.device_name} status (properties) changes:`, JSON.stringify(changes, null, 2));
       }
     }
 
@@ -352,7 +352,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
       for (const attr of status.attributes) {
         if (attr && typeof attr === 'object' && 'name' in attr && 'currentValue' in attr) {
           const attrObj = attr as { name: string; currentValue: string };
-          console.log(`[${new Date().toLocaleString()}] [Haier Evo] Processing attribute ${attrObj.name} = ${attrObj.currentValue}`);
+          this.log.info(`Processing attribute ${attrObj.name} = ${attrObj.currentValue}`);
 
           switch (attrObj.name) {
           case '0': // Refrigerator temperature
@@ -480,9 +480,9 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
 
       // Log changes if any were detected
       if (Object.keys(changes).length > 0) {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Refrigerator ${this.device_name} status changes:`, JSON.stringify(changes, null, 2));
+        this.log.info(`Refrigerator ${this.device_name} status changes:`, JSON.stringify(changes, null, 2));
       } else {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] No refrigerator-specific changes detected for ${this.device_name}`);
+        this.log.info(`No refrigerator-specific changes detected for ${this.device_name}`);
       }
     }
   }
@@ -533,7 +533,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   // Implement missing abstract methods from BaseDevice
   async set_operation_mode(mode: string): Promise<void> {
     // Refrigerators don't have operation modes like AC units
-    console.log(`Operation mode not supported for refrigerator: ${mode}`);
+    this.log.info(`Operation mode not supported for refrigerator: ${mode}`);
   }
 
   async set_fan_mode(mode: string): Promise<void> {

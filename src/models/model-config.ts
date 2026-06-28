@@ -1,5 +1,5 @@
 import modelsConfig from './device-models.json';
-import { ModelsConfigSchema, ModelDefinition } from '../types';
+import { ModelsConfigSchema, ModelDefinition } from '../types.js';
 
 export class ModelConfigService {
   private static instance: ModelConfigService | null = null;

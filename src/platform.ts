@@ -7,11 +7,11 @@ import {
   Service,
   Characteristic
 } from 'homebridge';
-import { HaierAPI } from './haier-api';
-import { DeviceFactory } from './device-factory';
-import { HaierEvoAccessory } from './accessories/haier-evo-accessory';
-import { HaierEvoConfig } from './types';
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
+import { HaierAPI } from './haier-api.js';
+import { DeviceFactory } from './device-factory.js';
+import { HaierEvoAccessory } from './accessories/haier-evo-accessory.js';
+import { HaierEvoConfig, DeviceInfo } from './types.js';
+import { PLATFORM_NAME, PLUGIN_NAME } from './settings.js';
 
 export class HaierEvoPlatform {
   public readonly Service: typeof Service = this.api.hap.Service;
@@ -35,7 +35,7 @@ export class HaierEvoPlatform {
     this.validateConfig();
 
     // Initialize Haier API
-    this.haierAPI = new HaierAPI(this.config as unknown as HaierEvoConfig);
+    this.haierAPI = new HaierAPI(this.config as unknown as HaierEvoConfig, this.log);
 
     // Set up event listeners
     this.setupEventListeners();
@@ -284,11 +284,11 @@ export class HaierEvoPlatform {
     });
   }
 
-  private async createAccessory(deviceInfo: any): Promise<void> {
+  private async createAccessory(deviceInfo: DeviceInfo): Promise<void> {
     const uuid = this.api.hap.uuid.generate(deviceInfo.id);
 
     // Check if accessory already exists
-    const existingAccessory = (this.platform as any).accessories.find((accessory: any) => accessory.UUID === uuid);
+    const existingAccessory = (this.platform as DynamicPlatformPlugin & { accessories: PlatformAccessory[] }).accessories.find((accessory) => accessory.UUID === uuid);
 
     if (existingAccessory) {
       this.log.info(`Restoring existing accessory: ${deviceInfo.name}`);
@@ -516,13 +516,13 @@ export class HaierEvoPlatform {
       this.refreshTimer = null;
     }
 
-    // Destroy all accessories
     for (const accessory of this.accessories.values()) {
       accessory.destroy();
     }
     this.accessories.clear();
 
-    // Disconnect API
+    // Clean up HaierAPI: remove event listeners then disconnect
+    this.haierAPI.removeAllListeners();
     this.haierAPI.disconnect();
   }
 }

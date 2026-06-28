@@ -5,7 +5,7 @@ describe('HaierAPI model-based mapping', () => {
   test('convertPropertiesToDeviceStatus respects model config for HSU-09HTT103', () => {
     const api = new HaierAPI({
       email: 'a', password: 'b', region: 'ru', deviceId: 'dev1'
-    } as any);
+    } as any, { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() } as any);
 
     const svc = ModelConfigService.getInstance();
     expect(svc.getGroupCommandNameForModel('HSU-09HTT103/R3(IN)')).toBe('3');

@@ -4,9 +4,9 @@ import {
   Logger,
   CharacteristicValue
 } from 'homebridge';
-import { HaierEvoPlatform } from '../platform';
-import { DeviceFactory } from '../device-factory';
-import { HaierDevice, DeviceInfo, DeviceStatus } from '../types';
+import { HaierEvoPlatform } from '../platform.js';
+import { DeviceFactory } from '../device-factory.js';
+import { HaierDevice, DeviceInfo, DeviceStatus } from '../types.js';
 
 export class HaierEvoAccessory {
   private device: HaierDevice;
