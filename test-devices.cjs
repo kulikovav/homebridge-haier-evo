@@ -35,6 +35,7 @@ const MOCK_DEVICES = {
 // Create a mock API for testing
 const createMockApi = () => {
   return {
+    log: { info: () => {}, error: () => {}, warn: () => {}, debug: () => {} },
     on: () => {},
     emit: () => {},
     sendCommand: async () => Promise.resolve({}),

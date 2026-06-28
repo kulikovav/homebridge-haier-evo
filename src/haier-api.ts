@@ -2089,7 +2089,12 @@ export class HaierAPI extends EventEmitter {
     this.closing = true;
     this.wsState = 'disconnecting';
     if (this.ws) {
-      this.ws.close();
+      try {
+        this.ws.close();
+      } catch {
+        // Swallow close errors so cleanup always proceeds
+      }
+      this.ws = null;
     }
 
     if (this.reconnectTimer) {

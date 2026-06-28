@@ -15,12 +15,12 @@ async function testRateLimiting() {
 
   try {
     // Create API instance
+    const mockLog = { info: () => {}, error: () => {}, warn: () => {}, debug: () => {} };
     const api = new HaierAPI({
       email: process.env.HAIER_EVO_EMAIL || 'test@example.com',
       password: process.env.HAIER_EVO_PASSWORD || 'testpassword',
-      region: process.env.HAIER_EVO_REGION || 'ru',
-      debug: true
-    });
+      region: process.env.HAIER_EVO_REGION || 'ru'
+    }, mockLog);
 
     console.log('✅ API instance created');
 

@@ -1,4 +1,4 @@
-import modelsConfig from './device-models.json';
+import modelsConfig from './device-models.json' with { type: 'json' };
 import { ModelsConfigSchema, ModelDefinition } from '../types.js';
 
 export class ModelConfigService {
