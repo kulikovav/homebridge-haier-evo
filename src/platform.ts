@@ -259,7 +259,7 @@ export class HaierEvoPlatform {
       if (config.excludeNamePattern) {
         try {
           const excludeRegex = new RegExp(config.excludeNamePattern, 'i');
-          if (!excludeRegex.test(device.name)) {
+          if (excludeRegex.test(device.name)) {
             this.log.debug(`Device ${device.name} (${device.id}) excluded: name matches excludeNamePattern`);
             return false;
           }
