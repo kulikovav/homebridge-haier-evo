@@ -26,6 +26,7 @@ import {
   API_WEBSOCKET_STATUS,
   API_TIMEOUT
 } from './constants.js';
+import { parseAuthResponse, parseAuthToken, parseDeviceConfig } from './validation.js';
 
 interface ApiErrorResponse {
   error?: unknown;
@@ -363,7 +364,12 @@ export class HaierAPI extends EventEmitter {
         throw new Error(`Authentication failed: ${JSON.stringify(response.data.error)}`);
       }
 
-      const { token } = response.data.data;
+      const authData = parseAuthResponse(response.data);
+      if (!authData?.data?.token) {
+        throw new Error('Authentication failed: invalid token structure in response');
+      }
+
+      const token = authData.data.token;
       this.accessToken = token.accessToken;
       this.refreshToken = token.refreshToken;
       this.tokenExpire = new Date(token.expire);
@@ -524,7 +530,13 @@ export class HaierAPI extends EventEmitter {
         throw new Error(`Token refresh failed: ${JSON.stringify(response.data.error)}`);
       }
 
-      const { token } = response.data.data;
+      const refreshData = parseAuthResponse(response.data);
+      if (!refreshData?.data?.token) {
+        this.refreshFailureCount++;
+        throw new Error('Token refresh failed: invalid token structure in response');
+      }
+
+      const token = refreshData.data.token;
       this.accessToken = token.accessToken;
       this.refreshToken = token.refreshToken;
       this.tokenExpire = new Date(token.expire);
@@ -763,9 +775,8 @@ export class HaierAPI extends EventEmitter {
    * Fetches device configuration without using the main getDeviceStatus cache
    * This is used during device discovery to build the complete cache
    */
-  private async getDeviceConfigForEnrichment(mac: string): Promise<Record<string, unknown>> {
+   private async getDeviceConfigForEnrichment(mac: string): Promise<Record<string, unknown>> {
     try {
-      // Ensure token is valid before making the request
       await this.ensureValidToken();
 
       const response = await this.executeWithRateLimit(() =>
@@ -774,37 +785,41 @@ export class HaierAPI extends EventEmitter {
         )
       );
 
-      // Trim all string values in the response data
-      if (response.data) {
-        response.data = this.trimData(response.data);
+      const trimmed = this.trimData(response.data) as Record<string, unknown>;
+
+      if (trimmed.error) {
+        throw new Error(`Failed to get device configuration: ${JSON.stringify(trimmed.error)}`);
       }
 
-      if (response.data.error) {
-        throw new Error(`Failed to get device configuration: ${JSON.stringify(response.data.error)}`);
-      }
-
-      // Extract device information from API_DEVICE_CONFIG response
+      const parsed = parseDeviceConfig(trimmed);
       const deviceConfig: Record<string, unknown> = {};
 
-      if (response.data) {
-        // Extract model from info.model
-        if (response.data.info && response.data.info.model) {
-          deviceConfig.model = response.data.info.model;
+      if (parsed) {
+        if (parsed.info?.model) {
+          deviceConfig.model = parsed.info.model;
         }
-
-        // Extract serial number from info.serialNumber
-        if (response.data.info && response.data.info.serialNumber) {
-          deviceConfig.serialNumber = response.data.info.serialNumber;
+        if (parsed.info?.serialNumber) {
+          deviceConfig.serialNumber = parsed.info.serialNumber;
         }
-
-        // Extract firmware version from settings.firmware.value
-        if (response.data.settings && response.data.settings.firmware && response.data.settings.firmware.value) {
-          deviceConfig.firmwareVersion = response.data.settings.firmware.value;
+        if (parsed.settings?.firmware?.value) {
+          deviceConfig.firmwareVersion = parsed.settings.firmware.value;
         }
-
-        // Extract device name from settings.name.name (if available)
-        if (response.data.settings && response.data.settings.name && response.data.settings.name.name) {
-          deviceConfig.deviceName = response.data.settings.name.name.trim();
+        if (parsed.settings?.name?.name) {
+          deviceConfig.deviceName = parsed.settings.name.name.trim();
+        }
+      } else if (trimmed) {
+        // Fallback: extract from unvalidated response
+        const info = trimmed.info as Record<string, unknown> | undefined;
+        if (info?.model) deviceConfig.model = info.model;
+        if (info?.serialNumber) deviceConfig.serialNumber = info.serialNumber;
+        const settings = trimmed.settings as Record<string, unknown> | undefined;
+        if (settings?.firmware && typeof settings.firmware === 'object') {
+          const fw = settings.firmware as Record<string, unknown>;
+          if (fw?.value) deviceConfig.firmwareVersion = fw.value;
+        }
+        if (settings?.name && typeof settings.name === 'object') {
+          const name = settings.name as Record<string, unknown>;
+          if (typeof name?.name === 'string') deviceConfig.deviceName = name.name.trim();
         }
       }
 
@@ -1035,103 +1050,79 @@ export class HaierAPI extends EventEmitter {
         )
       );
 
-      if (response.data) {
-        response.data = this.trimData(response.data);
-      }
+      const trimmed = this.trimData(response.data) as Record<string, unknown>;
 
-      if (this.config.debug) {
-        this.log.debug(`Device status response for ${mac} - status:`, response.status);
-      }
-
-      if (response.data.error) {
-        throw new Error(`Failed to get device configuration: ${JSON.stringify(response.data.error)}`);
+      if (trimmed.error) {
+        throw new Error(`Failed to get device configuration: ${JSON.stringify(trimmed.error)}`);
       }
 
       const deviceStatus: DeviceStatus = {};
+      const parsed = trimmed.error ? null : parseDeviceConfig(trimmed);
 
-      if (response.data) {
-        if (response.data.info && response.data.info.model) {
-          deviceStatus.model = response.data.info.model;
+      if (parsed) {
+        if (parsed.info?.model) deviceStatus.model = parsed.info.model;
+        if (parsed.info?.serialNumber) deviceStatus.serialNumber = parsed.info.serialNumber;
+        if (parsed.settings?.firmware?.value) deviceStatus.firmwareVersion = parsed.settings.firmware.value;
+        if (parsed.settings?.name?.name) deviceStatus.deviceName = parsed.settings.name.name.trim();
+        if (parsed.attributes) deviceStatus.attributes = parsed.attributes as unknown[];
+      } else if (trimmed) {
+        // Fallback: extract from unvalidated response
+        const info = trimmed.info as Record<string, unknown> | undefined;
+        if (typeof info?.model === 'string') deviceStatus.model = info.model;
+        if (typeof info?.serialNumber === 'string') deviceStatus.serialNumber = info.serialNumber;
+        const settings = trimmed.settings as Record<string, unknown> | undefined;
+        if (settings?.firmware && typeof settings.firmware === 'object') {
+          const fw = settings.firmware as Record<string, unknown>;
+          if (typeof fw?.value === 'string') deviceStatus.firmwareVersion = fw.value;
         }
-
-        if (response.data.info && response.data.info.serialNumber) {
-          deviceStatus.serialNumber = response.data.info.serialNumber;
+        if (settings?.name && typeof settings.name === 'object') {
+          const n = settings.name as Record<string, unknown>;
+          if (typeof n?.name === 'string') deviceStatus.deviceName = n.name.trim();
         }
-
-        if (response.data.settings?.firmware?.value) {
-          deviceStatus.firmwareVersion = response.data.settings.firmware.value;
-        }
-
-        if (response.data.settings?.name?.name) {
-          deviceStatus.deviceName = response.data.settings.name.name.trim();
-        }
+        if (Array.isArray(trimmed.attributes)) deviceStatus.attributes = trimmed.attributes;
       }
 
-      if (response.data.attributes && Array.isArray(response.data.attributes)) {
-        deviceStatus.attributes = response.data.attributes;
-      }
-
-      if (response.data.sensors?.items) {
-        const tempSensor = (response.data.sensors.items as unknown[]).find((item: unknown) => {
-          const it = item as Record<string, unknown>;
-          const val = it.value as Record<string, unknown> | undefined;
+      // Extract temperature from sensors
+      if (parsed?.sensors?.items) {
+        const tempSensor = parsed.sensors.items.find((s) => {
+          const val = s.value;
           return val && (val.description === 'indoorTemperature' || val.name === '36');
         });
 
-        if (tempSensor) {
-          this.log.info(`Found temperature sensor for device ${mac}`);
-
-          const tempAttribute = (response.data.attributes as unknown[] | undefined)?.find((attr: unknown) => {
-            const a = attr as Record<string, unknown>;
-            const tv = tempSensor as Record<string, unknown>;
-            const tvVal = tv.value as Record<string, unknown> | undefined;
-            return a.name === tvVal?.name;
-          });
-
-          if (tempAttribute) {
-            const ta = tempAttribute as Record<string, unknown>;
-            if (typeof ta.currentValue === 'string') {
-              const currentTemp = parseFloat(ta.currentValue);
-              if (!isNaN(currentTemp)) {
-                deviceStatus.current_temperature = currentTemp;
-                this.log.info(`Found current temperature for device ${mac}: ${currentTemp}C`);
-              }
+        if (tempSensor?.value && parsed.attributes && typeof tempSensor.value.name === 'string') {
+          const sensorName = tempSensor.value.name;
+          const tempAttribute = parsed.attributes.find((a) => a.name === sensorName);
+          if (tempAttribute?.currentValue) {
+            const currentTemp = parseFloat(tempAttribute.currentValue);
+            if (!isNaN(currentTemp)) {
+              deviceStatus.current_temperature = currentTemp;
+              this.log.info(`Found current temperature for device ${mac}: ${currentTemp}C`);
             }
           }
         }
       }
 
-      if (response.data.temperature?.value) {
-        const tempAttribute = (response.data.attributes as unknown[] | undefined)?.find((attr: unknown) => {
-          const a = attr as Record<string, unknown>;
-          return a.name === response.data.temperature!.value!.name;
-        });
-
-        if (tempAttribute) {
-          const ta = tempAttribute as Record<string, unknown>;
-          if (typeof ta.currentValue === 'string') {
-            const targetTemp = parseFloat(ta.currentValue);
-            if (!isNaN(targetTemp)) {
-              deviceStatus.target_temperature = targetTemp;
-              this.log.info(`Found target temperature for device ${mac}: ${targetTemp}C`);
-            }
+      // Extract target temperature
+      if (parsed?.temperature?.value && parsed.attributes && typeof parsed.temperature.value.name === 'string') {
+        const targetName = parsed.temperature.value.name;
+        const tempAttribute = parsed.attributes.find((a) => a.name === targetName);
+        if (tempAttribute?.currentValue) {
+          const targetTemp = parseFloat(tempAttribute.currentValue);
+          if (!isNaN(targetTemp)) {
+            deviceStatus.target_temperature = targetTemp;
+            this.log.info(`Found target temperature for device ${mac}: ${targetTemp}C`);
           }
         }
       }
 
-      if (response.data.power?.value) {
-        const powerAttribute = (response.data.attributes as unknown[] | undefined)?.find((attr: unknown) => {
-          const a = attr as Record<string, unknown>;
-          return a.name === response.data.power!.value!.name;
-        });
-
-        if (powerAttribute) {
-          const pa = powerAttribute as Record<string, unknown>;
-          if (typeof pa.currentValue === 'string') {
-            const powerStatus = pa.currentValue === '1' ? 1 : 0;
-            deviceStatus.status = powerStatus;
-            this.log.info(`Found power status for device ${mac}: ${powerStatus ? 'ON' : 'OFF'}`);
-          }
+      // Extract power status
+      if (parsed?.power?.value && parsed.attributes && typeof parsed.power.value.name === 'string') {
+        const powerName = parsed.power.value.name;
+        const powerAttribute = parsed.attributes.find((a) => a.name === powerName);
+        if (powerAttribute?.currentValue) {
+          const powerStatus = powerAttribute.currentValue === '1' ? 1 : 0;
+          deviceStatus.status = powerStatus;
+          this.log.info(`Found power status for device ${mac}: ${powerStatus ? 'ON' : 'OFF'}`);
         }
       }
 
