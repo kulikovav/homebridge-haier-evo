@@ -42,7 +42,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     super();
 
     this.api = api;
-    this.log = (api as any)?.log ?? { info: () => {}, error: () => {}, warn: () => {}, debug: () => {} };
+    this.log = (this.api as unknown as { log: Logger }).log ?? { info: () => {}, error: () => {}, warn: () => {}, debug: () => {} };
 
     this.device_id = deviceInfo.id;
     this.device_name = deviceInfo.name;
@@ -61,17 +61,15 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     this.log.info(`Device ${this.device_name} will receive status updates via WebSocket`);
 
     // Guard for tests/minimal API mocks
-    const apiAny = this.api as any;
-    if (!apiAny || typeof apiAny.on !== 'function') {
+    const apiClient = this.api as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void; getDeviceStatus: (mac: string) => Promise<Record<string, unknown>>; removeListener: (event: string, listener: (...args: unknown[]) => void) => void };
+    if (!apiClient || typeof apiClient.on !== 'function') {
       this.log.info(`API client not available; skipping event subscription for ${this.device_name}`);
       return;
     }
 
-    // Set up WebSocket event listeners in the API client using the handler methods
-    apiAny.on('device_status_update', this.handleDeviceStatusUpdate);
+    apiClient.on('device_status_update', this.handleDeviceStatusUpdate as (...args: unknown[]) => void);
 
-    // Also listen for the legacy event format
-    apiAny.on('deviceStatusUpdate', this.handleLegacyStatusUpdate);
+    apiClient.on('deviceStatusUpdate', this.handleLegacyStatusUpdate as (...args: unknown[]) => void);
 
     // Do an initial status fetch to get the current state
     this.fetchInitialStatus();
@@ -113,8 +111,8 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     // Fetch initial configuration once at startup
   protected async fetchInitialStatus(): Promise<void> {
     try {
-      const apiAny = this.api as any;
-      if (!apiAny || typeof apiAny.getDeviceStatus !== 'function') {
+      const apiClient = this.api as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void; getDeviceStatus: (mac: string) => Promise<Record<string, unknown>>; removeListener: (event: string, listener: (...args: unknown[]) => void) => void };
+      if (!apiClient || typeof apiClient.getDeviceStatus !== 'function') {
         this.log.info(`API client not available; skipping initial configuration fetch for ${this.device_name}`);
         return;
       }
@@ -131,7 +129,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
       }
 
       this.log.info(`Fetching initial configuration for device ${this.device_name} (${this.mac})`);
-      const config = await apiAny.getDeviceStatus(this.mac);
+      const config = await apiClient.getDeviceStatus(this.mac);
 
       // Update device with any extracted configuration data
       if (Object.keys(config).length > 0) {
@@ -141,24 +139,24 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
         if (config.attributes && Array.isArray(config.attributes)) {
           // Log temperature values if found
           const tempAttr = config.attributes.find((attr: unknown) =>
-            attr && typeof attr === 'object' && 'name' in (attr as any) && (attr as any).name === '36' && 'currentValue' in (attr as any)
+            attr && typeof attr === 'object' && 'name' in (attr as { name?: string; currentValue?: string }) && (attr as { name?: string; currentValue?: string }).name === '36' && 'currentValue' in (attr as { name?: string; currentValue?: string })
           );
           if (tempAttr) {
-            this.log.info(`Found current temperature for device ${this.mac}: ${tempAttr.currentValue}°C`);
+            this.log.info(`Found current temperature for device ${this.mac}: ${(tempAttr as { currentValue: string }).currentValue}°C`);
           }
 
           const targetTempAttr = config.attributes.find((attr: unknown) =>
-            attr && typeof attr === 'object' && 'name' in (attr as any) && (attr as any).name === '0' && 'currentValue' in (attr as any)
+            attr && typeof attr === 'object' && 'name' in (attr as { name?: string; currentValue?: string }) && (attr as { name?: string; currentValue?: string }).name === '0' && 'currentValue' in (attr as { name?: string; currentValue?: string })
           );
           if (targetTempAttr) {
-            this.log.info(`Found target temperature for device ${this.mac}: ${targetTempAttr.currentValue}°C`);
+            this.log.info(`Found target temperature for device ${this.mac}: ${(targetTempAttr as { currentValue: string }).currentValue}°C`);
           }
 
           const powerAttr = config.attributes.find((attr: unknown) =>
-            attr && typeof attr === 'object' && 'name' in (attr as any) && (attr as any).name === '21' && 'currentValue' in (attr as any)
+            attr && typeof attr === 'object' && 'name' in (attr as { name?: string; currentValue?: string }) && (attr as { name?: string; currentValue?: string }).name === '21' && 'currentValue' in (attr as { name?: string; currentValue?: string })
           );
           if (powerAttr) {
-            const powerStatus = powerAttr.currentValue === '1' ? 'ON' : 'OFF';
+            const powerStatus = (powerAttr as { currentValue: string }).currentValue === '1' ? 'ON' : 'OFF';
             this.log.info(`Found power status for device ${this.mac}: ${powerStatus}`);
           }
         }
@@ -206,7 +204,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   public updateFromStatus(status: DeviceStatus): void {
     this.log.info(`Updating status for device ${this.device_name} (${this.device_type})`);
 
-    const changes: Record<string, { old: any, new: any }> = {};
+    const changes: Record<string, { old: unknown; new: unknown }> = {};
 
     if (status.current_temperature !== undefined) {
       // Validate current temperature is reasonable (not below -50 or above 100)
@@ -392,10 +390,10 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     }
 
     // Remove WebSocket event listeners
-    const apiAny = this.api as any;
-    if (apiAny && typeof apiAny.removeListener === 'function') {
-      apiAny.removeListener('device_status_update', this.handleDeviceStatusUpdate);
-      apiAny.removeListener('deviceStatusUpdate', this.handleLegacyStatusUpdate);
+    const apiClient = this.api as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void; getDeviceStatus: (mac: string) => Promise<Record<string, unknown>>; removeListener: (event: string, listener: (...args: unknown[]) => void) => void };
+    if (apiClient && typeof apiClient.removeListener === 'function') {
+      apiClient.removeListener('device_status_update', this.handleDeviceStatusUpdate as (...args: unknown[]) => void);
+      apiClient.removeListener('deviceStatusUpdate', this.handleLegacyStatusUpdate as (...args: unknown[]) => void);
     }
 
     // Remove all other event listeners
@@ -410,11 +408,12 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     }
   }
 
-  private handleLegacyStatusUpdate = (data: any) => {
-    if (data.macAddress === this.mac) {
-      this.updateFromStatus(data.status);
+  private handleLegacyStatusUpdate = (data: unknown) => {
+    const d = data as { macAddress?: string; status?: DeviceStatus };
+    if (d.macAddress === this.mac) {
+      this.updateFromStatus(d.status as DeviceStatus);
       this.lastStatusUpdate = new Date();
-      this.emit('statusUpdated', data.status);
+      this.emit('statusUpdated', d.status);
     }
   }
 

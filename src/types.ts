@@ -130,6 +130,10 @@ export interface DeviceStatus {
   serialNumber?: string;
   firmwareVersion?: string;
   deviceName?: string;
+
+  // Refrigerator-specific door statuses
+  freezer_door_open?: boolean;
+  refrigerator_door_open?: boolean;
 }
 
 export interface HaierDevice {

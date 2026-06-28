@@ -222,11 +222,11 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
     this.log.info(`Updating refrigerator status for ${this.device_name}`);
 
     // Handle WebSocket properties format
-    if (status && typeof status === 'object' && 'properties' in status && (status as any).properties) {
-      const props = (status as any).properties as Record<string, string>;
-      const changes: Record<string, { old: any, new: any }> = {};
+    if (status && typeof status === 'object' && 'properties' in status && (status as { properties?: Record<string, string> }).properties) {
+      const props = (status as { properties: Record<string, string> }).properties;
+      const changes: Record<string, { old: unknown; new: unknown }> = {};
 
-      const parseIntSafe = (v: any): number => {
+      const parseIntSafe = (v: unknown): number => {
         const n = parseInt(String(v));
         return isNaN(n) ? 0 : n;
       };
@@ -347,7 +347,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
 
     // Parse attributes from refrigerator data response
     if (status && typeof status === 'object' && 'attributes' in status && status.attributes && Array.isArray(status.attributes)) {
-      const changes: Record<string, { old: any, new: any }> = {};
+      const changes: Record<string, { old: unknown; new: unknown }> = {};
 
       for (const attr of status.attributes) {
         if (attr && typeof attr === 'object' && 'name' in attr && 'currentValue' in attr) {
@@ -504,7 +504,12 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Get temperature ranges for UI
-  public get_temperature_ranges(): any {
+  public get_temperature_ranges(): {
+    refrigerator: { min: number; max: number; step: number };
+    freezer: { min: number; max: number; step: number };
+    myzone: { min: number; max: number; step: number };
+    ambient: { min: number; max: number; step: number };
+  } {
     return {
       refrigerator: HaierRefrigeratorDevice.TEMP_RANGES.REFRIGERATOR,
       freezer: HaierRefrigeratorDevice.TEMP_RANGES.FREEZER,
@@ -514,7 +519,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Get current status summary
-  public get_status_summary(): any {
+  public get_status_summary(): Record<string, unknown> {
     return {
       power: this.status === 1 ? 'on' : 'off',
       refrigerator_temp: this.refrigerator_temperature,

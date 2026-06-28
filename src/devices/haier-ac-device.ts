@@ -71,11 +71,11 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * @param mode The HVAC mode to set (auto, cool, dry, heat, fan_only)
    */
   async set_operation_mode(mode: string): Promise<void> {
-    this.log.info(`🌡️ Setting operation mode for ${this.device_name} to ${mode}`);
+    this.log.info(`Setting operation mode for ${this.device_name} to ${mode}`);
 
     if (!this.isValidHVACMode(mode)) {
       const error = `Invalid HVAC mode: ${mode}`;
-      this.log.error(`❌ ${error}`);
+      this.log.error(`${error}`);
       throw new Error(error);
     }
 
@@ -102,19 +102,17 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
           throw new Error(`Unsupported mode: ${mode}`);
       }
 
-      this.log.info(`📤 Sending operation mode command: ${mode} (value: ${commandValue})`);
+      this.log.info(`Sending operation mode command: ${mode} (value: ${commandValue})`);
       const propId = this.getId('mode', HaierACDevice.COMMANDS.MODE);
       const valueToSend = this.modelConfig.mapValueToHaier(this.device_model, 'mode', mode);
       await this.api.setDeviceProperty(this.mac, propId, valueToSend);
 
-      // Update local state
       this.mode = mode;
-      this.log.info(`✅ Operation mode set to ${mode}`);
+      this.log.info(`Operation mode set to ${mode}`);
 
-      // Emit event
       this.emit('modeChanged', mode);
     } catch (error) {
-      this.log.error(`❌ Error setting operation mode: ${error}`);
+      this.log.error(`Error setting operation mode: ${error}`);
       throw error;
     }
   }
@@ -124,52 +122,46 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * @param temp The target temperature to set
    */
   async set_temperature(temp: number): Promise<void> {
-    this.log.info(`🌡️ Setting temperature for ${this.device_name} to ${temp}°C`);
+    this.log.info(`Setting temperature for ${this.device_name} to ${temp}°C`);
 
     try {
       // Format the temperature value with 2 decimal places
       const tempValue = temp.toFixed(2);
 
-      this.log.info(`📤 Sending temperature command: ${tempValue}°C`);
+      this.log.info(`Sending temperature command: ${tempValue}°C`);
       const propId = this.getId('target_temperature', HaierACDevice.COMMANDS.TEMPERATURE);
       await this.api.setDeviceProperty(this.mac, propId, tempValue);
 
-      // Update local state
       this.target_temperature = temp;
-      this.log.info(`✅ Temperature set to ${temp}°C`);
+      this.log.info(`Temperature set to ${temp}°C`);
 
-      // Emit event
       this.emit('temperatureChanged', temp);
     } catch (error) {
-      this.log.error(`❌ Error setting temperature: ${error}`);
+      this.log.error(`Error setting temperature: ${error}`);
       throw error;
     }
   }
 
-    /**
+  /**
    * Set the light state for the air conditioner
    * @param value true to turn on, false to turn off
    */
   async set_light(value: boolean): Promise<void> {
-    this.log.info(`💡 Setting light for ${this.device_name} to ${value ? 'ON' : 'OFF'}`);
-    this.log.info(`📊 Device details: MAC=${this.mac}, ID=${this.device_id}, Type=${this.device_type}`);
+    this.log.info(`Setting light for ${this.device_name} to ${value ? 'ON' : 'OFF'}`);
+    this.log.info(`Device details: MAC=${this.mac}, ID=${this.device_id}, Type=${this.device_type}`);
 
     try {
-      // Log current state before change
-      this.log.info(`🔍 Current light state: ${this.light_on ? 'ON' : 'OFF'}`);
+      this.log.info(`Current light state: ${this.light_on ? 'ON' : 'OFF'}`);
 
-      // Send command via WebSocket
       const propId = this.getId('light', HaierACDevice.COMMANDS.LIGHT);
       await this.api.setDeviceProperty(this.mac, propId, value);
 
-      // Update local state
       this.light_on = value;
-      this.log.info(`✅ Light state updated to: ${this.light_on ? 'ON' : 'OFF'}`);
+      this.log.info(`Light state updated to: ${this.light_on ? 'ON' : 'OFF'}`);
 
-      // Emit event
       this.emit('lightChanged', value);
     } catch (error) {
-      this.log.error(`❌ Error setting light: ${error}`);
+      this.log.error(`Error setting light: ${error}`);
       throw error;
     }
   }
@@ -178,22 +170,19 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * Turn on the air conditioner
    */
   async switch_on(): Promise<void> {
-    this.log.info(`🔌 Turning ON device ${this.device_name}`);
+    this.log.info(`Turning ON device ${this.device_name}`);
 
     try {
-      // Then turn on the device using WebSocket API
-      this.log.info(`📤 Sending power ON command`);
+      this.log.info(`Sending power ON command`);
       const propId = this.getId('status', HaierACDevice.COMMANDS.POWER);
       await this.api.setDeviceProperty(this.mac, propId, true);
 
-      // Update local state
       this.status = 1;
-      this.log.info(`✅ Device powered ON successfully`);
+      this.log.info(`Device powered ON successfully`);
 
-      // Emit event
       this.emit('powerChanged', true);
     } catch (error) {
-      this.log.error(`❌ Error turning device ON: ${error}`);
+      this.log.error(`Error turning device ON: ${error}`);
       throw error;
     }
   }
@@ -202,22 +191,20 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * Turn off the air conditioner
    */
   async switch_off(): Promise<void> {
-    this.log.info(`🔌 Turning OFF device ${this.device_name}`);
+    this.log.info(`Turning OFF device ${this.device_name}`);
 
     try {
       // Send power off command using WebSocket API
-      this.log.info(`📤 Sending power OFF command`);
+      this.log.info(`Sending power OFF command`);
       const propId = this.getId('status', HaierACDevice.COMMANDS.POWER);
       await this.api.setDeviceProperty(this.mac, propId, false);
 
-      // Update local state
       this.status = 0;
-      this.log.info(`✅ Device powered OFF successfully`);
+      this.log.info(`Device powered OFF successfully`);
 
-      // Emit event
       this.emit('powerChanged', false);
     } catch (error) {
-      this.log.error(`❌ Error turning device OFF: ${error}`);
+      this.log.error(`Error turning device OFF: ${error}`);
       throw error;
     }
   }
@@ -227,11 +214,11 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * @param mode The fan mode to set (high, medium, low, auto)
    */
   async set_fan_mode(mode: string): Promise<void> {
-    this.log.info(`💨 Setting fan mode for ${this.device_name} to ${mode}`);
+    this.log.info(`Setting fan mode for ${this.device_name} to ${mode}`);
 
     if (!this.isValidFanMode(mode)) {
       const error = `Invalid fan mode: ${mode}`;
-      this.log.error(`❌ ${error}`);
+      this.log.error(`${error}`);
       throw new Error(error);
     }
 
@@ -255,51 +242,41 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
           throw new Error(`Unsupported fan mode: ${mode}`);
       }
 
-      this.log.info(`📤 Sending fan mode command: ${mode} (value: ${commandValue})`);
+      this.log.info(`Sending fan mode command: ${mode} (value: ${commandValue})`);
       const propId = this.getId('fan_mode', HaierACDevice.COMMANDS.FAN_SPEED);
       const valueToSend = this.modelConfig.mapValueToHaier(this.device_model, 'fan_mode', mode);
       await this.api.setDeviceProperty(this.mac, propId, valueToSend || commandValue);
 
-      // Update local state
       this.fan_mode = mode;
-      this.log.info(`✅ Fan mode set to ${mode}`);
+      this.log.info(`Fan mode set to ${mode}`);
 
-      // Emit event
       this.emit('fanModeChanged', mode);
     } catch (error) {
-      this.log.error(`❌ Error setting fan mode: ${error}`);
+      this.log.error(`Error setting fan mode: ${error}`);
       throw error;
     }
   }
 
-  // Enhanced swing control
   /**
-   * Set the swing mode for the air conditioner
-   * @param mode The swing mode to set (off, upper, position_1, bottom, position_2, position_3, position_4, position_5, auto, special)
-   */
-    /**
    * Set the swing mode for the air conditioner's vertical blinds
    * This method supports both string mode names and numeric tilt angles
    * @param mode The swing mode to set ('off', 'upper', 'position_1', etc.) or a tilt angle (-90 to 90)
    */
   async set_swing_mode(mode: string | number): Promise<void> {
-    this.log.info(`🔄 Setting vertical blinds for ${this.device_name} to ${mode}`);
+    this.log.info(`Setting vertical blinds for ${this.device_name} to ${mode}`);
 
     let commandValue: string;
 
-    // Handle numeric tilt angle input (for HomeKit Slats service)
     if (typeof mode === 'number') {
-      // Convert tilt angle (-90 to 90) to swing mode command (0 to 9)
       commandValue = this.tiltAngleToCommandValue(mode);
-      this.log.info(`ℹ️ Converted tilt angle ${mode}° to command value ${commandValue}`);
+      this.log.info(`Converted tilt angle ${mode} to command value ${commandValue}`);
 
-      // Update mode to be the string representation for our internal state
       mode = this.commandValueToSwingMode(commandValue);
     } else {
       // Handle string mode input
       if (!this.isValidSwingMode(mode)) {
         const error = `Invalid swing mode: ${mode}`;
-        this.log.error(`❌ ${error}`);
+        this.log.error(`${error}`);
         throw new Error(error);
       }
 
@@ -341,14 +318,12 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
     }
 
     try {
-      this.log.info(`📤 Sending vertical blinds command: ${mode} (value: ${commandValue})`);
+      this.log.info(`Sending vertical blinds command: ${mode} (value: ${commandValue})`);
       await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.VERTICAL_SWING, commandValue);
 
-      // Update local state
       this.swing_mode = mode as string;
-      this.log.info(`✅ Vertical blinds set to ${mode}`);
+      this.log.info(`Vertical blinds set to ${mode}`);
 
-      // Emit events
       this.emit('swingModeChanged', mode);
       this.emit('verticalBlindsChanged', {
         mode: mode,
@@ -356,7 +331,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
         tiltAngle: this.swingModeToTiltAngle(mode as string)
       });
     } catch (error) {
-      this.log.error(`❌ Error setting vertical blinds: ${error}`);
+      this.log.error(`Error setting vertical blinds: ${error}`);
       throw error;
     }
   }
@@ -399,77 +374,64 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
     }
   }
 
-  // Enhanced preset mode controls
-        /**
+  /**
    * Set the quiet mode (mute) for the air conditioner
    * @param enabled true to enable quiet mode, false to disable
    */
   async set_quiet_mode(enabled: boolean): Promise<void> {
-    this.log.info(`🔇 Setting quiet mode for ${this.device_name} to ${enabled ? 'ON' : 'OFF'}`);
+    this.log.info(`Setting quiet mode for ${this.device_name} to ${enabled ? 'ON' : 'OFF'}`);
 
     try {
       if (enabled) {
         await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.QUIET, true);
 
-        // Update local states
         this.quiet = enabled;
         this.turbo = false;
 
-        // Emit events
         this.emit('quietModeChanged', enabled);
         this.emit('turboModeChanged', false);
       } else {
-        // If disabling quiet mode, just send a single command
-        this.log.info(`📤 Sending quiet mode command: OFF`);
+        this.log.info(`Sending quiet mode command: OFF`);
         await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.QUIET, false);
 
-        // Update local state
         this.quiet = false;
-
-        // Emit event
         this.emit('quietModeChanged', false);
       }
 
-      this.log.info(`✅ Quiet mode operation completed successfully`);
+      this.log.info(`Quiet mode operation completed successfully`);
     } catch (error) {
-      this.log.error(`❌ Error setting quiet mode: ${error}`);
+      this.log.error(`Error setting quiet mode: ${error}`);
       throw error;
     }
   }
 
-        /**
+  /**
    * Set the turbo mode (rapid mode) for the air conditioner
    * @param enabled true to enable turbo mode, false to disable
    */
   async set_turbo_mode(enabled: boolean): Promise<void> {
-    this.log.info(`🚀 Setting turbo mode for ${this.device_name} to ${enabled ? 'ON' : 'OFF'}`);
+    this.log.info(`Setting turbo mode for ${this.device_name} to ${enabled ? 'ON' : 'OFF'}`);
 
     try {
       if (enabled) {
         await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.TURBO, true);
 
-        // Update local states
         this.turbo = enabled;
         this.quiet = false;
 
-        // Emit events
         this.emit('turboModeChanged', enabled);
         this.emit('quietModeChanged', false);
       } else {
-        // If disabling turbo mode, just send a single command
-        this.log.info(`📤 Sending turbo mode command: OFF`);
+        this.log.info(`Sending turbo mode command: OFF`);
         await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.TURBO, false);
 
-        // Update local state
         this.turbo = false;
-
-        // Emit event
         this.emit('turboModeChanged', false);
       }
 
-      this.log.info(`✅ Turbo mode operation completed successfully`);
+      this.log.info(`Turbo mode operation completed successfully`);
     } catch (error) {
-      this.log.error(`❌ Error setting turbo mode: ${error}`);
+      this.log.error(`Error setting turbo mode: ${error}`);
       throw error;
     }
   }
@@ -479,20 +441,18 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * @param enabled true to enable comfort mode, false to disable
    */
   async set_comfort_mode(enabled: boolean): Promise<void> {
-    this.log.info(`😴 Setting comfort mode for ${this.device_name} to ${enabled ? 'ON' : 'OFF'}`);
+    this.log.info(`Setting comfort mode for ${this.device_name} to ${enabled ? 'ON' : 'OFF'}`);
 
     try {
-      this.log.info(`📤 Sending comfort mode command: ${enabled ? 'ON' : 'OFF'}`);
+      this.log.info(`Sending comfort mode command: ${enabled ? 'ON' : 'OFF'}`);
       await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.COMFORT, enabled);
 
-      // Update local state
       this.comfort = enabled;
-      this.log.info(`✅ Comfort mode set to ${enabled ? 'ON' : 'OFF'}`);
+      this.log.info(`Comfort mode set to ${enabled ? 'ON' : 'OFF'}`);
 
-      // Emit event
       this.emit('comfortModeChanged', enabled);
     } catch (error) {
-      this.log.error(`❌ Error setting comfort mode: ${error}`);
+      this.log.error(`Error setting comfort mode: ${error}`);
       throw error;
     }
   }
@@ -502,27 +462,23 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * @param enabled true to enable health mode, false to disable
    */
   async set_health_mode(enabled: boolean): Promise<void> {
-    this.log.info(`🌿 Setting health mode for ${this.device_name} to ${enabled ? 'ON' : 'OFF'}`);
+    this.log.info(`Setting health mode for ${this.device_name} to ${enabled ? 'ON' : 'OFF'}`);
 
     try {
-      this.log.info(`📤 Sending health mode command: ${enabled ? 'ON' : 'OFF'}`);
+      this.log.info(`Sending health mode command: ${enabled ? 'ON' : 'OFF'}`);
       await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.HEALTH, enabled);
 
-      // Update local state
       this.health = enabled;
-      this.log.info(`✅ Health mode set to ${enabled ? 'ON' : 'OFF'}`);
+      this.log.info(`Health mode set to ${enabled ? 'ON' : 'OFF'}`);
 
-      // Emit event
       this.emit('healthModeChanged', enabled);
     } catch (error) {
-      this.log.error(`❌ Error setting health mode: ${error}`);
+      this.log.error(`Error setting health mode: ${error}`);
       throw error;
     }
   }
 
-  // Light control is now handled by set_light method defined above
-
-    /**
+  /**
    * Sound mode has been removed as requested
    * @param enabled This parameter is ignored
    */
@@ -563,7 +519,6 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
     this.emit('autohumidityChanged', enabled);
   }
 
-  // Enhanced status update from AC data
   updateFromStatus(status: unknown) {
     this.log.info(`Updating AC status for ${this.device_name}`);
 
@@ -608,7 +563,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
   private updateFromWebSocketStatus(properties: Record<string, unknown>) {
     this.log.info(`Processing WebSocket properties for ${this.device_name}:`, JSON.stringify(properties, null, 2));
 
-    const changes: Record<string, { old: any, new: any }> = {};
+    const changes: Record<string, { old: unknown; new: unknown }> = {};
 
     Object.entries(properties).forEach(([propertyId, value]) => {
       this.log.info(`Processing WebSocket property ${propertyId} = ${value}`);
@@ -669,13 +624,8 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
             changes.swing_mode = { old: this.swing_mode, new: swingMode };
             this.swing_mode = swingMode;
 
-            // Emit events for vertical blinds changes
-            this.log.info(`🔄 Vertical blinds changed from ${changes.swing_mode.old} to ${changes.swing_mode.new}`);
-
-            // Calculate tilt angle for the new swing mode
+            this.log.info(`Vertical blinds changed from ${changes.swing_mode.old} to ${changes.swing_mode.new}`);
             const tiltAngle = this.swingModeToTiltAngle(swingMode);
-
-            // Emit events
             this.emit('swingModeChanged', swingMode);
             this.emit('verticalBlindsChanged', {
               mode: swingMode,
@@ -703,7 +653,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
             // If quiet mode is enabled, automatically update turbo mode state to false
             if (quietMode) {
-              this.log.info(`ℹ️ Quiet mode enabled from WebSocket, updating turbo mode state to OFF`);
+              this.log.info(`Quiet mode enabled from WebSocket, updating turbo mode state to OFF`);
               changes.turbo = { old: this.turbo, new: false };
               this.turbo = false;
             }
@@ -719,7 +669,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
             // If turbo mode is enabled, automatically update quiet mode state to false
             if (turboMode) {
-              this.log.info(`ℹ️ Turbo mode enabled from WebSocket, updating quiet mode state to OFF`);
+              this.log.info(`Turbo mode enabled from WebSocket, updating quiet mode state to OFF`);
               changes.quiet = { old: this.quiet, new: false };
               this.quiet = false;
             }
@@ -762,17 +712,17 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
         }
 
         case '12': { // screenDisplayStatus (light)
-          this.log.info(`💡 Processing light property update: value=${value}`);
+          this.log.info(`Processing light property update: value=${value}`);
 
           const lightMode = value === '1';
           if (lightMode !== this.light_on) {
             changes.light = { old: this.light_on, new: lightMode };
-            this.log.info(`🔄 Light state changing from ${this.light_on ? 'ON' : 'OFF'} to ${lightMode ? 'ON' : 'OFF'}`);
+            this.log.info(`Light state changing from ${this.light_on ? 'ON' : 'OFF'} to ${lightMode ? 'ON' : 'OFF'}`);
 
             this.light_on = lightMode;
             this.emit('lightChanged', this.light_on);
           } else {
-            this.log.info(`ℹ️ Light state unchanged: ${this.light_on ? 'ON' : 'OFF'}`);
+            this.log.info(`Light state unchanged: ${this.light_on ? 'ON' : 'OFF'}`);
           }
           break;
         }
@@ -799,7 +749,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
   private updateFromAttributeStatus(attributes: unknown[]) {
     // Track changes to emit events later
-    const changes: Record<string, { old: any, new: any }> = {};
+    const changes: Record<string, { old: unknown; new: unknown }> = {};
 
     attributes.forEach(attr => {
       if (attr && typeof attr === 'object' && 'name' in attr && 'currentValue' in attr) {
@@ -963,7 +913,6 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
     if (Object.keys(changes).length > 0) {
       this.log.info(`AC ${this.device_name} attribute status changes:`, JSON.stringify(changes, null, 2));
 
-      // Emit events for each changed property
       if (changes.target_temperature) {
         this.emit('temperatureChanged', this.target_temperature);
       }
@@ -1030,7 +979,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
     // Handle direct property updates (fallback)
     if (typeof status === 'object') {
       const statusObj = status as Record<string, unknown>;
-      const changes: Record<string, { old: any, new: any }> = {};
+      const changes: Record<string, { old: unknown; new: unknown }> = {};
 
       if (statusObj.target_temperature !== undefined) {
         const targetTemp = parseFloat(String(statusObj.target_temperature));
@@ -1075,13 +1024,8 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
         changes.swing_mode = { old: this.swing_mode, new: newSwingMode };
         this.swing_mode = newSwingMode;
 
-        // Emit events for vertical blinds changes
-        this.log.info(`🔄 Vertical blinds direct update from ${changes.swing_mode.old} to ${changes.swing_mode.new}`);
-
-        // Calculate tilt angle for the new swing mode
+        this.log.info(`Vertical blinds direct update from ${changes.swing_mode.old} to ${changes.swing_mode.new}`);
         const tiltAngle = this.swingModeToTiltAngle(newSwingMode);
-
-        // Emit events
         this.emit('swingModeChanged', newSwingMode);
         this.emit('verticalBlindsChanged', {
           mode: newSwingMode,
@@ -1172,12 +1116,12 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
       }
 
       // Call the base class updateFromStatus to handle device information and other base properties
-      super.updateFromStatus(status as any);
+      super.updateFromStatus(status);
     }
   }
 
   private mapOperationMode(modeValue: string): string {
-    const modeMap: { [key: string]: string } = {
+    const modeMap: Record<string, string> = {
       '0': 'auto',
       '1': 'cool',
       '2': 'dry',
@@ -1188,7 +1132,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
   }
 
   private mapFanMode(fanValue: string): string {
-    const fanMap: { [key: string]: string } = {
+    const fanMap: Record<string, string> = {
       '1': 'high',
       '2': 'medium',
       '3': 'low',
@@ -1212,7 +1156,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * @returns The corresponding swing mode string
    */
   private commandValueToSwingMode(commandValue: string): string {
-    const swingMap: { [key: string]: string } = {
+    const swingMap: Record<string, string> = {
       '0': 'off',
       '1': 'upper',
       '2': 'position_1',

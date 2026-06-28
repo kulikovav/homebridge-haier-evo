@@ -41,7 +41,7 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": ">=22.12.0",
+    "node": ">=24.0.0",
     "homebridge": ">=2.0.0"
   },
   "files": [
@@ -53,7 +53,8 @@
     "axios": "^1.18.1",
     "dotenv": "^17.4.2",
     "uuid": "^13.0.0",
-    "ws": "^8.21.0"
+    "ws": "^8.21.0",
+    "zod": "^4.4.3"
   },
   "peerDependencies": {
     "homebridge": "^2.0.0"
@@ -61,7 +62,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.12.0",
+    "@types/node": "^24.0.0",
     "@types/ws": "^8.5.0",
     "@typescript-eslint/eslint-plugin": "^8.62.0",
     "@typescript-eslint/parser": "^8.62.0",
@@ -76,6 +77,9 @@
     "ts-jest": "^29.4.0",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.62.0"
+  },
+  "overrides": {
+    "js-yaml": ">=4.2.0"
   },
   "repository": {
     "type": "git",
