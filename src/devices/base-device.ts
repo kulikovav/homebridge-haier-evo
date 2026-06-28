@@ -69,7 +69,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
 
     apiClient.on('device_status_update', this.handleDeviceStatusUpdate as (...args: unknown[]) => void);
 
-    apiClient.on('deviceStatusUpdate', this.handleLegacyStatusUpdate as (...args: unknown[]) => void);
+    apiClient.on('deviceStatusUpdate', this.handleLegacyStatusUpdate);
 
     // Do an initial status fetch to get the current state
     this.fetchInitialStatus();
@@ -138,25 +138,25 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
         // Extract key properties for logging
         if (config.attributes && Array.isArray(config.attributes)) {
           // Log temperature values if found
-          const tempAttr = config.attributes.find((attr: unknown) =>
+          const tempAttr: unknown = config.attributes.find((attr: unknown) =>
             attr && typeof attr === 'object' && 'name' in (attr as { name?: string; currentValue?: string }) && (attr as { name?: string; currentValue?: string }).name === '36' && 'currentValue' in (attr as { name?: string; currentValue?: string })
           );
           if (tempAttr) {
-            this.log.info(`Found current temperature for device ${this.mac}: ${(tempAttr as { currentValue: string }).currentValue}°C`);
+            this.log.info(`Found current temperature for device ${this.mac}: ${String((tempAttr as Record<string, unknown>).currentValue)}°C`);
           }
 
-          const targetTempAttr = config.attributes.find((attr: unknown) =>
+          const targetTempAttr: unknown = config.attributes.find((attr: unknown) =>
             attr && typeof attr === 'object' && 'name' in (attr as { name?: string; currentValue?: string }) && (attr as { name?: string; currentValue?: string }).name === '0' && 'currentValue' in (attr as { name?: string; currentValue?: string })
           );
           if (targetTempAttr) {
-            this.log.info(`Found target temperature for device ${this.mac}: ${(targetTempAttr as { currentValue: string }).currentValue}°C`);
+            this.log.info(`Found target temperature for device ${this.mac}: ${String((targetTempAttr as Record<string, unknown>).currentValue)}°C`);
           }
 
-          const powerAttr = config.attributes.find((attr: unknown) =>
+          const powerAttr: unknown = config.attributes.find((attr: unknown) =>
             attr && typeof attr === 'object' && 'name' in (attr as { name?: string; currentValue?: string }) && (attr as { name?: string; currentValue?: string }).name === '21' && 'currentValue' in (attr as { name?: string; currentValue?: string })
           );
           if (powerAttr) {
-            const powerStatus = (powerAttr as { currentValue: string }).currentValue === '1' ? 'ON' : 'OFF';
+            const powerStatus = String((powerAttr as Record<string, unknown>).currentValue) === '1' ? 'ON' : 'OFF';
             this.log.info(`Found power status for device ${this.mac}: ${powerStatus}`);
           }
         }
@@ -362,8 +362,9 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
   abstract set_light(enabled: boolean): Promise<void>;
   // Sound mode has been removed as requested
   // Default implementation that does nothing
-  async set_sound(enabled: boolean): Promise<void> {
+  set_sound(_enabled: boolean): Promise<void> {
     this.log.info(`Sound mode has been removed from the plugin`);
+    return Promise.resolve();
   }
   abstract set_antifreeze(enabled: boolean): Promise<void>;
   abstract set_cleaning(enabled: boolean): Promise<void>;
@@ -393,7 +394,7 @@ export abstract class BaseDevice extends EventEmitter implements HaierDevice {
     const apiClient = this.api as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void; getDeviceStatus: (mac: string) => Promise<Record<string, unknown>>; removeListener: (event: string, listener: (...args: unknown[]) => void) => void };
     if (apiClient && typeof apiClient.removeListener === 'function') {
       apiClient.removeListener('device_status_update', this.handleDeviceStatusUpdate as (...args: unknown[]) => void);
-      apiClient.removeListener('deviceStatusUpdate', this.handleLegacyStatusUpdate as (...args: unknown[]) => void);
+      apiClient.removeListener('deviceStatusUpdate', this.handleLegacyStatusUpdate);
     }
 
     // Remove all other event listeners

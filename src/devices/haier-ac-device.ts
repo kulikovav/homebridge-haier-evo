@@ -112,7 +112,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.emit('modeChanged', mode);
     } catch (error) {
-      this.log.error(`Error setting operation mode: ${error}`);
+      this.log.error(`Error setting operation mode: ${String(error)}`);
       throw error;
     }
   }
@@ -137,7 +137,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.emit('temperatureChanged', temp);
     } catch (error) {
-      this.log.error(`Error setting temperature: ${error}`);
+      this.log.error(`Error setting temperature: ${String(error)}`);
       throw error;
     }
   }
@@ -161,7 +161,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.emit('lightChanged', value);
     } catch (error) {
-      this.log.error(`Error setting light: ${error}`);
+      this.log.error(`Error setting light: ${String(error)}`);
       throw error;
     }
   }
@@ -182,7 +182,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.emit('powerChanged', true);
     } catch (error) {
-      this.log.error(`Error turning device ON: ${error}`);
+      this.log.error(`Error turning device ON: ${String(error)}`);
       throw error;
     }
   }
@@ -204,7 +204,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.emit('powerChanged', false);
     } catch (error) {
-      this.log.error(`Error turning device OFF: ${error}`);
+      this.log.error(`Error turning device OFF: ${String(error)}`);
       throw error;
     }
   }
@@ -252,7 +252,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.emit('fanModeChanged', mode);
     } catch (error) {
-      this.log.error(`Error setting fan mode: ${error}`);
+      this.log.error(`Error setting fan mode: ${String(error)}`);
       throw error;
     }
   }
@@ -321,17 +321,17 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
       this.log.info(`Sending vertical blinds command: ${mode} (value: ${commandValue})`);
       await this.api.setDeviceProperty(this.mac, HaierACDevice.COMMANDS.VERTICAL_SWING, commandValue);
 
-      this.swing_mode = mode as string;
+      this.swing_mode = mode;
       this.log.info(`Vertical blinds set to ${mode}`);
 
       this.emit('swingModeChanged', mode);
       this.emit('verticalBlindsChanged', {
         mode: mode,
         commandValue: commandValue,
-        tiltAngle: this.swingModeToTiltAngle(mode as string)
+        tiltAngle: this.swingModeToTiltAngle(mode)
       });
     } catch (error) {
-      this.log.error(`Error setting vertical blinds: ${error}`);
+      this.log.error(`Error setting vertical blinds: ${String(error)}`);
       throw error;
     }
   }
@@ -400,7 +400,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.log.info(`Quiet mode operation completed successfully`);
     } catch (error) {
-      this.log.error(`Error setting quiet mode: ${error}`);
+      this.log.error(`Error setting quiet mode: ${String(error)}`);
       throw error;
     }
   }
@@ -431,7 +431,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.log.info(`Turbo mode operation completed successfully`);
     } catch (error) {
-      this.log.error(`Error setting turbo mode: ${error}`);
+      this.log.error(`Error setting turbo mode: ${String(error)}`);
       throw error;
     }
   }
@@ -452,7 +452,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.emit('comfortModeChanged', enabled);
     } catch (error) {
-      this.log.error(`Error setting comfort mode: ${error}`);
+      this.log.error(`Error setting comfort mode: ${String(error)}`);
       throw error;
     }
   }
@@ -473,7 +473,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
       this.emit('healthModeChanged', enabled);
     } catch (error) {
-      this.log.error(`Error setting health mode: ${error}`);
+      this.log.error(`Error setting health mode: ${String(error)}`);
       throw error;
     }
   }
@@ -482,8 +482,9 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
    * Sound mode has been removed as requested
    * @param enabled This parameter is ignored
    */
-  override async set_sound(enabled: boolean): Promise<void> {
+  override set_sound(_enabled: boolean): Promise<void> {
     this.log.info(`Sound mode has been removed from the plugin`);
+    return Promise.resolve();
   }
 
   async set_cleaning(enabled: boolean): Promise<void> {
@@ -544,7 +545,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
     // Handle status field directly (for online/offline status)
     if (status && typeof status === 'object' && 'status' in status) {
-      this.log.info(`Processing status update for ${this.device_name}: ${status.status}`);
+      this.log.info(`Processing status update for ${this.device_name}: ${String(status.status)}`);
       const newStatus = Number(status.status);
       if (this.status !== newStatus) {
         const oldStatus = this.status;
@@ -566,7 +567,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
     const changes: Record<string, { old: unknown; new: unknown }> = {};
 
     Object.entries(properties).forEach(([propertyId, value]) => {
-      this.log.info(`Processing WebSocket property ${propertyId} = ${value}`);
+      this.log.info(`Processing WebSocket property ${propertyId} = ${String(value)}`);
 
       switch (propertyId) {
         case '0': { // targetTemperature
@@ -624,7 +625,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
             changes.swing_mode = { old: this.swing_mode, new: swingMode };
             this.swing_mode = swingMode;
 
-            this.log.info(`Vertical blinds changed from ${changes.swing_mode.old} to ${changes.swing_mode.new}`);
+            this.log.info(`Vertical blinds changed from ${String(changes.swing_mode.old)} to ${String(changes.swing_mode.new)}`);
             const tiltAngle = this.swingModeToTiltAngle(swingMode);
             this.emit('swingModeChanged', swingMode);
             this.emit('verticalBlindsChanged', {
@@ -712,7 +713,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
         }
 
         case '12': { // screenDisplayStatus (light)
-          this.log.info(`Processing light property update: value=${value}`);
+          this.log.info(`Processing light property update: value=${String(value)}`);
 
           const lightMode = value === '1';
           if (lightMode !== this.light_on) {
@@ -734,7 +735,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
         default:
           // Unknown property ID - log it for debugging
-          this.log.info(`Unknown property ID: ${propertyId} = ${value}`);
+          this.log.info(`Unknown property ID: ${propertyId} = ${String(value)}`);
           break;
       }
     });
@@ -967,7 +968,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
     private updateFromDirectStatus(status: unknown) {
     // Check if status is empty or undefined
-    if (!status || (typeof status === 'object' && Object.keys(status as object).length === 0)) {
+    if (!status || (typeof status === 'object' && Object.keys(status).length === 0)) {
       this.log.info(`Warning: Empty status data for ${this.device_name}, using cached values`);
       this.log.info(`Will wait for WebSocket updates for device ${this.device_name}`);
       return;
@@ -1024,7 +1025,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
         changes.swing_mode = { old: this.swing_mode, new: newSwingMode };
         this.swing_mode = newSwingMode;
 
-        this.log.info(`Vertical blinds direct update from ${changes.swing_mode.old} to ${changes.swing_mode.new}`);
+        this.log.info(`Vertical blinds direct update from ${String(changes.swing_mode.old)} to ${String(changes.swing_mode.new)}`);
         const tiltAngle = this.swingModeToTiltAngle(newSwingMode);
         this.emit('swingModeChanged', newSwingMode);
         this.emit('verticalBlindsChanged', {
@@ -1316,8 +1317,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
   }
 
   // Implement missing abstract methods from BaseDevice
-  async set_swing_horizontal_mode(_mode: string): Promise<void> {
-    // Horizontal swing not supported by this AC model
+  set_swing_horizontal_mode(_mode: string): Promise<void> {
     throw new Error('Horizontal swing mode not supported by this AC device');
   }
 
@@ -1364,8 +1364,7 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
 
   // These methods are already implemented above with enhanced functionality
 
-  async set_eco_sensor(_mode: string): Promise<void> {
-    // Eco sensor not supported by this AC model
+  set_eco_sensor(_mode: string): Promise<void> {
     throw new Error('Eco sensor mode not supported by this AC device');
   }
 

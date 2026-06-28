@@ -251,6 +251,19 @@ export interface PropertyMappings {
 
 
 export interface HaierRefrigerator extends HaierDevice {
+  // Refrigerator-specific properties
+  freezer_temperature: number;
+  refrigerator_temperature: number;
+  myzone_temperature: number;
+  ambient_temperature: number;
+  eco_mode: boolean;
+  vacation_mode: boolean;
+  defrost_mode: boolean;
+  super_cool_mode: boolean;
+  super_freeze_mode: boolean;
+  refrigerator_door_open: boolean;
+  freezer_door_open: boolean;
+
   // Refrigerator-specific methods
   set_freezer_temperature(temp: number): Promise<void>;
   set_refrigerator_temperature(temp: number): Promise<void>;

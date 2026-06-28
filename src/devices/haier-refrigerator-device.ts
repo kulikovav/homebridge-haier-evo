@@ -150,14 +150,13 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Power control methods (inherited from base)
-  async switch_on(mode?: string): Promise<void> {
-    // Refrigerators are always on when plugged in
+  switch_on(_mode?: string): Promise<void> {
     this.status = 1;
     this.emit('powerChanged', true);
+    return Promise.resolve();
   }
 
-  async switch_off(): Promise<void> {
-    // Refrigerators cannot be turned off via API
+  switch_off(): Promise<void> {
     throw new Error('Refrigerators cannot be turned off via API for safety reasons');
   }
 
@@ -536,23 +535,20 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Implement missing abstract methods from BaseDevice
-  async set_operation_mode(mode: string): Promise<void> {
-    // Refrigerators don't have operation modes like AC units
+  set_operation_mode(mode: string): Promise<void> {
     this.log.info(`Operation mode not supported for refrigerator: ${mode}`);
+    return Promise.resolve();
   }
 
-  async set_fan_mode(mode: string): Promise<void> {
-    // Refrigerators don't have fan modes
+  set_fan_mode(_mode: string): Promise<void> {
     throw new Error('Fan mode not supported by refrigerator devices');
   }
 
-  async set_swing_mode(mode: string): Promise<void> {
-    // Refrigerators don't have swing modes
+  set_swing_mode(_mode: string): Promise<void> {
     throw new Error('Swing mode not supported by refrigerator devices');
   }
 
-  async set_swing_horizontal_mode(mode: string): Promise<void> {
-    // Refrigerators don't have horizontal swing modes
+  set_swing_horizontal_mode(_mode: string): Promise<void> {
     throw new Error('Horizontal swing mode not supported by refrigerator devices');
   }
 
@@ -572,63 +568,51 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
     }
   }
 
-  async set_quiet(enabled: boolean): Promise<void> {
-    // Refrigerators don't have quiet mode
+  set_quiet(_enabled: boolean): Promise<void> {
     throw new Error('Quiet mode not supported by refrigerator devices');
   }
 
-  async set_turbo(enabled: boolean): Promise<void> {
-    // Refrigerators don't have turbo mode
+  set_turbo(_enabled: boolean): Promise<void> {
     throw new Error('Turbo mode not supported by refrigerator devices');
   }
 
-  async set_comfort(enabled: boolean): Promise<void> {
-    // Refrigerators don't have comfort mode
+  set_comfort(_enabled: boolean): Promise<void> {
     throw new Error('Comfort mode not supported by refrigerator devices');
   }
 
-  async set_health(enabled: boolean): Promise<void> {
-    // Refrigerators don't have health mode
+  set_health(_enabled: boolean): Promise<void> {
     throw new Error('Health mode not supported by refrigerator devices');
   }
 
-  async set_light(enabled: boolean): Promise<void> {
-    // Refrigerators don't have light control
+  set_light(_enabled: boolean): Promise<void> {
     throw new Error('Light control not supported by refrigerator devices');
   }
 
-  async set_sound(enabled: boolean): Promise<void> {
-    // Refrigerators don't have sound control
+  set_sound(_enabled: boolean): Promise<void> {
     throw new Error('Sound control not supported by refrigerator devices');
   }
 
-  async set_antifreeze(enabled: boolean): Promise<void> {
-    // Refrigerators don't have antifreeze mode
+  set_antifreeze(_enabled: boolean): Promise<void> {
     throw new Error('Antifreeze mode not supported by refrigerator devices');
   }
 
-  async set_cleaning(enabled: boolean): Promise<void> {
-    // Refrigerators don't have cleaning mode
+  set_cleaning(_enabled: boolean): Promise<void> {
     throw new Error('Cleaning mode not supported by refrigerator devices');
   }
 
-  async set_autohumidity(enabled: boolean): Promise<void> {
-    // Refrigerators don't have auto humidity control
+  set_autohumidity(_enabled: boolean): Promise<void> {
     throw new Error('Auto humidity control not supported by refrigerator devices');
   }
 
-  async set_eco_sensor(mode: string): Promise<void> {
-    // Refrigerators don't have eco sensor
+  set_eco_sensor(_mode: string): Promise<void> {
     throw new Error('Eco sensor not supported by refrigerator devices');
   }
 
-  async set_sleep_mode(enabled: boolean): Promise<void> {
-    // Refrigerators don't have sleep mode
+  set_sleep_mode(_enabled: boolean): Promise<void> {
     throw new Error('Sleep mode not supported by refrigerator devices');
   }
 
-  async set_boost_mode(enabled: boolean): Promise<void> {
-    // Refrigerators don't have boost mode
+  set_boost_mode(_enabled: boolean): Promise<void> {
     throw new Error('Boost mode not supported by refrigerator devices');
   }
 }

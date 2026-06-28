@@ -25,27 +25,31 @@ export default [
     plugins: {
       '@typescript-eslint': typescript,
     },
-          rules: {
-        ...typescript.configs.recommended.rules,
+    rules: {
+      ...typescript.configs.recommended.rules,
 
-        // Custom rules for this project - less strict for publishing
-        '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-        '@typescript-eslint/explicit-function-return-type': 'off',
-        '@typescript-eslint/explicit-module-boundary-types': 'off',
-        '@typescript-eslint/no-explicit-any': 'off', // Allow any for now
-        '@typescript-eslint/no-var-requires': 'warn',
-        '@typescript-eslint/no-unsafe-argument': 'warn',
-        '@typescript-eslint/no-unsafe-member-access': 'warn',
-        '@typescript-eslint/no-unsafe-assignment': 'warn',
-        '@typescript-eslint/no-misused-promises': 'warn',
-        '@typescript-eslint/restrict-template-expressions': 'warn',
-        '@typescript-eslint/require-await': 'warn',
+      // Custom rules for this project
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-var-requires': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/restrict-template-expressions': 'error',
+      '@typescript-eslint/require-await': 'error',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'error',
 
-        // General rules
-        'no-console': 'warn',
-        'no-var': 'warn',
-        'no-undef': 'warn',
-      },
+      // General rules
+      'no-console': 'warn',
+      'no-var': 'error',
+      'no-undef': 'error',
+      'no-constant-condition': 'error',
+      'no-empty': 'error',
+    },
   },
 
   // Test files configuration
