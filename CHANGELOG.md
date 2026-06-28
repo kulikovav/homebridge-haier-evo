@@ -65,4 +65,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.2] - 2025-11-02
 - Remove RATE_LIMITING.md documentation file, consolidating rate limiting and retry logic details into the main codebase for improved clarity and accessibility.
 
+## [2.0.0] - 2026-06-28
+
+### BREAKING CHANGES
+
+- **ESM-only**: The plugin is now an ES Module (`"type": "module"`). Cannot be loaded via `require()`.
+- **Node.js >=22.12.0 required**: Dropped support for Node.js 14-20. Homebridge 2.x requires Node.js 22 or 24.
+- **Homebridge >=2.0.0 required**: Moved Homebridge to `peerDependencies: ^2.0.0`. Homebridge 1.x users must upgrade Homebridge first.
+- **Import paths changed**: All relative imports now use `.js` extensions per ESM spec.
+
+### Changed
+
+- **Dependency updates**: axios 1.18, ws 8.21, dotenv 17.4, TypeScript 5.5, Jest 30, uuid 13, @typescript-eslint 8.62
+- **Logging modernized**: Replaced all `console.log` calls with Homebridge Logger (`this.log.info`/`this.log.debug`)
+- **Stability hardened**: Added WebSocket state machine, connection race condition fixes, timer cleanup
+- **Status request debouncing**: Multiple rapid commands no longer fire redundant all-device status requests
+
+### Fixed
+
+- Resource leaks: All timers now properly cleaned up on disconnect/destroy
+- Event listener accumulation on platform restart
+- WebSocket disconnect race condition preventing clean shutdown
+
 ## [Unreleased]

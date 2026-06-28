@@ -43,6 +43,8 @@ export class HaierAPI extends EventEmitter {
   private devices: Map<string, HaierDevice> = new Map();
   private reconnectTimer: NodeJS.Timeout | null = null;
   private heartbeatTimer: NodeJS.Timeout | null = null;
+  private pendingStatusTimer: NodeJS.Timeout | null = null;
+  private initialStatusTimer: NodeJS.Timeout | null = null;
   private pendingStatusRequest = false;
   private isConnected = false;
   private connectionEstablished = false;
@@ -1204,6 +1206,8 @@ export class HaierAPI extends EventEmitter {
         this.log.info(`🔌 Connecting to WebSocket...`);
         this.log.info(`WebSocket status path: ${API_WEBSOCKET_STATUS}`);
 
+        this.wsState = 'connecting';
+
         // Ensure we have a valid token before connecting
         try {
           await this.ensureValidToken();
@@ -1236,6 +1240,7 @@ export class HaierAPI extends EventEmitter {
           this.log.info(`✅ WebSocket connected successfully`);
           this.isConnected = true;
           this.connectionEstablished = true;
+          this.wsState = 'connected';
           this.connectionAttempts = 0; // Reset connection attempts on successful connection
           this.emit('connected');
           this.startHeartbeat();
@@ -1246,7 +1251,9 @@ export class HaierAPI extends EventEmitter {
           try {
             const message = JSON.parse(data.toString());
 
+            if (this.config.debug) {
               this.log.debug(`WebSocket message received:`, JSON.stringify(message, null, 2));
+            }
             this.handleWebSocketMessage(message);
           } catch (error) {
             this.log.error(`Failed to parse WebSocket message:`, error);
@@ -1702,7 +1709,7 @@ export class HaierAPI extends EventEmitter {
     this.log.info(`🔄 Starting periodic status requests...`);
 
     // First request immediately after connection (with a small delay)
-    setTimeout(() => {
+    this.initialStatusTimer = setTimeout(() => {
       if (this.ws && this.isConnected) {
         this.log.info(`🔄 Sending initial status request...`);
         this.requestDeviceStatuses();
@@ -1724,6 +1731,10 @@ export class HaierAPI extends EventEmitter {
     if (this.statusRequestTimer) {
       clearInterval(this.statusRequestTimer);
       this.statusRequestTimer = null;
+    }
+    if (this.initialStatusTimer) {
+      clearTimeout(this.initialStatusTimer);
+      this.initialStatusTimer = null;
     }
   }
 
@@ -1795,6 +1806,11 @@ export class HaierAPI extends EventEmitter {
   }
 
   private scheduleReconnect(): void {
+    if (this.closing) {
+      this.log.info(`🔄 Skipping reconnect — platform is shutting down`);
+      return;
+    }
+
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
     }
@@ -2053,8 +2069,9 @@ export class HaierAPI extends EventEmitter {
           if (!this.pendingStatusRequest) {
             this.pendingStatusRequest = true;
             this.log.info(`🔄 Scheduling status update request in 1 second`);
-            setTimeout(() => {
+            this.pendingStatusTimer = setTimeout(() => {
               this.pendingStatusRequest = false;
+              this.pendingStatusTimer = null;
               this.requestDeviceStatuses();
             }, 1000);
           }
@@ -2069,6 +2086,8 @@ export class HaierAPI extends EventEmitter {
     }
 
   async disconnect(): Promise<void> {
+    this.closing = true;
+    this.wsState = 'disconnecting';
     if (this.ws) {
       this.ws.close();
     }
@@ -2088,6 +2107,11 @@ export class HaierAPI extends EventEmitter {
       this.statusRequestTimer = null;
     }
 
+    if (this.pendingStatusTimer) {
+      clearTimeout(this.pendingStatusTimer);
+      this.pendingStatusTimer = null;
+    }
+
     this.pendingStatusRequest = false;
 
     // Clear command batches and reject pending promises
@@ -2102,6 +2126,8 @@ export class HaierAPI extends EventEmitter {
     this.clearTokenRefreshTimer();
 
     this.isConnected = false;
+    this.closing = false;
+    this.wsState = 'closed';
   }
 
   async disconnectWebSocket(): Promise<void> {
