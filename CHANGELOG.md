@@ -121,4 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: restore debug log guards and add WebSocket status request debounce
 - refactor: bump version to 2.0.0 for ESM migration
 
+## [2.0.3] - 2026-06-29
+- fix: allow platform field in config schema
+
 ## [Unreleased]

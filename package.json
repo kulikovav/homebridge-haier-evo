@@ -1,6 +1,6 @@
 {
   "name": "homebridge-haier-evo",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Homebridge plugin for Haier Evo devices (air conditioners, refrigerators, etc.)",
   "type": "module",
   "main": "dist/index.js",
