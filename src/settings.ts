@@ -6,6 +6,7 @@ export const PLUGIN_NAME = 'homebridge-haier-evo';
 export const VALID_REGIONS = ['ru', 'kz', 'by'] as const;
 
 export const haierEvoConfigSchema = z.object({
+  platform: z.string().optional(),
   name: z.string().min(1, 'Name is required').default('Haier Evo'),
   email: z.string().email('Email must be a valid email address'),
   password: z.string().min(1, 'Password is required'),
