@@ -87,4 +87,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Event listener accumulation on platform restart
 - WebSocket disconnect race condition preventing clean shutdown
 
+## [2.1.0] - 2026-06-30
+- fix: allow platform field in config schema
+- docs: remove testing documentation files
+- fix(ci): add null guard for API log property in BaseDevice constructor
+- fix(review): apply findings #2, #3, #5 - async promise rejection, apiClient shim, DeviceStatus guard
+- fix(review): invert excludeNamePattern regex logic (P0 bug)
+- chore(deps): update dependencies (jiti, @types/node, uuid, globals)
+- chore(lint): strengthen ESLint rules and fix all violations
+- feat(validation): add Zod validation for API responses and improve error handling
+- refactor(types): tighten TypeScript types and remove AI slop across codebase
+- feat(config): add Zod validation for plugin configuration
+- fix: align CI workflows with Node.js 24 engine requirement
+- fix: resolve CI build failures from ESM migration
+- fix: apply review fixes - CI indentation, CHANGELOG, performance, dead code
+- refactor: ESM migration, dependency updates, stability hardening, AI slop removal
+- fix: restore debug log guards and add WebSocket status request debounce
+- refactor: bump version to 2.0.0 for ESM migration
+
 ## [Unreleased]
