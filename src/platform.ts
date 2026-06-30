@@ -7,11 +7,11 @@ import {
   Service,
   Characteristic
 } from 'homebridge';
-import { HaierAPI } from './haier-api';
-import { DeviceFactory } from './device-factory';
-import { HaierEvoAccessory } from './accessories/haier-evo-accessory';
-import { HaierEvoConfig } from './types';
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
+import { HaierAPI } from './haier-api.js';
+import { DeviceFactory } from './device-factory.js';
+import { HaierEvoAccessory } from './accessories/haier-evo-accessory.js';
+import { HaierEvoConfig, DeviceInfo } from './types.js';
+import { PLATFORM_NAME, PLUGIN_NAME, validateConfig, type HaierEvoConfigSchema } from './settings.js';
 
 export class HaierEvoPlatform {
   public readonly Service: typeof Service = this.api.hap.Service;
@@ -22,6 +22,8 @@ export class HaierEvoPlatform {
   private accessories: Map<string, HaierEvoAccessory> = new Map();
   private refreshTimer: NodeJS.Timeout | null = null;
 
+  private validatedConfig: HaierEvoConfigSchema;
+
   constructor(
     private readonly platform: DynamicPlatformPlugin,
     private readonly config: PlatformConfig,
@@ -31,11 +33,11 @@ export class HaierEvoPlatform {
     this.log = log;
     this.log.debug('Initializing Haier Evo platform');
 
-    // Validate configuration
-    this.validateConfig();
+    // Validate and normalize configuration using Zod
+    this.validatedConfig = validateConfig(config as unknown as Record<string, unknown>);
 
     // Initialize Haier API
-    this.haierAPI = new HaierAPI(this.config as unknown as HaierEvoConfig);
+    this.haierAPI = new HaierAPI(this.validatedConfig as unknown as HaierEvoConfig, this.log);
 
     // Set up event listeners
     this.setupEventListeners();
@@ -73,21 +75,6 @@ export class HaierEvoPlatform {
     } catch (error) {
       this.log.error('Failed to initialize platform:', error);
       throw error;
-    }
-  }
-
-  private validateConfig(): void {
-    const requiredFields = ['email', 'password', 'region'];
-    for (const field of requiredFields) {
-      if (!this.config[field]) {
-        throw new Error(`Missing required configuration field: ${field}`);
-      }
-    }
-
-    // Validate region
-    const validRegions = ['ru', 'kz', 'by'];
-    if (!validRegions.includes(this.config.region.toLowerCase())) {
-      throw new Error(`Invalid region: ${this.config.region}. Must be one of: ${validRegions.join(', ')}`);
     }
   }
 
@@ -197,8 +184,8 @@ export class HaierEvoPlatform {
   /**
    * Filter devices based on configuration criteria
    */
-  private filterDevices(devices: any[]): any[] {
-    const config = this.config as unknown as HaierEvoConfig;
+  private filterDevices(devices: DeviceInfo[]): DeviceInfo[] {
+    const config = this.validatedConfig;
 
     // If no filtering options are specified, return all devices
     if (!config.includeDevices &&
@@ -210,9 +197,12 @@ export class HaierEvoPlatform {
       return devices;
     }
 
-    return devices.filter(device => {
+    return devices.filter((device): device is DeviceInfo => {
       // Skip invalid devices
-      if (!device || !device.id || !device.name || !device.type) {
+      if (!device || typeof device !== 'object') {
+        return false;
+      }
+      if (!device.id || !device.name || !device.type) {
         return false;
       }
 
@@ -284,11 +274,11 @@ export class HaierEvoPlatform {
     });
   }
 
-  private async createAccessory(deviceInfo: any): Promise<void> {
+  private async createAccessory(deviceInfo: DeviceInfo): Promise<void> {
     const uuid = this.api.hap.uuid.generate(deviceInfo.id);
 
     // Check if accessory already exists
-    const existingAccessory = (this.platform as any).accessories.find((accessory: any) => accessory.UUID === uuid);
+    const existingAccessory = (this.platform as DynamicPlatformPlugin & { accessories: PlatformAccessory[] }).accessories.find((accessory) => accessory.UUID === uuid);
 
     if (existingAccessory) {
       this.log.info(`Restoring existing accessory: ${deviceInfo.name}`);
@@ -416,7 +406,7 @@ export class HaierEvoPlatform {
   }
 
   private startRefreshTimer(): void {
-    const refreshInterval = (this.config as unknown as HaierEvoConfig).refreshInterval || 300; // Default: 5 minutes
+    const refreshInterval = this.validatedConfig.refreshInterval ?? 300; // Default: 5 minutes
 
     this.refreshTimer = setInterval(async () => {
       try {
@@ -502,8 +492,8 @@ export class HaierEvoPlatform {
     this.api.updatePlatformAccessories([accessory]);
   }
 
-  getConfig(): HaierEvoConfig {
-    return this.config as unknown as HaierEvoConfig;
+  getConfig(): HaierEvoConfigSchema {
+    return this.validatedConfig;
   }
 
   public getAccessory(deviceId: string): HaierEvoAccessory | undefined {
@@ -516,13 +506,13 @@ export class HaierEvoPlatform {
       this.refreshTimer = null;
     }
 
-    // Destroy all accessories
     for (const accessory of this.accessories.values()) {
       accessory.destroy();
     }
     this.accessories.clear();
 
-    // Disconnect API
+    // Clean up HaierAPI: remove event listeners then disconnect
+    this.haierAPI.removeAllListeners();
     this.haierAPI.disconnect();
   }
 }

@@ -101,6 +101,7 @@ test-results.xml
 # Documentation build
 docs/build/
 docs/_build/
+docs/plans/
 
 # Backup files
 *.bak
@@ -135,7 +136,10 @@ npm-debug.log*
 !tests/refrigerator.data
 
 tests/integration/test-config.ts
+
 # Environment variables for testing
 .*
 !.gitignore
 !.npmignore
+!.kiloignore
+!.github

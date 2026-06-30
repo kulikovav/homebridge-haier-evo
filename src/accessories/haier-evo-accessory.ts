@@ -4,9 +4,9 @@ import {
   Logger,
   CharacteristicValue
 } from 'homebridge';
-import { HaierEvoPlatform } from '../platform';
-import { DeviceFactory } from '../device-factory';
-import { HaierDevice, DeviceInfo, DeviceStatus } from '../types';
+import { HaierEvoPlatform } from '../platform.js';
+import { DeviceFactory } from '../device-factory.js';
+import { HaierDevice, HaierRefrigerator, DeviceInfo, DeviceStatus } from '../types.js';
 
 export class HaierEvoAccessory {
   private device: HaierDevice;
@@ -54,7 +54,7 @@ export class HaierEvoAccessory {
     this.device = DeviceFactory.createDevice(deviceInfo, platform.getHaierAPI());
     try {
       // Register device in API for model lookup when sending commands
-      platform.getHaierAPI().addDevice(this.device as any);
+      platform.getHaierAPI().addDevice(this.device);
     } catch {
       this.log.debug('Device registration in API skipped (minimal/mock environment)');
     }
@@ -62,8 +62,7 @@ export class HaierEvoAccessory {
     // Skip initial config fetch since we already have complete device info from platform
     this.device.setSkipInitialFetch(true);
 
-                // Device info is now complete from efficient caching in fetchDevices()
-            this.log.debug(`Device ${deviceInfo.name} has complete info: model=${deviceInfo.model}, serial=${deviceInfo.serialNumber}, firmware=${deviceInfo.firmwareVersion}`);
+    this.log.debug(`Device ${deviceInfo.name} has complete info: model=${deviceInfo.model}, serial=${deviceInfo.serialNumber}, firmware=${deviceInfo.firmwareVersion}`);
 
     // Check if this is an existing accessory that already has services
     const isExistingAccessory = this.accessory.services.length > 1; // More than just AccessoryInformation
@@ -367,7 +366,7 @@ export class HaierEvoAccessory {
     // Persist structural changes so Homebridge updates cached services
     try {
       this.platform.updatePlatformAccessory(this.accessory);
-    } catch (_e) {
+    } catch {
       // In tests or minimal environments, platform may not expose updater
     }
   }
@@ -817,7 +816,7 @@ export class HaierEvoAccessory {
   private setupSimpleSwitchCharacteristics(
     service: Service,
     getter: () => boolean,
-    setter: (value: any) => Promise<void>
+    setter: (value: CharacteristicValue) => Promise<void>
   ): void {
     service.getCharacteristic(this.platform.Characteristic.On)
       .onGet(getter)
@@ -828,12 +827,12 @@ export class HaierEvoAccessory {
   private debugLog(message: string): void {
     try {
       const cfg = this.platform.getConfig();
-      if (cfg && (cfg as any).debug) {
+      if (cfg?.debug) {
         this.log.info(message);
       } else {
         this.log.debug(message);
       }
-    } catch (_e) {
+    } catch {
       this.log.debug(message);
     }
   }
@@ -893,7 +892,7 @@ export class HaierEvoAccessory {
         this._lastPublishedTemp = temperature;
         this.debugLog(`Temperature event published: ${temperature}`);
       } catch (error) {
-        this.log.debug(`Temperature event update failed: ${error}`);
+        this.log.debug(`Temperature event update failed: ${String(error)}`);
       }
     };
 
@@ -918,11 +917,11 @@ export class HaierEvoAccessory {
 
   private setupEventHandlers(): void {
     // Listen for device events
-    this.device.on('statusUpdated', (status) => {
+    this.device.on('statusUpdated', (status: DeviceStatus) => {
       this.updateCharacteristics(status);
     });
 
-    this.device.on('deviceInfoUpdated', (info) => {
+    this.device.on('deviceInfoUpdated', (info: { model?: string; serialNumber?: string; firmwareVersion?: string; deviceName?: string }) => {
       this.log.debug(`Device info updated for ${this.deviceInfo.name}:`, info);
 
       // Update the device itself
@@ -939,7 +938,7 @@ export class HaierEvoAccessory {
     });
 
     this.device.on('error', (error) => {
-      this.log.error(`Device error: ${error}`);
+      this.log.error(`Device error: ${String(error)}`);
     });
   }
 
@@ -1015,7 +1014,7 @@ export class HaierEvoAccessory {
         mode = 'auto';
         break;
       default:
-        throw new Error(`Invalid heater cooler state: ${value}`);
+        throw new Error(`Invalid heater cooler state: ${String(value)}`);
     }
 
     await this.device.set_operation_mode(mode);
@@ -1054,7 +1053,7 @@ export class HaierEvoAccessory {
     }
   }
 
-    // Blinds Fan service methods (using Fanv2 for blinds control)
+  // Blinds Fan service methods (using Fanv2 for blinds control)
   private getBlindsActive(): number {
     // Active when not in auto mode (manual control)
     return this.device.swing_mode !== 'auto' ?
@@ -1184,10 +1183,10 @@ export class HaierEvoAccessory {
     return temp;
   }
 
-  private async setTargetTemperature(value: any): Promise<void> {
+  private async setTargetTemperature(value: CharacteristicValue): Promise<void> {
     // Validate temperature value
     if (typeof value !== 'number' || isNaN(value)) {
-      throw new Error(`Invalid temperature value: ${value}`);
+      throw new Error(`Invalid temperature value: ${String(value)}`);
     }
 
     // Ensure temperature is within device limits
@@ -1202,7 +1201,7 @@ export class HaierEvoAccessory {
     return this.device.available && this.device.status > 0;
   }
 
-  private async setSwitchState(value: any): Promise<void> {
+  private async setSwitchState(value: CharacteristicValue): Promise<void> {
     if (value) {
       await this.device.switch_on();
     } else {
@@ -1216,7 +1215,7 @@ export class HaierEvoAccessory {
       this.platform.Characteristic.Active.INACTIVE;
   }
 
-  private async setFanActiveState(value: any): Promise<void> {
+  private async setFanActiveState(value: CharacteristicValue): Promise<void> {
     if (value === this.platform.Characteristic.Active.ACTIVE) {
       await this.device.switch_on();
     } else {
@@ -1249,7 +1248,7 @@ export class HaierEvoAccessory {
       this.platform.Characteristic.TargetFanState.MANUAL;
   }
 
-  private async setTargetFanState(value: any): Promise<void> {
+  private async setTargetFanState(value: CharacteristicValue): Promise<void> {
     if (value === this.platform.Characteristic.TargetFanState.AUTO) {
       await this.device.set_fan_mode('auto');
     } else {
@@ -1276,7 +1275,7 @@ export class HaierEvoAccessory {
     }
   }
 
-  private async setFanSpeed(value: any): Promise<void> {
+  private async setFanSpeed(value: CharacteristicValue): Promise<void> {
     let mode: string;
     const speed = Number(value);
 
@@ -1560,27 +1559,31 @@ export class HaierEvoAccessory {
 
   // Refrigerator-specific methods
   private getFreezerTemperature(): number {
-    return (this.device as any).freezer_temperature ?? -18;
+    const fridge = this.device as HaierRefrigerator;
+    return fridge.freezer_temperature ?? -18;
   }
 
   private getMyZoneTemperature(): number {
-    return (this.device as any).myzone_temperature ?? -5;
+    const fridge = this.device as HaierRefrigerator;
+    return fridge.myzone_temperature ?? -5;
   }
 
   private getAmbientTemperature(): number {
-    return (this.device as any).ambient_temperature ?? 25;
+    const fridge = this.device as HaierRefrigerator;
+    return fridge.ambient_temperature ?? 25;
   }
 
   private getRefrigeratorDoorState(): number {
-    // Map Haier door flag: true (open) -> NOT_DETECTED, false (closed) -> DETECTED
-    const isOpen: boolean = Boolean((this.device as any).refrigerator_door_open);
+    const fridge = this.device as HaierRefrigerator;
+    const isOpen = fridge.refrigerator_door_open ?? false;
     return isOpen
       ? this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
       : this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED;
   }
 
   private getFreezerDoorState(): number {
-    const isOpen: boolean = Boolean((this.device as any).freezer_door_open);
+    const fridge = this.device as HaierRefrigerator;
+    const isOpen = fridge.freezer_door_open ?? false;
     return isOpen
       ? this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
       : this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED;

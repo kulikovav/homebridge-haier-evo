@@ -4,7 +4,7 @@
  * This script demonstrates the various commands available for AC control
  */
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { HaierAPI } = require('./lib/haier-api');
 const { DeviceFactory } = require('./lib/device-factory');
 

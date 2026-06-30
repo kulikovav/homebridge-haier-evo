@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [24.x]
 
     steps:
     - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
       run: npm run test:unit
 
     - name: Run standalone device tests
-      run: node test-devices.js
+      run: node test-devices.cjs
 
     - name: Run standalone rate limiting tests
-      run: node test-rate-limiting.js
+      run: node test-rate-limiting.cjs

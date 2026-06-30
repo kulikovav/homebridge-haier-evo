@@ -9,7 +9,7 @@
  */
 
 // Load environment variables from .env file
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 const { HaierAPI } = require('./dist/haier-api');
 const { DeviceFactory } = require('./dist/device-factory');

@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Install dependencies
@@ -43,10 +43,10 @@ jobs:
         run: npm run test:unit
 
       - name: Run standalone device tests
-        run: node test-devices.js
+        run: node test-devices.cjs
 
       - name: Run standalone rate limiting tests
-        run: node test-rate-limiting.js
+        run: node test-rate-limiting.cjs
 
   publish-npm:
     needs: build
@@ -59,7 +59,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Install dependencies

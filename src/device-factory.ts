@@ -1,9 +1,10 @@
-import { DeviceInfo, HaierDevice, HaierAC, HaierRefrigerator } from './types';
-import { HaierACDevice } from './devices/haier-ac-device';
-import { HaierRefrigeratorDevice } from './devices/haier-refrigerator-device';
+import { DeviceInfo, HaierDevice, HaierAC, HaierRefrigerator } from './types.js';
+import { HaierACDevice } from './devices/haier-ac-device.js';
+import { HaierRefrigeratorDevice } from './devices/haier-refrigerator-device.js';
+import { HaierAPI } from './haier-api.js';
 
 export class DeviceFactory {
-  static createDevice(deviceInfo: DeviceInfo, api: any): HaierDevice {
+  static createDevice(deviceInfo: DeviceInfo, api: HaierAPI): HaierDevice {
     const deviceType = deviceInfo.type.toLowerCase();
 
     switch (deviceType) {

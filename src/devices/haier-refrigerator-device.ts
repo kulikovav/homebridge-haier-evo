@@ -1,6 +1,6 @@
-import { BaseDevice } from './base-device';
-import { HaierRefrigerator, DeviceInfo, DeviceStatus } from '../types';
-import { HaierAPI } from '../haier-api';
+import { BaseDevice } from './base-device.js';
+import { HaierRefrigerator, DeviceInfo, DeviceStatus } from '../types.js';
+import { HaierAPI } from '../haier-api.js';
 
 export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefrigerator {
   // Refrigerator-specific properties
@@ -150,15 +150,14 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Power control methods (inherited from base)
-  async switch_on(mode?: string): Promise<void> {
-    // Refrigerators are always on when plugged in
+  switch_on(_mode?: string): Promise<void> {
     this.status = 1;
     this.emit('powerChanged', true);
+    return Promise.resolve();
   }
 
-  async switch_off(): Promise<void> {
-    // Refrigerators cannot be turned off via API
-    throw new Error('Refrigerators cannot be turned off via API for safety reasons');
+  switch_off(): Promise<void> {
+    return Promise.reject(new Error('Refrigerators cannot be turned off via API for safety reasons'));
   }
 
   // Additional refrigerator-specific methods required by interface
@@ -219,14 +218,14 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
 
   // Enhanced status update from refrigerator data
   updateFromStatus(status: unknown): void {
-    console.log(`[${new Date().toLocaleString()}] [Haier Evo] Updating refrigerator status for ${this.device_name}`);
+    this.log.info(`Updating refrigerator status for ${this.device_name}`);
 
     // Handle WebSocket properties format
-    if (status && typeof status === 'object' && 'properties' in status && (status as any).properties) {
-      const props = (status as any).properties as Record<string, string>;
-      const changes: Record<string, { old: any, new: any }> = {};
+    if (status && typeof status === 'object' && 'properties' in status && (status as { properties?: Record<string, string> }).properties) {
+      const props = (status as { properties: Record<string, string> }).properties;
+      const changes: Record<string, { old: unknown; new: unknown }> = {};
 
-      const parseIntSafe = (v: any): number => {
+      const parseIntSafe = (v: unknown): number => {
         const n = parseInt(String(v));
         return isNaN(n) ? 0 : n;
       };
@@ -336,7 +335,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
       }
 
       if (Object.keys(changes).length > 0) {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Refrigerator ${this.device_name} status (properties) changes:`, JSON.stringify(changes, null, 2));
+        this.log.info(`Refrigerator ${this.device_name} status (properties) changes:`, JSON.stringify(changes, null, 2));
       }
     }
 
@@ -347,12 +346,12 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
 
     // Parse attributes from refrigerator data response
     if (status && typeof status === 'object' && 'attributes' in status && status.attributes && Array.isArray(status.attributes)) {
-      const changes: Record<string, { old: any, new: any }> = {};
+      const changes: Record<string, { old: unknown; new: unknown }> = {};
 
       for (const attr of status.attributes) {
         if (attr && typeof attr === 'object' && 'name' in attr && 'currentValue' in attr) {
           const attrObj = attr as { name: string; currentValue: string };
-          console.log(`[${new Date().toLocaleString()}] [Haier Evo] Processing attribute ${attrObj.name} = ${attrObj.currentValue}`);
+          this.log.info(`Processing attribute ${attrObj.name} = ${attrObj.currentValue}`);
 
           switch (attrObj.name) {
           case '0': // Refrigerator temperature
@@ -480,9 +479,9 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
 
       // Log changes if any were detected
       if (Object.keys(changes).length > 0) {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] Refrigerator ${this.device_name} status changes:`, JSON.stringify(changes, null, 2));
+        this.log.info(`Refrigerator ${this.device_name} status changes:`, JSON.stringify(changes, null, 2));
       } else {
-        console.log(`[${new Date().toLocaleString()}] [Haier Evo] No refrigerator-specific changes detected for ${this.device_name}`);
+        this.log.info(`No refrigerator-specific changes detected for ${this.device_name}`);
       }
     }
   }
@@ -504,7 +503,12 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Get temperature ranges for UI
-  public get_temperature_ranges(): any {
+  public get_temperature_ranges(): {
+    refrigerator: { min: number; max: number; step: number };
+    freezer: { min: number; max: number; step: number };
+    myzone: { min: number; max: number; step: number };
+    ambient: { min: number; max: number; step: number };
+  } {
     return {
       refrigerator: HaierRefrigeratorDevice.TEMP_RANGES.REFRIGERATOR,
       freezer: HaierRefrigeratorDevice.TEMP_RANGES.FREEZER,
@@ -514,7 +518,7 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Get current status summary
-  public get_status_summary(): any {
+  public get_status_summary(): Record<string, unknown> {
     return {
       power: this.status === 1 ? 'on' : 'off',
       refrigerator_temp: this.refrigerator_temperature,
@@ -531,24 +535,21 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
   }
 
   // Implement missing abstract methods from BaseDevice
-  async set_operation_mode(mode: string): Promise<void> {
-    // Refrigerators don't have operation modes like AC units
-    console.log(`Operation mode not supported for refrigerator: ${mode}`);
+  set_operation_mode(mode: string): Promise<void> {
+    this.log.info(`Operation mode not supported for refrigerator: ${mode}`);
+    return Promise.resolve();
   }
 
-  async set_fan_mode(mode: string): Promise<void> {
-    // Refrigerators don't have fan modes
-    throw new Error('Fan mode not supported by refrigerator devices');
+  set_fan_mode(_mode: string): Promise<void> {
+    return Promise.reject(new Error('Fan mode not supported by refrigerator devices'));
   }
 
-  async set_swing_mode(mode: string): Promise<void> {
-    // Refrigerators don't have swing modes
-    throw new Error('Swing mode not supported by refrigerator devices');
+  set_swing_mode(_mode: string): Promise<void> {
+    return Promise.reject(new Error('Swing mode not supported by refrigerator devices'));
   }
 
-  async set_swing_horizontal_mode(mode: string): Promise<void> {
-    // Refrigerators don't have horizontal swing modes
-    throw new Error('Horizontal swing mode not supported by refrigerator devices');
+  set_swing_horizontal_mode(_mode: string): Promise<void> {
+    return Promise.reject(new Error('Horizontal swing mode not supported by refrigerator devices'));
   }
 
   async set_preset_mode(mode: string): Promise<void> {
@@ -567,63 +568,51 @@ export class HaierRefrigeratorDevice extends BaseDevice implements HaierRefriger
     }
   }
 
-  async set_quiet(enabled: boolean): Promise<void> {
-    // Refrigerators don't have quiet mode
-    throw new Error('Quiet mode not supported by refrigerator devices');
+  set_quiet(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Quiet mode not supported by refrigerator devices'));
   }
 
-  async set_turbo(enabled: boolean): Promise<void> {
-    // Refrigerators don't have turbo mode
-    throw new Error('Turbo mode not supported by refrigerator devices');
+  set_turbo(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Turbo mode not supported by refrigerator devices'));
   }
 
-  async set_comfort(enabled: boolean): Promise<void> {
-    // Refrigerators don't have comfort mode
-    throw new Error('Comfort mode not supported by refrigerator devices');
+  set_comfort(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Comfort mode not supported by refrigerator devices'));
   }
 
-  async set_health(enabled: boolean): Promise<void> {
-    // Refrigerators don't have health mode
-    throw new Error('Health mode not supported by refrigerator devices');
+  set_health(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Health mode not supported by refrigerator devices'));
   }
 
-  async set_light(enabled: boolean): Promise<void> {
-    // Refrigerators don't have light control
-    throw new Error('Light control not supported by refrigerator devices');
+  set_light(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Light control not supported by refrigerator devices'));
   }
 
-  async set_sound(enabled: boolean): Promise<void> {
-    // Refrigerators don't have sound control
-    throw new Error('Sound control not supported by refrigerator devices');
+  set_sound(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Sound control not supported by refrigerator devices'));
   }
 
-  async set_antifreeze(enabled: boolean): Promise<void> {
-    // Refrigerators don't have antifreeze mode
-    throw new Error('Antifreeze mode not supported by refrigerator devices');
+  set_antifreeze(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Antifreeze mode not supported by refrigerator devices'));
   }
 
-  async set_cleaning(enabled: boolean): Promise<void> {
-    // Refrigerators don't have cleaning mode
-    throw new Error('Cleaning mode not supported by refrigerator devices');
+  set_cleaning(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Cleaning mode not supported by refrigerator devices'));
   }
 
-  async set_autohumidity(enabled: boolean): Promise<void> {
-    // Refrigerators don't have auto humidity control
-    throw new Error('Auto humidity control not supported by refrigerator devices');
+  set_autohumidity(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Auto humidity control not supported by refrigerator devices'));
   }
 
-  async set_eco_sensor(mode: string): Promise<void> {
-    // Refrigerators don't have eco sensor
-    throw new Error('Eco sensor not supported by refrigerator devices');
+  set_eco_sensor(_mode: string): Promise<void> {
+    return Promise.reject(new Error('Eco sensor not supported by refrigerator devices'));
   }
 
-  async set_sleep_mode(enabled: boolean): Promise<void> {
-    // Refrigerators don't have sleep mode
-    throw new Error('Sleep mode not supported by refrigerator devices');
+  set_sleep_mode(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Sleep mode not supported by refrigerator devices'));
   }
 
-  async set_boost_mode(enabled: boolean): Promise<void> {
-    // Refrigerators don't have boost mode
-    throw new Error('Boost mode not supported by refrigerator devices');
+  set_boost_mode(_enabled: boolean): Promise<void> {
+    return Promise.reject(new Error('Boost mode not supported by refrigerator devices'));
   }
 }

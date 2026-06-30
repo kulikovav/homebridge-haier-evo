@@ -1,5 +1,5 @@
-import modelsConfig from './device-models.json';
-import { ModelsConfigSchema, ModelDefinition } from '../types';
+import modelsConfig from './device-models.json' with { type: 'json' };
+import { ModelsConfigSchema, ModelDefinition } from '../types.js';
 
 export class ModelConfigService {
   private static instance: ModelConfigService | null = null;
@@ -7,7 +7,7 @@ export class ModelConfigService {
   private readonly compiledPatterns: Array<{ def: ModelDefinition; regex: RegExp }>;
 
   private constructor() {
-    this.config = modelsConfig as ModelsConfigSchema;
+    this.config = modelsConfig;
     this.compiledPatterns = (this.config.models || []).map(def => ({
       def,
       regex: new RegExp(def.modelPattern, 'i')
@@ -43,7 +43,7 @@ export class ModelConfigService {
     const def = this.findDefinitionForModel(model);
     if (!def) return haierValue;
     const attr = def.attributes.find(a => a.name === canonicalName);
-    if (!attr || !attr.mappings) return haierValue;
+    if (!attr?.mappings) return haierValue;
     const mapping = attr.mappings.find(m => m.haier === haierValue);
     return mapping?.value || haierValue;
   }
@@ -52,7 +52,7 @@ export class ModelConfigService {
     const def = this.findDefinitionForModel(model);
     if (!def) return value;
     const attr = def.attributes.find(a => a.name === canonicalName);
-    if (!attr || !attr.mappings) return value;
+    if (!attr?.mappings) return value;
     const mapping = attr.mappings.find(m => m.value === value);
     return mapping?.haier || value;
   }

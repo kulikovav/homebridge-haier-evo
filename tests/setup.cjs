@@ -1,5 +1,5 @@
 // Test setup file
-import 'jest';
+// Using .cjs extension because Jest 30 setupFilesAfterEnv runs before transform pipeline
 
 // Mock console methods to reduce noise in tests
 global.console = {
@@ -12,22 +12,22 @@ global.console = {
 };
 
 // Mock setTimeout and setInterval with proper typing and mock property
-const mockTimeout = jest.fn((callback: any, delay: any) => {
-  return 123 as any;
+const mockTimeout = jest.fn((callback, delay) => {
+  return 123;
 });
 
-const mockInterval = jest.fn((callback: any, delay: any) => {
-  return 456 as any;
+const mockInterval = jest.fn((callback, delay) => {
+  return 456;
 });
 
 const mockClearTimeout = jest.fn();
 const mockClearInterval = jest.fn();
 
 // Assign to global with proper typing and ensure mock property is accessible
-(global as any).setTimeout = mockTimeout;
-(global as any).setInterval = mockInterval;
-(global as any).clearTimeout = mockClearTimeout;
-(global as any).clearInterval = mockClearInterval;
+global.setTimeout = mockTimeout;
+global.setInterval = mockInterval;
+global.clearTimeout = mockClearTimeout;
+global.clearInterval = mockClearInterval;
 
 // Mock EventEmitter
 jest.mock('events', () => {
@@ -57,8 +57,8 @@ jest.mock('axios', () => {
   };
 });
 
-// Global test utilities with proper typing
-(global as any).testUtils = {
+// Global test utilities
+global.testUtils = {
   createMockDevice: (overrides = {}) => ({
     id: 'test-device-1',
     name: 'Test Air Conditioner',
@@ -91,7 +91,7 @@ jest.mock('axios', () => {
     ...overrides,
   }),
 
-  wait: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
+  wait: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
 
   createMockLogger: () => ({
     debug: jest.fn(),
