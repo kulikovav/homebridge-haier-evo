@@ -105,4 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: restore debug log guards and add WebSocket status request debounce
 - refactor: bump version to 2.0.0 for ESM migration
 
+## [2.1.1] - 2026-06-30
+- chore: remove GitHub Actions release workflow
+
 ## [Unreleased]
