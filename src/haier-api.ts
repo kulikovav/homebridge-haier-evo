@@ -225,7 +225,17 @@ export class HaierAPI extends EventEmitter {
             'Content-Type': config.headers['Content-Type']
           });
           if (config.data) {
-            this.log.debug('Request body:', JSON.stringify(config.data, null, 2));
+            let dataToLog = config.data;
+            if (typeof config.data === 'object' && config.data !== null) {
+              dataToLog = { ...config.data };
+              if ('password' in dataToLog) {
+                dataToLog.password = '***';
+              }
+              if ('refreshToken' in dataToLog) {
+                dataToLog.refreshToken = '***';
+              }
+            }
+            this.log.debug('Request body:', JSON.stringify(dataToLog, null, 2));
           }
         }
 
