@@ -2177,10 +2177,6 @@ export class HaierAPI extends EventEmitter {
     this.devices.set(device.device_id, device);
   }
 
-  removeDevice(deviceId: string): void {
-    this.devices.delete(deviceId);
-  }
-
   // Rate limiting and retry methods
   private async executeWithRateLimit<T>(
     requestFn: () => Promise<T>,
