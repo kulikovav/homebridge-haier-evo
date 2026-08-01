@@ -92,7 +92,7 @@ describe('HaierAPI WebSocket lifecycle', () => {
   // -------------------------------------------------------------------
 
   describe('Timer management', () => {
-    test('disconnect() clears reconnectTimer, heartbeatTimer, statusRequestTimer', () => {
+    test('disconnect() clears reconnectTimer, heartbeatTimer, statusRequestTimer and sets ws to null', () => {
       const a = api as any;
       const ws = createControlledWs();
       a.ws = ws;
@@ -110,13 +110,11 @@ describe('HaierAPI WebSocket lifecycle', () => {
 
       api.disconnect();
 
-      // disconnect clears timers but does NOT set ws to null (current behavior)
       expect(a.reconnectTimer).toBeNull();
       expect(a.heartbeatTimer).toBeNull();
       expect(a.statusRequestTimer).toBeNull();
       expect(a.isConnected).toBe(false);
-      // ws is NOT nulled in disconnect() (only in disconnectWebSocket())
-      // This is a bug to fix in the refactoring
+      expect(a.ws).toBeNull();
     });
 
     test('disconnectWebSocket() sets ws to null', () => {
