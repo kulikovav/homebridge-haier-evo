@@ -1,5 +1,14 @@
 import modelsConfig from './device-models.json' with { type: 'json' };
 import { ModelsConfigSchema, ModelDefinition } from '../types.js';
+import { HVAC_MODES, FAN_MODES } from '../constants.js';
+
+const DEFAULT_MODE_TO_HAIER: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(HVAC_MODES).map(([haier, value]) => [value, haier])
+);
+
+const DEFAULT_FAN_MODE_TO_HAIER: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(FAN_MODES).map(([haier, value]) => [value, haier])
+);
 
 export class ModelConfigService {
   private static instance: ModelConfigService | null = null;
@@ -41,50 +50,30 @@ export class ModelConfigService {
 
   private getDefaultMappingFromHaier(canonicalName: string, haierValue: string): string {
     if (canonicalName === 'mode') {
-      const map: Record<string, string> = {
-        '0': 'auto',
-        '1': 'cool',
-        '2': 'dry',
-        '4': 'heat',
-        '6': 'fan_only'
-      };
-      return map[haierValue] || haierValue;
+      return HVAC_MODES[haierValue as keyof typeof HVAC_MODES] ?? 'auto';
     }
     if (canonicalName === 'fan_mode') {
-      const map: Record<string, string> = {
-        '1': 'high',
-        '2': 'medium',
-        '3': 'low',
-        '5': 'auto'
-      };
-      return map[haierValue] || haierValue;
+      return FAN_MODES[haierValue as keyof typeof FAN_MODES] ?? 'auto';
     }
     return haierValue;
   }
 
   private getDefaultMappingToHaier(canonicalName: string, value: string): string {
     if (canonicalName === 'mode') {
-      const map: Record<string, string> = {
-        'auto': '0',
-        'cool': '1',
-        'dry': '2',
-        'heat': '4',
-        'fan_only': '6'
-      };
-      return map[value] || value;
+      return DEFAULT_MODE_TO_HAIER[value] || value;
     }
     if (canonicalName === 'fan_mode') {
-      const map: Record<string, string> = {
-        'high': '1',
-        'medium': '2',
-        'low': '3',
-        'auto': '5'
-      };
-      return map[value] || value;
+      return DEFAULT_FAN_MODE_TO_HAIER[value] || value;
     }
     return value;
   }
 
+  /**
+   * Maps a Haier API attribute value to the plugin canonical value.
+   * For mode/fan_mode, unknown models and missing/incomplete mappings use the
+   * standard encodings from HVAC_MODES/FAN_MODES (unknown Haier codes → "auto").
+   * Other attributes remain pass-through when unmapped.
+   */
   public mapValueFromHaier(model: string | undefined, canonicalName: string, haierValue: string): string {
     const def = this.findDefinitionForModel(model);
     if (!def) {
@@ -98,6 +87,12 @@ export class ModelConfigService {
     return mapping?.value || this.getDefaultMappingFromHaier(canonicalName, haierValue);
   }
 
+  /**
+   * Maps a plugin canonical attribute value to the Haier API value.
+   * For mode/fan_mode, unknown models and missing/incomplete mappings use the
+   * standard encodings from HVAC_MODES/FAN_MODES (unmapped canonical values pass through).
+   * Other attributes remain pass-through when unmapped.
+   */
   public mapValueToHaier(model: string | undefined, canonicalName: string, value: string): string {
     const def = this.findDefinitionForModel(model);
     if (!def) {
@@ -111,5 +106,3 @@ export class ModelConfigService {
     return mapping?.haier || this.getDefaultMappingToHaier(canonicalName, value);
   }
 }
-
-
