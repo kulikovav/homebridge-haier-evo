@@ -496,10 +496,6 @@ export class HaierEvoPlatform {
     return this.validatedConfig;
   }
 
-  public getAccessory(deviceId: string): HaierEvoAccessory | undefined {
-    return this.accessories.get(deviceId);
-  }
-
   public destroy(): void {
     if (this.refreshTimer) {
       clearInterval(this.refreshTimer);
