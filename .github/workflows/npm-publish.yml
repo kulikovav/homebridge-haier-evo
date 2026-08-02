@@ -153,24 +153,21 @@ jobs:
 
       - name: Setup .npmrc file for authentication
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "always-auth=true" >> .npmrc
-
-          # Verify token is set (without revealing it)
           if [ -z "$NPM_TOKEN" ]; then
             echo "::error::NPM_TOKEN is not set. Please add it to your repository secrets."
             exit 1
-          else
-            echo "NPM_TOKEN is set and will be used for authentication"
           fi
+
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "NPM_TOKEN is set and will be used for authentication"
         env:
-          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm
         run: npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Output publishing result
         run: |
@@ -179,7 +176,7 @@ jobs:
 
       - name: Create GitHub Release
         if: github.event_name == 'workflow_dispatch'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ env.VERSION }}
           name: Release v${{ env.VERSION }}
