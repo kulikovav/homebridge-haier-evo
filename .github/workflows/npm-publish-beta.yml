@@ -41,10 +41,10 @@ jobs:
         run: npm run test:unit
 
       - name: Run standalone device tests
-        run: node test-devices.js
+        run: node test-devices.cjs
 
       - name: Run standalone rate limiting tests
-        run: node test-rate-limiting.js
+        run: node test-rate-limiting.cjs
 
   publish-npm-beta:
     needs: build
@@ -101,16 +101,14 @@ jobs:
 
       - name: Setup .npmrc file for authentication
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "always-auth=true" >> .npmrc
-
           if [ -z "$NPM_TOKEN" ]; then
             echo "::error::NPM_TOKEN is not set. Please add it to your repository secrets."
             exit 1
-          else
-            echo "NPM_TOKEN is set and will be used for authentication"
           fi
+
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "NPM_TOKEN is set and will be used for authentication"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -126,7 +124,7 @@ jobs:
           echo "Install with: npm install homebridge-haier-evo@beta"
 
       - name: Create GitHub Prerelease
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ env.VERSION }}
           name: Beta v${{ env.VERSION }}
