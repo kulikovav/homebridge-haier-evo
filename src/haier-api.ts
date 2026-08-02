@@ -2019,8 +2019,8 @@ export class HaierAPI extends EventEmitter {
       } catch {
         // Swallow close errors so cleanup always proceeds
       }
-      this.ws = null;
     }
+    this.ws = null;
 
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
