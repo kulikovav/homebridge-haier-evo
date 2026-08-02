@@ -39,22 +39,76 @@ export class ModelConfigService {
     return attr?.id || fallbackId;
   }
 
+  private getDefaultMappingFromHaier(canonicalName: string, haierValue: string): string {
+    if (canonicalName === 'mode') {
+      const map: Record<string, string> = {
+        '0': 'auto',
+        '1': 'cool',
+        '2': 'dry',
+        '4': 'heat',
+        '6': 'fan_only'
+      };
+      return map[haierValue] || haierValue;
+    }
+    if (canonicalName === 'fan_mode') {
+      const map: Record<string, string> = {
+        '1': 'high',
+        '2': 'medium',
+        '3': 'low',
+        '5': 'auto'
+      };
+      return map[haierValue] || haierValue;
+    }
+    return haierValue;
+  }
+
+  private getDefaultMappingToHaier(canonicalName: string, value: string): string {
+    if (canonicalName === 'mode') {
+      const map: Record<string, string> = {
+        'auto': '0',
+        'cool': '1',
+        'dry': '2',
+        'heat': '4',
+        'fan_only': '6'
+      };
+      return map[value] || value;
+    }
+    if (canonicalName === 'fan_mode') {
+      const map: Record<string, string> = {
+        'high': '1',
+        'medium': '2',
+        'low': '3',
+        'auto': '5'
+      };
+      return map[value] || value;
+    }
+    return value;
+  }
+
   public mapValueFromHaier(model: string | undefined, canonicalName: string, haierValue: string): string {
     const def = this.findDefinitionForModel(model);
-    if (!def) return haierValue;
+    if (!def) {
+      return this.getDefaultMappingFromHaier(canonicalName, haierValue);
+    }
     const attr = def.attributes.find(a => a.name === canonicalName);
-    if (!attr?.mappings) return haierValue;
+    if (!attr?.mappings) {
+      return this.getDefaultMappingFromHaier(canonicalName, haierValue);
+    }
     const mapping = attr.mappings.find(m => m.haier === haierValue);
-    return mapping?.value || haierValue;
+    return mapping?.value || this.getDefaultMappingFromHaier(canonicalName, haierValue);
   }
 
   public mapValueToHaier(model: string | undefined, canonicalName: string, value: string): string {
     const def = this.findDefinitionForModel(model);
-    if (!def) return value;
+    if (!def) {
+      return this.getDefaultMappingToHaier(canonicalName, value);
+    }
     const attr = def.attributes.find(a => a.name === canonicalName);
-    if (!attr?.mappings) return value;
+    if (!attr?.mappings) {
+      return this.getDefaultMappingToHaier(canonicalName, value);
+    }
     const mapping = attr.mappings.find(m => m.value === value);
-    return mapping?.haier || value;
+    return mapping?.haier || this.getDefaultMappingToHaier(canonicalName, value);
   }
 }
 
