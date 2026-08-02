@@ -26,15 +26,6 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
   // Properties
   public light_on: boolean = true;
 
-  // Operation mode values from AC data
-  private static readonly OPERATION_MODES = {
-    AUTO: '0',           // Auto
-    COOL: '1',           // Cool
-    DRY: '2',            // Dehumidify
-    HEAT: '4',           // Heat
-    FAN: '6'             // Fan only
-  } as const;
-
   // Fan speed values from AC data
   private static readonly FAN_SPEEDS = {
     FAST: '1',           // Fast mode
@@ -67,49 +58,42 @@ export class HaierACDevice extends BaseDevice implements HaierAC {
   }
 
   /**
-   * Set the operation mode of the air conditioner
+   * Set the operation mode of the air conditioner.
+   * When the unit is off, power-on and target temperature are enqueued in the same
+   * API batch as the mode change. Some models (e.g. AS50HQJ) ignore OFF→COOL
+   * unless power (and often a setpoint) travel with the mode command.
    * @param mode The HVAC mode to set (auto, cool, dry, heat, fan_only)
    */
   async set_operation_mode(mode: string): Promise<void> {
     this.log.info(`Setting operation mode for ${this.device_name} to ${mode}`);
-
     if (!this.isValidHVACMode(mode)) {
       const error = `Invalid HVAC mode: ${mode}`;
       this.log.error(`${error}`);
       throw new Error(error);
     }
-
     try {
-      // Map mode string to command value
-      let commandValue: string;
-      switch (mode) {
-        case 'auto':
-          commandValue = HaierACDevice.OPERATION_MODES.AUTO;
-          break;
-        case 'cool':
-          commandValue = HaierACDevice.OPERATION_MODES.COOL;
-          break;
-        case 'dry':
-          commandValue = HaierACDevice.OPERATION_MODES.DRY;
-          break;
-        case 'heat':
-          commandValue = HaierACDevice.OPERATION_MODES.HEAT;
-          break;
-        case 'fan_only':
-          commandValue = HaierACDevice.OPERATION_MODES.FAN;
-          break;
-        default:
-          throw new Error(`Unsupported mode: ${mode}`);
-      }
-
-      this.log.info(`Sending operation mode command: ${mode} (value: ${commandValue})`);
-      const propId = this.getId('mode', HaierACDevice.COMMANDS.MODE);
+      const modePropId = this.getId('mode', HaierACDevice.COMMANDS.MODE);
       const valueToSend = this.modelConfig.mapValueToHaier(this.device_model, 'mode', mode);
-      await this.api.setDeviceProperty(this.mac, propId, valueToSend);
-
+      const pendingCommands: Array<Promise<void>> = [];
+      const wasOff = this.status === 0;
+      if (wasOff) {
+        const powerPropId = this.getId('status', HaierACDevice.COMMANDS.POWER);
+        const tempPropId = this.getId('target_temperature', HaierACDevice.COMMANDS.TEMPERATURE);
+        this.log.info(`Device is off; batching power ON and target temperature with mode ${mode}`);
+        pendingCommands.push(this.api.setDeviceProperty(this.mac, powerPropId, true));
+        pendingCommands.push(
+          this.api.setDeviceProperty(this.mac, tempPropId, this.target_temperature.toFixed(2))
+        );
+      }
+      this.log.info(`Sending operation mode command: ${mode} (value: ${valueToSend})`);
+      pendingCommands.push(this.api.setDeviceProperty(this.mac, modePropId, valueToSend));
+      await Promise.all(pendingCommands);
+      if (wasOff) {
+        this.status = 1;
+        this.emit('powerChanged', true);
+      }
       this.mode = mode;
       this.log.info(`Operation mode set to ${mode}`);
-
       this.emit('modeChanged', mode);
     } catch (error) {
       this.log.error(`Error setting operation mode: ${String(error)}`);

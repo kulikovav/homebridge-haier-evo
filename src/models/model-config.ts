@@ -1,5 +1,14 @@
 import modelsConfig from './device-models.json' with { type: 'json' };
 import { ModelsConfigSchema, ModelDefinition } from '../types.js';
+import { HVAC_MODES, FAN_MODES } from '../constants.js';
+
+const DEFAULT_MODE_TO_HAIER: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(HVAC_MODES).map(([haier, value]) => [value, haier])
+);
+
+const DEFAULT_FAN_MODE_TO_HAIER: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(FAN_MODES).map(([haier, value]) => [value, haier])
+);
 
 export class ModelConfigService {
   private static instance: ModelConfigService | null = null;
@@ -39,23 +48,61 @@ export class ModelConfigService {
     return attr?.id || fallbackId;
   }
 
+  private getDefaultMappingFromHaier(canonicalName: string, haierValue: string): string {
+    if (canonicalName === 'mode') {
+      return HVAC_MODES[haierValue as keyof typeof HVAC_MODES] ?? 'auto';
+    }
+    if (canonicalName === 'fan_mode') {
+      return FAN_MODES[haierValue as keyof typeof FAN_MODES] ?? 'auto';
+    }
+    return haierValue;
+  }
+
+  private getDefaultMappingToHaier(canonicalName: string, value: string): string {
+    if (canonicalName === 'mode') {
+      return DEFAULT_MODE_TO_HAIER[value] || value;
+    }
+    if (canonicalName === 'fan_mode') {
+      return DEFAULT_FAN_MODE_TO_HAIER[value] || value;
+    }
+    return value;
+  }
+
+  /**
+   * Maps a Haier API attribute value to the plugin canonical value.
+   * For mode/fan_mode, unknown models and missing/incomplete mappings use the
+   * standard encodings from HVAC_MODES/FAN_MODES (unknown Haier codes → "auto").
+   * Other attributes remain pass-through when unmapped.
+   */
   public mapValueFromHaier(model: string | undefined, canonicalName: string, haierValue: string): string {
     const def = this.findDefinitionForModel(model);
-    if (!def) return haierValue;
+    if (!def) {
+      return this.getDefaultMappingFromHaier(canonicalName, haierValue);
+    }
     const attr = def.attributes.find(a => a.name === canonicalName);
-    if (!attr?.mappings) return haierValue;
+    if (!attr?.mappings) {
+      return this.getDefaultMappingFromHaier(canonicalName, haierValue);
+    }
     const mapping = attr.mappings.find(m => m.haier === haierValue);
-    return mapping?.value || haierValue;
+    return mapping?.value || this.getDefaultMappingFromHaier(canonicalName, haierValue);
   }
 
+  /**
+   * Maps a plugin canonical attribute value to the Haier API value.
+   * For mode/fan_mode, unknown models and missing/incomplete mappings use the
+   * standard encodings from HVAC_MODES/FAN_MODES (unmapped canonical values pass through).
+   * Other attributes remain pass-through when unmapped.
+   */
   public mapValueToHaier(model: string | undefined, canonicalName: string, value: string): string {
     const def = this.findDefinitionForModel(model);
-    if (!def) return value;
+    if (!def) {
+      return this.getDefaultMappingToHaier(canonicalName, value);
+    }
     const attr = def.attributes.find(a => a.name === canonicalName);
-    if (!attr?.mappings) return value;
+    if (!attr?.mappings) {
+      return this.getDefaultMappingToHaier(canonicalName, value);
+    }
     const mapping = attr.mappings.find(m => m.value === value);
-    return mapping?.haier || value;
+    return mapping?.haier || this.getDefaultMappingToHaier(canonicalName, value);
   }
 }
-
-
