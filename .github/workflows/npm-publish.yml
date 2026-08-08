@@ -106,15 +106,37 @@ jobs:
             # Create a temporary file
             TEMP_FILE=$(mktemp)
 
-            CURRENT_VERSION=$(git describe --abbrev=0 --tags)
+            RELEASE_TAG="v${{ env.VERSION }}"
+            if git rev-parse -q --verify "refs/tags/$RELEASE_TAG" >/dev/null; then
+              TAG_REF="${RELEASE_TAG}^"
+            else
+              TAG_REF="HEAD"
+            fi
+
+            # Find the previous stable release, skipping prerelease tags (e.g. beta)
+            # so that commits from beta releases are included in the changelog
+            PREVIOUS_VERSION=""
+            for TAG in $(git tag --sort=-version:refname); do
+              if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && git merge-base --is-ancestor "$TAG" "$TAG_REF" 2>/dev/null; then
+                PREVIOUS_VERSION="$TAG"
+                break
+              fi
+            done
+
+            if [ -n "$PREVIOUS_VERSION" ]; then
+              RELEASE_NOTES=$(git log --pretty=format:"- %s" "$PREVIOUS_VERSION..HEAD" | grep -Ev "(Merge pull request|Merge branch|Bump version)" || true)
+            else
+              RELEASE_NOTES=$(git log --pretty=format:"- %s" | grep -Ev "(Merge pull request|Merge branch|Bump version)" || true)
+            fi
 
             # Process the changelog
             while IFS= read -r line; do
               if [[ "$line" == "## [Unreleased]" ]]; then
                 # Add the new version header
                 echo "## [${{ env.VERSION }}] - $CURRENT_DATE" >> "$TEMP_FILE"
-                # Generate release notes from commit messages since previous version
-                git log --pretty=format:"- %s" $CURRENT_VERSION..HEAD | egrep -v "(Merge pull request|Merge branch|Bump version)" >> "$TEMP_FILE"
+                if [ -n "$RELEASE_NOTES" ]; then
+                  echo "$RELEASE_NOTES" >> "$TEMP_FILE"
+                fi
                 echo "" >> "$TEMP_FILE"
                 echo "## [Unreleased]" >> "$TEMP_FILE"
               else
