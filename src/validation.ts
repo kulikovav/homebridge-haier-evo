@@ -55,7 +55,7 @@ export const deviceConfigResponseSchema = z.object({
   power: z.object({
     value: z.object({ name: z.string() }).optional(),
   }).optional(),
-}).strict();
+}).passthrough();
 
 export const deviceStatusEventSchema = z.object({
   event: z.string(),

@@ -253,13 +253,13 @@ describe('parseDeviceConfig', () => {
     expect(parseDeviceConfig([])).toBeNull();
   });
 
-  it('should return null if unexpected extra properties are present (due to .strict())', () => {
+  it('should preserve unexpected top-level properties from API responses', () => {
     const raw = {
       info: { model: 'model-123' },
-      extra: 'this should fail',
+      extra: 'kept for forward-compatible API responses',
     };
     const result = parseDeviceConfig(raw);
-    expect(result).toBeNull();
+    expect(result).toEqual(raw);
   });
 
   it('should strip unknown nested properties on non-strict nested schemas', () => {
