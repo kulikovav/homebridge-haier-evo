@@ -108,4 +108,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.1] - 2026-06-30
 - chore: remove GitHub Actions release workflow
 
+## [2.3.1] - 2026-08-08
+- fix(ci): update npm publish workflow to include beta commits in changelog
+- Fix changelog update in npm publish workflow
+- Fix device config validation for extra API fields
+- fix(ci): drop always-auth and bump gh-release to v3
+- fix(ci): use .cjs standalone tests in beta publish workflow
+- test: combine validation unit tests for auth and device parsers
+- ci: use Node.js 24 for beta npm publish workflow
+- ci: add workflow to publish npm packages with beta tag
+- fix: batch power and setpoint with mode when AC is off
+- fix(review): reuse HVAC/FAN constants and harden mapping tests
+- fix: resolve HVAC mode changes failing with Error -1 for AS50HQJ1HRA-B and other unmapped AC models
+- Redact sensitive fields in debug logs
+- fix: Nullify ws in disconnect()
+- refactor: remove unused removeDevice method from HaierAPI
+- Refactor: Remove unused `getAccessory` method in `src/platform.ts`
+- test: Add unit tests for `validateConfig` in `src/settings.ts`
+
 ## [Unreleased]
